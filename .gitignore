@@ -1,0 +1,7 @@
+.DS_Store
+Thumbs.db
+
+.idea
+.vs_code
+
+node_modules

@@ -1,0 +1,24 @@
+{
+	"name": "beson",
+	"version": "0.0.1",
+	"description": "Yet an another binary representation of json format",
+	"main": "beson",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/JCloudYu/beson.git"
+	},
+	"keywords": [
+		"BSON",
+		"BEson",
+		"Binary"
+	],
+	"author": "JCloudYu",
+	"license": "WTFPL",
+	"bugs": {
+		"url": "https://github.com/JCloudYu/beson/issues"
+	},
+	"homepage": "https://github.com/JCloudYu/beson#readme"
+}
