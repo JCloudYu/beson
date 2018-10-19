@@ -5,7 +5,13 @@
  * Create Date: Sep. 02, 2018 
  */
 (()=>{
-	"use strict";
-	
-	
+    'use strict';
+
+    const serialize = require('./lib/serializer');
+    const deserialize = require('./lib/deserializer');
+    
+    module.exports = {
+        serialize,
+        deserialize
+    };
 })();

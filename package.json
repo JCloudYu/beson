@@ -4,7 +4,7 @@
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test_node": "node ./test/test_node.js"
 	},
 	"repository": {
 		"type": "git",
