@@ -30,7 +30,7 @@
     console.log('* Array:');
     console.log(Buffer.from(serialize([true, 2147483647, Math.PI])));               // length: 17, content: [0x0101, 0x7fffffff, 0x400921fb54442d18]
     console.log('* Object:');
-    console.log(Buffer.from(serialize({ a: true, b: 2147483647, c: Math.PI })));    // something has error for boolean
+    console.log(Buffer.from(serialize({ a: true, b: 2147483647, c: Math.PI })));
     console.log('* Date:');
     console.log(Buffer.from(serialize(new Date(1539838676247))));                   // 0x4276685898d17000
 })();
