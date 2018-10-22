@@ -4,6 +4,7 @@
     const { serialize, deserialize } = require('../beson');
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
+    const ObjectId = require('../types/objectid/index');
 
     console.log('* Null:');
     console.log(Buffer.from(serialize(null)));
@@ -33,4 +34,8 @@
     console.log(Buffer.from(serialize({ a: true, b: 2147483647, c: Math.PI })));
     console.log('* Date:');
     console.log(Buffer.from(serialize(new Date(1539838676247))));                   // 0x4276685898d17000
+    console.log('* ObjectId:');
+    let objectId = new ObjectId(123);
+    console.log(objectId);
+    console.log(Buffer.from(serialize(objectId)));
 })();
