@@ -31,7 +31,7 @@
 			let hash_low	= HASH_RESULT.readUInt16LE(0);
 			let hash_high	= HASH_RESULT.readUInt16LE(2);
 			let new_low		= hash_low * FNV_PRIME_LOW;
-			let new_high	= hash_low * FNV_PRIME_HIGH + hash_high * FNV_PRIME_LOW +  + (new_low>>>16);
+			let new_high	= hash_low * FNV_PRIME_HIGH + hash_high * FNV_PRIME_LOW + (new_low>>>16);
 			
 			HASH_RESULT.writeUInt16LE((new_low  & 0xFFFF)>>>0, 0);
 			HASH_RESULT.writeUInt16LE((new_high & 0xFFFF)>>>0, 2);
