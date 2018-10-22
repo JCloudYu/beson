@@ -5,6 +5,7 @@
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
+    const fs = require('fs');
 
     console.log('* Null:');
     console.log(Buffer.from(Serialize(null)));
@@ -30,8 +31,31 @@
     console.log(Buffer.from(Serialize('hello world')));
     console.log('* Array:');
     console.log(Buffer.from(Serialize([true, 2147483647, Math.PI])));               // length: 17, content: [0x0101, 0x7fffffff, 0x400921fb54442d18]
-    console.log('* Object:');
-    console.log(Buffer.from(Serialize({ a: true, b: 2147483647, c: Math.PI })));
+    
+    const Obj = {z:1234567};
+    Obj.b = 1; Obj.a = false; Obj._ = "test"; Obj.PI = Math.PI;
+    console.log('* Object - obj1:');
+    const Obj1Buff = Buffer.from(Serialize(Obj));
+    console.log(Obj1Buff);
+    console.log('* Object - obj1 - sort-key:');
+    const Obj1SortBuff = Buffer.from(Serialize(Obj, {sort_key:true}));
+    console.log(Obj1SortBuff);
+    
+    const Obj2 = {PI:Math.PI};
+    Obj2.z = 1234567; Obj2.a = false; Obj2._ = "test"; Obj2.b = 1;
+    console.log('* Object - obj2:');
+    const Obj2Buff = Buffer.from(Serialize(Obj2));
+    console.log(Obj2Buff);
+    console.log('* Object - obj1 - sort-key:');
+    const Obj2SortBuff = Buffer.from(Serialize(Obj2, {sort_key:true}));
+    console.log(Obj2SortBuff);
+    
+    
+    console.log(`* Object - obj1 vs obj2 - not sorted: ${Obj1Buff.compare(Obj2Buff) === 0 ? "EQUAL": "NOT EQUAL"}`);
+    console.log(`* Object - obj1 vs obj2 - sorted: ${Obj1SortBuff.compare(Obj2SortBuff) === 0 ? "EQUAL": "NOT EQUAL"}`);
+    
+    
+    
     console.log('* Date:');
     console.log(Buffer.from(Serialize(new Date(1539838676247))));                   // 0x4276685898d17000
     console.log('* ObjectId:');
