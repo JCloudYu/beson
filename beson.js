@@ -7,11 +7,11 @@
 (()=>{
     'use strict';
 
-    const serialize = require('./lib/serializer');
-    const deserialize = require('./lib/deserializer');
+    const Serialize = require('./lib/serializer');
+    const Deserialize = require('./lib/deserializer');
     
     module.exports = {
-        serialize,
-        deserialize
+        Serialize,
+        Deserialize
     };
 })();
