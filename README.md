@@ -16,7 +16,7 @@ double64    double precesion float point value
 
 
 beson    ::= uint8 uint8 content
-content  ::=   "\x00"                         null
+content  ::=   "\x00" "\x00"                  null
              | "\x01" "\x00"                  false
              | "\x01" "\x01"                  true
              | "\x02" "\x00" int32            32-bits integer
@@ -26,18 +26,18 @@ content  ::=   "\x00"                         null
              | "\x03" "\x01" uint64           64-bits unsigned integer
              | "\x03" "\x02" uint128          128-bits unsigned integer
              | "\x03" "\x03" uint var         n-bits unsigned integer
-             | "\x04" double64                64-bits floating point value
-             | "\x05" string                  utf8 string ( contains bad character )
-             | "\x06" uint32 array            Determinative array with fixed items
-             | "\x07" array                   Non-determinative array init operator
-             | "\x08"                         Non-determinative array end operator
-             | "\x09" uint32 object           Determinative object with fixed fields
-             | "\x0A" object                  Non-determinative object init operator
-             | "\x0B"                         Non-determinative object end operator
-             | "\x0C" double64                JS Date ( Unix timestamp in milliseconds )
-             | "\x0D" (byte*12)               ObjectId
-             | "\x0E" uint32 (byte*)          Binary Data
-             | "\x0F" ~ "\x1F"                Reserved types
+             | "\x04" "\x00" double64         64-bits floating point value
+             | "\x05" "\x00" string           utf8 string ( contains bad character )
+             | "\x06" "\x00" uint32 array     Determinative array with fixed items
+             | "\x07" "\x00" array            Non-determinative array init operator
+             | "\x08" "\x00"                  Non-determinative array end operator
+             | "\x09" "\x00" uint32 object    Determinative object with fixed fields
+             | "\x0A" "\x00" object           Non-determinative object init operator
+             | "\x0B" "\x00"                  Non-determinative object end operator
+             | "\x0C" "\x00" double64         JS Date ( Unix timestamp in milliseconds )
+             | "\x0D" "\x00" (byte*12)        ObjectId
+             | "\x0E" "\x00" uint32 (byte*)   Binary Data
+             | "\x0F" "\x00" ~ "\x1F" "\x00"  Reserved types
              
 object  ::=    list_elm e_list 
              | list_elm ""

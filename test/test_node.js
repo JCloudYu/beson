@@ -64,5 +64,5 @@
     console.log(Buffer.from(Serialize(objectId)));
     console.log('* Binary:');
     let buffer = Binary.from(Serialize(2147483647));
-    console.log(Buffer.from(Serialize(buffer)));        // 0x7fffffff
+    console.log(Buffer.from(Serialize(buffer)));                                    // 0x7fffffff
 })();
