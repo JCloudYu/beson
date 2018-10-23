@@ -1,6 +1,6 @@
 {
 	"name": "beson",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
