@@ -5,7 +5,7 @@
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
-    const fs = require('fs');
+    const { Binary } = require('../types/binary');
 
     console.log('* Null:');
     console.log(Buffer.from(Serialize(null)));
@@ -62,4 +62,6 @@
     let objectId = new ObjectId(123);
     console.log(objectId);
     console.log(Buffer.from(Serialize(objectId)));
+    console.log('* Binary:');
+    console.log(Buffer.from(Serialize(Binary.from(Serialize(2147483647)))));                   // 0x4276685898d17000
 })();

@@ -36,8 +36,8 @@ content  ::=   "\x00"                         null
              | "\x0B"                         Non-determinative object end operator
              | "\x0C" double64                JS Date ( Unix timestamp in milliseconds )
              | "\x0D" (byte*12)               ObjectId
-             | "\x0E" uint32 (byte*)        Binary Data
-             | "\x0F" ~ "\x1F"               Reserved types
+             | "\x0E" uint32 (byte*)          Binary Data
+             | "\x0F" ~ "\x1F"                Reserved types
              
 object  ::=    list_elm e_list 
              | list_elm ""

@@ -7,13 +7,15 @@
 (()=>{
     'use strict';
 
-    const Serialize			= require('./lib/serializer');
-    const Deserialize		= require('./lib/deserializer');
-    const {UInt64, Int64}	= require( './types/uint64' );
-    const {UInt128, Int128}	= require( './types/uint64' );
+    const Serialize			  = require('./lib/serializer');
+    const Deserialize		  = require('./lib/deserializer');
+    const { Binary }          = require('./types/binary');
+    const { UInt64, Int64 }	  = require('./types/uint64');
+    const { UInt128, Int128 } = require('./types/uint128');
     
     module.exports = {
-    	UInt64,
+        Binary,
+        UInt64,
 		Int64,
 		UInt128,
 		Int128,
