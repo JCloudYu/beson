@@ -7,9 +7,18 @@
 	
 	const _WEAK_MAP = new WeakMap();
 	class Binary {
-		constructor() {
+		constructor(length=0) {
+			if ( typeof length !== "number" ) {
+				throw new TypeError( "Given argument should be a number!" );
+			}
+			
+			if ( length < 0 ) {
+				throw new TypeError( "length should be equal to or greater than zero!" );
+			}
+		
+			
 			const _PRIVATES = {
-				_buff:new ArrayBuffer(0)
+				_buff:new ArrayBuffer(length)
 			};
 			_WEAK_MAP.set(this, _PRIVATES);
 		}
@@ -68,15 +77,6 @@
 				throw new TypeError( "length should be equal to or greater than zero!" );
 			}
 			
-			
-			if ( typeof length !== "number" ) {
-				throw new TypeError( "Given argument should be a number!" );
-			}
-			
-			if ( length < 0 ) {
-				throw new TypeError( "length should be equal to or greater than zero!" );
-			}
-			
 			let _PRIVATE = _WEAK_MAP.get(this);
 			let {_buff} = _PRIVATE;
 			if ( length === _buff.byteLength ) {
@@ -97,6 +97,9 @@
 			let bin = new Binary();
 			bin.append(...segments);
 			return bin;
+		}
+		static alloc(length) {
+			return new Binary(length);
 		}
 	}
 	
