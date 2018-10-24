@@ -65,4 +65,11 @@
     console.log('* Binary:');
     let buffer = Binary.from(Serialize(2147483647));
     console.log(Buffer.from(Serialize(buffer)));                                    // 0x7fffffff
+    
+    let buff1 = Binary.alloc(4).set([0x00, 0x00, 0x02, 0x03]);
+    let buff2 = Binary.alloc(2).set([0x02, 0x03]);
+    console.log(buff1.toString(16));
+    console.log(buff2.toString(16));
+    console.log(buff1.compare(buff2, false));
+    console.log(buff1.compare(buff2));
 })();

@@ -37,6 +37,12 @@
 			this._ab = ___BUFFER_CONCAT(segments);
 			return this;
 		}
+		set(array, offset) {
+			let args = Array.prototype.slice.call(arguments, 0);
+			let buff = new Uint8Array(this._ab);
+			buff.set(...args);
+			return this;
+		}
 		resize(length) {
 			if ( typeof length !== "number" ) {
 				throw new TypeError( "Given argument should be a number!" );
@@ -72,6 +78,14 @@
 		not() {
 			___NOT(this._ab);
 			return this;
+		}
+		compare(value, align_cmp=true) {
+			let val = ___UNPACK(value);
+			if ( val === null ) {
+				throw new TypeError( "Input value must be either an ArrayBuffer or a Binary object" );
+			}
+		
+			return ___COMPARE(this._ab, val, align_cmp);
 		}
 		
 		
@@ -136,7 +150,83 @@
 	}
 	// endregion
 	
-	// region [ Helper Functions for Binary Operations ]
+	// region [ Helper Functions for Content Manipulation or Comparison ]
+	/**
+	 * Get raw ArrayBuffer from source value
+	 * @param {ArrayBuffer, Binary} value
+	 * @returns {ArrayBuffer}
+	 * @private
+	**/
+	function ___UNPACK(value) {
+		if ( value instanceof ArrayBuffer) {
+			return value;
+		}
+		
+		if ( value instanceof Binary ) {
+			return value._ab;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Compare two UInt128 values return -1 if a < b, 1 if a > b, 0 otherwise
+	 * @param {ArrayBuffer} a
+	 * @param {ArrayBuffer} b
+	 * @param {Boolean} align_cmp
+	 * @return {Number}
+	 * @private
+	**/
+	function ___COMPARE(a, b, align_cmp=true) {
+		if ( a.byteLength === 0 && b.byteLength === 0 ) {
+			return 0;
+		}
+		
+		let A = new Uint8Array(a);
+		let B = new Uint8Array(b);
+		if ( !align_cmp ) {
+			let valA, valB, max = A.length > B.length ? A.length : B.length;
+			for( let i=0; i<max; i++ ) {
+				valA = A[i] || 0; valB = B[i] || 0;
+				if ( valA === valB ) {
+					continue;
+				}
+				
+				return valA > valB ? 1 : -1;
+			}
+			
+			return 0;
+		}
+		else {
+			let shiftA, shiftB, valA, valB, max, offset;
+			if ( A.length > B.length ) {
+				max = A.length;
+				shiftA = 0;
+				shiftB = B.length - A.length;
+			}
+			else
+			if ( A.length < B.length ) {
+				max = B.length;
+				shiftA = A.length - B.length;
+				shiftB = 0;
+			}
+			else {
+				max = A.length;
+				shiftA = shiftB = 0;
+			}
+			
+			for( let i=0; i<max; i++ ) {
+				valA = (offset=i+shiftA) >= 0 ? A[offset] : 0;
+				valB = (offset=i+shiftB) >= 0 ? B[offset] : 0;
+				if ( valA === valB ) { continue; }
+				
+				return valA > valB ? 1 : -1;
+			}
+			
+			return 0;
+		}
+	}
+	
 	/**
 	 * A mutable operation that shifts the bits right.
 	 * Note that this function is mutable...
