@@ -150,6 +150,14 @@
 			return Buffer.from(candidate.slice(0, 12));
 		}
 		
+		if ( candidate instanceof ArrayBuffer ) {
+			if ( candidate.byteLength >= 12 ) {
+				return Buffer.from(candidate.slice(0, 12));
+			}
+			
+			return null;
+		}
+		
 		const type = typeof candidate;
 		if ( type === "string" ) {
 			if ( candidate.length === 12 ) {
