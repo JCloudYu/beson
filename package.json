@@ -20,5 +20,8 @@
 	"bugs": {
 		"url": "https://github.com/JCloudYu/beson/issues"
 	},
-	"homepage": "https://github.com/JCloudYu/beson#readme"
+	"homepage": "https://github.com/JCloudYu/beson#readme",
+	"devDependencies": {
+		"stringify-object": "^3.3.0"
+	}
 }

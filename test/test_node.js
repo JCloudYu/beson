@@ -1,75 +1,374 @@
 (() => {
     'use strict';
 
+    const stringifyObject = require('stringify-object');
     const { Serialize, Deserialize } = require('../beson');
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
     const { Binary } = require('../types/binary');
 
-    console.log('* Null:');
-    console.log(Buffer.from(Serialize(null)));
-    console.log('* False:');
-    console.log(Buffer.from(Serialize(false)));
-    console.log('* True:');
-    console.log(Buffer.from(Serialize(true)));
-    console.log('* Int32:');
-    console.log(Buffer.from(Serialize(2147483647)));                                // 0x7fffffff
-    console.log('* Int64:');
-    console.log(Buffer.from(Serialize(Int64.from(Number.MAX_SAFE_INTEGER))));       // 0x001fffffffffffff
-    console.log(Buffer.from(Serialize(Int64.from(Number.MIN_SAFE_INTEGER))));       // 0xffe0000000000001
-    console.log('* Int128:');
-    console.log(Buffer.from(Serialize(Int128.from(Int128.MAX))));                   // 0x7fffffffffffffffffffffffffffffff
-    console.log(Buffer.from(Serialize(Int128.from(Int128.MIN))));                   // 0x80000000000000000000000000000000
-    console.log('* UInt64:');
-    console.log(Buffer.from(Serialize(UInt64.from(Number.MAX_SAFE_INTEGER))));      // 0x001fffffffffffff
-    console.log('* UInt128:');
-    console.log(Buffer.from(Serialize(UInt128.from(UInt128.MAX))));                 // 0xffffffffffffffffffffffffffffffff
-    console.log('* Double:');
-    console.log(Buffer.from(Serialize(Math.PI)));                                   // 0x400921fb54442d18
-    console.log('* String:');
-    console.log(Buffer.from(Serialize('hello world')));
-    console.log('* Array:');
-    console.log(Buffer.from(Serialize([true, 2147483647, Math.PI])));               // length: 17, content: [0x0101, 0x7fffffff, 0x400921fb54442d18]
-    
-    const Obj = {z:1234567};
-    Obj.b = 1; Obj.a = false; Obj._ = "test"; Obj.PI = Math.PI;
-    console.log('* Object - obj1:');
-    const Obj1Buff = Buffer.from(Serialize(Obj));
-    console.log(Obj1Buff);
-    console.log('* Object - obj1 - sort-key:');
-    const Obj1SortBuff = Buffer.from(Serialize(Obj, {sort_key:true}));
-    console.log(Obj1SortBuff);
-    
-    const Obj2 = {PI:Math.PI};
-    Obj2.z = 1234567; Obj2.a = false; Obj2._ = "test"; Obj2.b = 1;
-    console.log('* Object - obj2:');
-    const Obj2Buff = Buffer.from(Serialize(Obj2));
-    console.log(Obj2Buff);
-    console.log('* Object - obj1 - sort-key:');
-    const Obj2SortBuff = Buffer.from(Serialize(Obj2, {sort_key:true}));
-    console.log(Obj2SortBuff);
-    
-    
-    console.log(`* Object - obj1 vs obj2 - not sorted: ${Obj1Buff.compare(Obj2Buff) === 0 ? "EQUAL": "NOT EQUAL"}`);
-    console.log(`* Object - obj1 vs obj2 - sorted: ${Obj1SortBuff.compare(Obj2SortBuff) === 0 ? "EQUAL": "NOT EQUAL"}`);
-    
-    
-    
-    console.log('* Date:');
-    console.log(Buffer.from(Serialize(new Date(1539838676247))));                   // 0x4276685898d17000
-    console.log('* ObjectId:');
-    let objectId = new ObjectId(123);
-    console.log(objectId);
-    console.log(Buffer.from(Serialize(objectId)));
-    console.log('* Binary:');
-    let buffer = Binary.from(Serialize(2147483647));
-    console.log(Buffer.from(Serialize(buffer)));                                    // 0x7fffffff
-    
-    let buff1 = Binary.alloc(4).set([0x00, 0x00, 0x02, 0x03]);
-    let buff2 = Binary.alloc(2).set([0x02, 0x03]);
-    console.log(buff1.toString(16));
-    console.log(buff2.toString(16));
-    console.log(buff1.compare(buff2, false));
-    console.log(buff1.compare(buff2));
+    process.stdout.write('* Testing Null:               ');
+    {
+        const ANSWER = null;
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER === TEST);
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing FALSE:              ');
+    {
+        const ANSWER = false;
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER === TEST);
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing TRUE:               ');
+    {
+        const ANSWER = true;
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER === TEST);
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Int32:              ');
+    {
+        const ANSWER = 2147483647;
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER === TEST);
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Int64 - max:        ');
+    {
+        const ANSWER = Int64.from(Int64.MAX);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Int64 - min:        ');
+    {
+        const ANSWER = Int64.from(Int64.MIN);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Int128 - max:       ');
+    {
+        const ANSWER = Int128.from(Int128.MAX);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Int128 - min:       ');
+    {
+        const ANSWER = Int128.from(Int128.MIN);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing UInt64 - max:       ');
+    {
+        const ANSWER = UInt64.from(UInt64.MAX);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing UInt128 - max:      ');
+    {
+        const ANSWER = UInt128.from(UInt128.MAX);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Double:             ');
+    {
+        const ANSWER = Math.PI;
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing String:             ');
+    {
+        const ANSWER = 'Hello World!!!!';
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER === TEST);
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Array:              ');
+    {
+        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'hello world', new Date(1539838676247), Int128.from(Int128.MAX)]];
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Array - stream1:    ');
+    {
+        const OPTIONS = { streaming_array: true };
+        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'hello world', new Date(1539838676247), Int128.from(Int128.MAX)]];
+        const TEST = Deserialize(Serialize(ANSWER, OPTIONS));
+        let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    // append some data in the end
+    process.stdout.write('* Testing Array - stream2:    ');
+    {
+        const OPTIONS = { streaming_array: true };
+        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'hello world', new Date(1539838676247), Int128.from(Int128.MAX)]];
+        const TEST = Deserialize(__arrayBufferConcat([Serialize(ANSWER, OPTIONS), new Uint8Array([123, 45, 67, 89]).buffer]));
+        let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Object:             ');
+    {
+        const ANSWER = {
+            z: {
+                c: 'aaa',
+                b: false,
+                a: 123
+            },
+            b: 123,
+            a: new Date(1539838676247),
+            _: Int128.from(Int128.MAX),
+            PI: Math.PI,
+            array: ['aaa', true, 123]
+        };
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Object - sort:      ');
+    {
+        const OPTIONS = { sort_key: true };
+        const SOURCE1 = {
+            z: {
+                c: 'aaa',
+                b: false,
+                a: 123
+            },
+            b: 123,
+            a: new Date(1539838676247),
+            _: Int128.from(Int128.MAX),
+            PI: Math.PI,
+            array: ['aaa', true, 123]
+        };
+        const SOURCE2 = {
+            z: {
+                c: 'aaa',
+                b: false,
+                a: 123
+            },
+            PI: Math.PI,
+            array: ['aaa', true, 123],
+            a: new Date(1539838676247),
+            _: Int128.from(Int128.MAX),
+            b: 123
+        };
+        const TEST1 = Deserialize(Serialize(SOURCE1, OPTIONS));
+        const TEST2 = Deserialize(Serialize(SOURCE2, OPTIONS));
+        let passed = (stringifyObject(TEST1) === stringifyObject(TEST2));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Object - stream1:   ');
+    {
+        const OPTIONS = { streaming_object: true };
+        const ANSWER = {
+            z: {
+                c: 'aaa',
+                b: false,
+                a: 123
+            },
+            b: 123,
+            a: new Date(1539838676247),
+            _: Int128.from(Int128.MAX),
+            PI: Math.PI,
+            array: ['aaa', true, 123]
+        };
+        const TEST = Deserialize(Serialize(ANSWER, OPTIONS));
+        let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    // append some data in the end
+    process.stdout.write('* Testing Object - stream2:   ');
+    {
+        const OPTIONS = { streaming_object: true };
+        const ANSWER = {
+            z: {
+                c: 'aaa',
+                b: false,
+                a: 123
+            },
+            b: 123,
+            a: new Date(1539838676247),
+            _: Int128.from(Int128.MAX),
+            PI: Math.PI,
+            array: ['aaa', true, 123]
+        };
+        const TEST = Deserialize(__arrayBufferConcat([Serialize(ANSWER, OPTIONS), new Uint8Array([123, 45, 67, 89]).buffer]));
+        let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Date:               ');
+    {
+        const ANSWER = new Date(1539838676247);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.getTime() === TEST.getTime());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing ObjectId:           ');
+    {
+        const ANSWER = new ObjectId(123);
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    process.stdout.write('* Testing Binary:             ');
+    {
+        const ANSWER = Binary.from(Serialize(new ObjectId()));
+        const TEST = Deserialize(Serialize(ANSWER));
+        let passed = (ANSWER.toString() === TEST.toString());
+        if (passed) {
+            process.stdout.write('passed!\n');
+        }
+        else {
+            process.stdout.write('failed!\n');
+        }
+    }
+
+    function __arrayBufferConcat(arrays) {
+        let totalLength = 0;
+        for (const arr of arrays) {
+            totalLength += arr.byteLength;
+        }
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const arr of arrays) {
+            result.set(new Uint8Array(arr), offset);
+            offset += arr.byteLength;
+        }
+        return result.buffer;
+    }
 })();
