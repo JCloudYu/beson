@@ -5,9 +5,15 @@
 ((exports)=>{
 	"use strict";
 	
-	
+	const HEX_FORMAT_CHECKER = /^0x[0-9a-fA-F]+$/g;
 	class Binary {
-		constructor(length=0) {
+		constructor(length=0, unsafeAlloc=false) {
+			// Special case when developer wants to initialize Binary object without an array ubffer
+			if ( unsafeAlloc && length === 0 ) {
+				this._ab = null;
+				return;
+			}
+		
 			if ( typeof length !== "number" ) {
 				throw new TypeError( "Given argument should be a number!" );
 			}
@@ -22,8 +28,11 @@
 		get size() {
 			return this._ab.byteLength;
 		}
+		get _ta() {
+			return new Uint8Array(this._ab);
+		}
 		clone() {
-			const newInst = new Binary();
+			const newInst = new Binary(0, false);
 			newInst._ab = this._ab.slice(0);
 			return newInst;
 		}
@@ -109,7 +118,14 @@
 		
 		
 		static from(...segments) {
-			return (new Binary()).append(...segments);
+			const newInst = new Binary(0, false);
+			newInst._ab = ___BUFFER_CONCAT(segments);
+			return newInst;
+		}
+		static fromHex(hexString) {
+			const newInst = new Binary(0, false);
+			newInst._ab = ___BUFFER_FROM_HEX(hexString);
+			return newInst;
 		}
 		static alloc(length) {
 			return new Binary(length);
@@ -121,6 +137,21 @@
 	
 	
 	// region [ Helper Functions for ArrayBuffer Alternation ]
+	const ___HEX_MAP_I = { 0:0, 1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, A:10, B:11, C:12, D:13, E:14, F:15 };
+	function ___BUFFER_FROM_HEX(hexStr) {
+		if ( HEX_FORMAT_CHECKER.test(hexStr) ) {
+			hexStr = hexStr.slice(2);
+			if ( hexStr.length % 2 === 1 ) { hexStr = '0' + hexStr; }
+			let buffer = new Uint8Array(hexStr.length/2);
+			for( let pointer=0; pointer < buffer.length; pointer++ ) {
+				let offset = pointer * 2;
+				buffer[pointer] = ___HEX_MAP_I[hexStr[offset+1]] | (___HEX_MAP_I[hexStr[offset]]<<4);
+			}
+			return buffer;
+		}
+		
+		throw new SyntaxError( "Given hex string is invalid!" );
+	}
 	function ___BUFFER_CONCAT(segments) {
 		let totalLength = 0;
 		let buffers = [];
