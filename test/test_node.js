@@ -163,7 +163,7 @@
 
     process.stdout.write('* Testing Array:              ');
     {
-        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'hello world', new Date(1539838676247), Int128.from(Int128.MAX)]];
+        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
         const TEST = Deserialize(Serialize(ANSWER));
         let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
         if (passed) {
@@ -177,7 +177,7 @@
     process.stdout.write('* Testing Array - stream1:    ');
     {
         const OPTIONS = { streaming_array: true };
-        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'hello world', new Date(1539838676247), Int128.from(Int128.MAX)]];
+        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
         const TEST = Deserialize(Serialize(ANSWER, OPTIONS));
         let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
         if (passed) {
@@ -192,7 +192,7 @@
     process.stdout.write('* Testing Array - stream2:    ');
     {
         const OPTIONS = { streaming_array: true };
-        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'hello world', new Date(1539838676247), Int128.from(Int128.MAX)]];
+        const ANSWER = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
         const TEST = Deserialize(__arrayBufferConcat([Serialize(ANSWER, OPTIONS), new Uint8Array([123, 45, 67, 89]).buffer]));
         let passed = (stringifyObject(ANSWER) === stringifyObject(TEST));
         if (passed) {
