@@ -3,10 +3,7 @@
 
     const stringifyObject = require('stringify-object');
     const { Serialize, Deserialize } = require('../beson');
-    const { Int64, UInt64 } = require('../types/uint64');
-    const { Int128, UInt128 } = require('../types/uint128');
-    const ObjectId = require('../types/objectid/index');
-    const { Binary } = require('../types/binary');
+    const { ObjectId, Binary, Int64, UInt64, Int128, UInt128 } = require('../beson');
 
     process.stdout.write('* Testing Null:               ');
     {

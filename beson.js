@@ -9,17 +9,19 @@
 
     const Serialize			  = require('./lib/serializer');
     const Deserialize		  = require('./lib/deserializer');
+    const ObjectId            = require('./types/objectid/index');
     const { Binary }          = require('./types/binary');
     const { UInt64, Int64 }	  = require('./types/uint64');
     const { UInt128, Int128 } = require('./types/uint128');
     
     module.exports = {
+        ObjectId,
         Binary,
         UInt64,
-		Int64,
-		UInt128,
-		Int128,
-		
+        Int64,
+        UInt128,
+        Int128,
+        
         Serialize,
         Deserialize
     };
