@@ -4,7 +4,8 @@
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
-		"test_node": "node ./test/test_node.js"
+		"test_node": "node ./test/test_node.js",
+		"test_mocha": "mocha ./test/test_mocha.js"
 	},
 	"repository": {
 		"type": "git",

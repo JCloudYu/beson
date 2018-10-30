@@ -56,5 +56,15 @@ console.log(data);                                      // Hello World
 
 ### Build and Run ###
 
-* Run test_node (use npm):
+#### Run test_node ####
+
+* Use npm:
     > npm run test_node
+
+#### Run test_mocha ####
+
+* Install mocha globally:
+    > npm install -g mocha
+
+* Use npm:
+    > npm run test_mocha
