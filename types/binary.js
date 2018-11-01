@@ -38,6 +38,10 @@
 		clone() {
 			return new Binary(this._ab.slice(0));
 		}
+		slice(begin, end) {
+			let args = Array.prototype.slice.call(arguments, 0);
+			return new Binary(this._ab.slice(...args));
+		}
 		cut(begin, end) {
 			let args = Array.prototype.slice.call(arguments, 0);
 			this._ab = this._ab.slice(...args);
