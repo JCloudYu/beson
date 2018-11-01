@@ -7,7 +7,7 @@
 	
 	const {ExtractBuffer} = require( '../lib/misc' );
 	
-	const HEX_FORMAT_CHECKER = /^0x[0-9a-fA-F]+$/g;
+	const HEX_FORMAT_CHECKER = /^0x[0-9a-fA-F]+$/;
 	class Binary {
 		constructor(length=0) {
 			// Special case when developer wants to initialize Binary object without an array ubffer
@@ -123,6 +123,9 @@
 			return new Binary(___BUFFER_CONCAT(segments));
 		}
 		static fromHex(hexString) {
+			if ( hexString.substring(0, 2) !== "0x" ) {
+				hexString = "0x" + hexString;
+			}
 			return new Binary(___BUFFER_FROM_HEX(hexString));
 		}
 		static alloc(length) {
