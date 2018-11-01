@@ -11,7 +11,7 @@
 	class Binary {
 		constructor(length=0) {
 			// Special case when developer wants to initialize Binary object without an array ubffer
-			let buffer = ExtractBuffer(length);
+			let buffer = ExtractBuffer(length, {primitive_convert:false});
 			if (buffer !== null) {
 				this._ab = buffer;
 				return;
