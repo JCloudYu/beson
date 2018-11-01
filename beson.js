@@ -7,12 +7,15 @@
 (()=>{
     'use strict';
 
-    const Serialize			  = require('./lib/serializer');
-    const Deserialize		  = require('./lib/deserializer');
-    const ObjectId            = require('./types/objectid/index');
-    const { Binary }          = require('./types/binary');
-    const { UInt64, Int64 }	  = require('./types/uint64');
-    const { UInt128, Int128 } = require('./types/uint128');
+    const { Serialize, Deserialize } = require( './beson-lib' );
+    const ObjectId					 = require( './types/objectid' );
+    const { Binary }				 = require( './types/binary' );
+    const { UInt64, Int64 }			 = require( './types/uint64' );
+    const { UInt128, Int128 }		 = require( './types/uint128' );
+    
+    const { ExtractBuffer }			 = require( './lib/misc' );
+    
+    
     
     module.exports = {
         ObjectId,
@@ -23,6 +26,9 @@
         Int128,
         
         Serialize,
-        Deserialize
+        Deserialize,
+        Helper: {
+        	ExtractBuffer
+        }
     };
 })();

@@ -5,15 +5,20 @@
 ((exports)=>{
 	"use strict";
 	
+	const {ExtractBuffer} = require( '../lib/misc' );
+	
 	const HEX_FORMAT_CHECKER = /^0x[0-9a-fA-F]+$/g;
 	class Binary {
-		constructor(length=0, unsafeAlloc=false) {
+		constructor(length=0) {
 			// Special case when developer wants to initialize Binary object without an array ubffer
-			if ( unsafeAlloc && length === 0 ) {
-				this._ab = null;
+			let buffer = ExtractBuffer(length);
+			if (buffer !== null) {
+				this._ab = buffer;
 				return;
 			}
-		
+			
+			
+			
 			if ( typeof length !== "number" ) {
 				throw new TypeError( "Given argument should be a number!" );
 			}
@@ -21,7 +26,6 @@
 			if ( length < 0 ) {
 				throw new TypeError( "length should be equal to or greater than zero!" );
 			}
-		
 			
 			this._ab = new ArrayBuffer(length);
 		}
@@ -32,9 +36,7 @@
 			return new Uint8Array(this._ab);
 		}
 		clone() {
-			const newInst = new Binary(0, false);
-			newInst._ab = this._ab.slice(0);
-			return newInst;
+			return new Binary(this._ab.slice(0));
 		}
 		cut(begin, end) {
 			let args = Array.prototype.slice.call(arguments, 0);
@@ -89,9 +91,9 @@
 			return this;
 		}
 		compare(value, align_cmp=true) {
-			let val = ___UNPACK(value);
+			let val = ExtractBuffer(value);
 			if ( val === null ) {
-				throw new TypeError( "Input value must be either an ArrayBuffer or a Binary object" );
+				throw new TypeError( "Input value cannot be converted to ArrayBuffer" );
 			}
 		
 			return ___COMPARE(this._ab, val, align_cmp);
@@ -118,14 +120,10 @@
 		
 		
 		static from(...segments) {
-			const newInst = new Binary(0, false);
-			newInst._ab = ___BUFFER_CONCAT(segments);
-			return newInst;
+			return new Binary(___BUFFER_CONCAT(segments));
 		}
 		static fromHex(hexString) {
-			const newInst = new Binary(0, false);
-			newInst._ab = ___BUFFER_FROM_HEX(hexString);
-			return newInst;
+			return new Binary(___BUFFER_FROM_HEX(hexString));
 		}
 		static alloc(length) {
 			return new Binary(length);
@@ -182,24 +180,6 @@
 	// endregion
 	
 	// region [ Helper Functions for Content Manipulation or Comparison ]
-	/**
-	 * Get raw ArrayBuffer from source value
-	 * @param {ArrayBuffer, Binary} value
-	 * @returns {ArrayBuffer}
-	 * @private
-	**/
-	function ___UNPACK(value) {
-		if ( value instanceof ArrayBuffer) {
-			return value;
-		}
-		
-		if ( value instanceof Binary ) {
-			return value._ab;
-		}
-		
-		return null;
-	}
-	
 	/**
 	 * Compare two UInt128 values return -1 if a < b, 1 if a > b, 0 otherwise
 	 * @param {ArrayBuffer} a

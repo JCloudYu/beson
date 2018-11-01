@@ -1,11 +1,11 @@
 {
 	"name": "beson",
-	"version": "0.0.7",
+	"version": "0.9.0",
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
-		"test_node": "node ./test/test_node.js",
-		"test_mocha": "mocha ./test/test_mocha.js"
+		"test-node": "node ./test/test-node.js",
+		"test-mocha": "mocha ./test/test-mocha.js"
 	},
 	"repository": {
 		"type": "git",

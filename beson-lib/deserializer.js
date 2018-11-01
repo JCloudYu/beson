@@ -5,7 +5,7 @@
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
     const { Binary } = require('../types/binary');
-    const { DATA_TYPE, TYPE_HEADER } = require('../lib/constants');
+    const { DATA_TYPE, TYPE_HEADER } = require('./constants');
 
     /**
      * Deserialize ArrayBuffer

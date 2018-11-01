@@ -1,13 +1,13 @@
 (() => {
     'use strict';
 
-    const stringifyObject = require('stringify-object');
+    const stringifyObject = require( 'stringify-object' );
     const { Serialize, Deserialize } = require('../beson');
     const { ObjectId, Binary, Int64, UInt64, Int128, UInt128 } = require('../beson');
-
-    const assert = require('assert');
-    describe('Serialize and Deserialize testing', () => {
-        describe('deserialize data is equal to origin data', () => {
+	
+    const assert = require( 'assert' );
+    describe( 'Serialize and Deserialize testing', () => {
+        describe( 'deserialize data is equal to origin data', () => {
             it('Null', () => {
                 let origin = null;
                 let test = Deserialize(Serialize(origin));
