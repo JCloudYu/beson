@@ -131,14 +131,14 @@
                     array: ['aaa', true, 123]
                 };
                 const origin2 = {
-                    z: {
-                        c: 'aaa',
-                        b: false,
-                        a: 123
-                    },
                     PI: Math.PI,
-                    array: ['aaa', true, 123],
                     a: new Date(1539838676247),
+                    array: ['aaa', true, 123],
+                    z: {
+                        b: false,
+                        a: 123,
+                        c: 'aaa'
+                    },
                     _: Int128.from(Int128.MAX),
                     b: 123
                 };
@@ -203,25 +203,25 @@
 
         describe('UTF8 decode data is equal to origin data', () => {
             it('1-byte sequence', () => {
-                let origin = 'B^{';
+                let origin = '7Bz^{';
                 let test = UTF8Decode(UTF8Encode(origin));
                 assert(test === origin);
             });
 
             it('2-byte sequence', () => {
-                let origin = 'Ƈݝπ';
+                let origin = 'ƇݝπԪ֍';
                 let test = UTF8Decode(UTF8Encode(origin));
                 assert(test === origin);
             });
 
             it('3-byte sequence', () => {
-                let origin = '乺ឈﬗ';
+                let origin = 'ぬ乺ឈㅎⓇ';
                 let test = UTF8Decode(UTF8Encode(origin));
                 assert(test === origin);
             });
 
             it('4-byte sequence', () => {
-                let origin = '𠁝🜓🝣';
+                let origin = '𠁝🜓🝣𐩸🤩';
                 let test = UTF8Decode(UTF8Encode(origin));
                 assert(test === origin);
             });
