@@ -6,6 +6,7 @@
     const ObjectId = require('../types/objectid/index');
     const { Binary } = require('../types/binary');
     const { DATA_TYPE, TYPE_HEADER } = require('./constants');
+    const { UTF8Decode } = require('../lib/misc');
 
     /**
      * Deserialize ArrayBuffer
@@ -65,10 +66,10 @@
         let length = 2;
         let end = start + length;
         let type;
-        let typeData = new Uint16Array(buffer, start, 1);
+        let typeData = new Uint8Array(buffer, start, length);
         Object.entries(TYPE_HEADER).forEach(([headerKey, headerVal]) => {
-            let headerData = new Uint16Array(headerVal);
-            if (typeData[0] === headerData[0]) {
+            let headerData = new Uint8Array(headerVal);
+            if ((typeData[0] === headerData[0]) && (typeData[1] === headerData[1])) {
                 type = headerKey.toLowerCase();
                 return;
             }
@@ -270,44 +271,44 @@
     }
 
     /**
-     * Deserialize string data
+     * Deserialize string data (use UTF8 decode)
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
      * @returns {{anchor: number, value: string}} anchor: byteOffset, value: 32-bits length string
      * @private
      */
     function __deserializeString(buffer, start) {
-        let step = 2;
+        let step = 1;
         let dataView = new DataView(buffer);
         let length = dataView.getUint32(start, true);
         start += 4;
         let end = start + length;
         let dataArray = [];
         for (let i = start; i < end; i += step) {
-            dataArray.push(dataView.getUint16(i, true));
+            dataArray.push(dataView.getUint8(i, true));
         }
-        let data = String.fromCharCode(...dataArray);
+        let data = UTF8Decode(Uint8Array.from(dataArray).buffer);
         return { anchor: end, value: data };
     }
 
     /**
-     * Deserialize short string data
+     * Deserialize short string data (use UTF8 decode)
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
      * @returns {{anchor: number, value: string}} anchor: byteOffset, value: 16-bits length string
      * @private
      */
     function __deserializeShortString(buffer, start) {
-        let step = 2;
+        let step = 1;
         let dataView = new DataView(buffer);
         let length = dataView.getUint16(start, true);
         start += 2;
         let end = start + length;
         let dataArray = [];
         for (let i = start; i < end; i += step) {
-            dataArray.push(dataView.getUint16(i, true));
+            dataArray.push(dataView.getUint8(i, true));
         }
-        let data = String.fromCharCode(...dataArray);
+        let data = UTF8Decode(Uint8Array.from(dataArray).buffer);
         return { anchor: end, value: data };
     }
 

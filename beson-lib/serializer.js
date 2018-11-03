@@ -6,6 +6,7 @@
     const ObjectId = require('../types/objectid/index');
     const { Binary } = require('../types/binary');
     const { DATA_TYPE, TYPE_HEADER } = require('./constants');
+    const { UTF8Encode } = require('../lib/misc');
 
     const DEFAULT_OPTIONS = {
         sort_key: false,
@@ -272,35 +273,29 @@
     }
 
     /**
-     * Serialize string data
+     * Serialize string data (use UTF8 encode)
      * @param {string} data - 32-bits length string
      * @returns {ArrayBuffer[]}
      * @private
      */
     function __serializeString(data) {
-        let contentData = new Uint16Array(data.length);
-        for (let i = 0; i < data.length; i++) {
-            contentData[i] = data.charCodeAt(i);
-        }
-        let length = contentData.buffer.byteLength;
+        let dataBuffer = UTF8Encode(data);
+        let length = dataBuffer.byteLength;
         let lengthData = new Uint32Array([length]);
-        return [lengthData.buffer, contentData.buffer];
+        return [lengthData.buffer, dataBuffer];
     }
 
     /**
-     * Serialize short string data
+     * Serialize short string data (use UTF8 encode)
      * @param {string} data - 16-bits length string
      * @returns {ArrayBuffer[]}
      * @private
      */
     function __serializeShortString(data) {
-        let contentData = new Uint16Array(data.length);
-        for (let i = 0; i < data.length; i++) {
-            contentData[i] = data.charCodeAt(i);
-        }
-        let length = contentData.buffer.byteLength;
+        let dataBuffer = UTF8Encode(data);
+        let length = dataBuffer.byteLength;
         let lengthData = new Uint16Array([length]);
-        return [lengthData.buffer, contentData.buffer];
+        return [lengthData.buffer, dataBuffer];
     }
 
     /**
