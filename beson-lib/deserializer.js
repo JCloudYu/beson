@@ -1,5 +1,7 @@
 (() => {
     'use strict';
+    
+    const __BUFFER_DEFINED = (typeof Buffer !== "undefined");
 
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
@@ -16,6 +18,16 @@
      * @returns {any}
      */
     function deserialize(buffer) {
+    	if ( __BUFFER_DEFINED ) {
+    		if ( buffer instanceof Buffer ) {
+    			let _buff = new Uint8Array(buffer.length);
+    			_buff.set(buffer);
+    			buffer = _buff.buffer;
+    		}
+    	}
+    	
+    	
+    	
         let anchor = 0;
         ({ anchor } = __deserializeHeader(buffer, anchor));
         let content;
