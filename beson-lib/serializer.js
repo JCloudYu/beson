@@ -101,7 +101,7 @@
         else if (Array.isArray(data)) {
             type = (options.streaming_array === true) ? DATA_TYPE.ARRAY_START : DATA_TYPE.ARRAY;
         }
-        else if (data instanceof Date || __isDate(data)) {
+        else if (data instanceof Date) {
             type = DATA_TYPE.DATE;
         }
         else if (data instanceof ObjectId) {
@@ -109,6 +109,36 @@
         }
         else if (data instanceof Binary) {
             type = DATA_TYPE.BINARY;
+        }
+        else if ( data instanceof ArrayBuffer) {
+            type = DATA_TYPE.ARRAY_BUFFER;
+        }
+        else if ( data instanceof DataView) {
+            type = DATA_TYPE.DATA_VIEW;
+        }
+        else if ( data instanceof Uint8Array) {
+            type = DATA_TYPE.UINT8_ARRAY;
+        }
+        else if ( data instanceof Int8Array) {
+            type = DATA_TYPE.INT8_ARRAY;
+        }
+        else if ( data instanceof Uint16Array) {
+            type = DATA_TYPE.UINT16_ARRAY;
+        }
+        else if ( data instanceof Int16Array) {
+            type = DATA_TYPE.INT16_ARRAY;
+        }
+        else if ( data instanceof Uint32Array) {
+            type = DATA_TYPE.UINT32_ARRAY;
+        }
+        else if ( data instanceof Int32Array) {
+            type = DATA_TYPE.INT32_ARRAY;
+        }
+        else if ( data instanceof Float32Array) {
+            type = DATA_TYPE.FLOAT32_ARRAY;
+        }
+        else if ( data instanceof Float64Array) {
+            type = DATA_TYPE.FLOAT64_ARRAY;
         }
         else if (type === 'object') {
             type = (options.streaming_object === true) ? DATA_TYPE.OBJECT_START : DATA_TYPE.OBJECT;
@@ -187,8 +217,39 @@
             buffers = __serializeObjectId(data);
         }
         else if (type === DATA_TYPE.BINARY) {
-            buffers = __serializeBinary(data);
+            buffers = __serializeArrayBuffer(data.toBytes());
         }
+        else if (type === DATA_TYPE.ARRAY_BUFFER) {
+        	buffers = __serializeArrayBuffer(data);
+        }
+        else if (type === DATA_TYPE.DATA_VIEW) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.UINT8_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.INT8_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.UINT16_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.INT16_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.UINT32_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.INT32_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.FLOAT32_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (type === DATA_TYPE.FLOAT64_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        
         return buffers;
     }
 
@@ -212,7 +273,7 @@
 
     /**
      * Serialize Int32 data
-     * @param {Int32} data
+     * @param {number} data
      * @returns {ArrayBuffer[]}
      * @private
      */
@@ -300,7 +361,7 @@
 
     /**
      * Serialize array data
-     * @param {any[]} data
+     * @param {*[]} data
      * @param {Object} options
      * @param {boolean} options.sort_key
      * @param {boolean} options.streaming_array
@@ -325,7 +386,7 @@
 
     /**
      * Serialize array data (use streaming)
-     * @param {any[]} data
+     * @param {*[]} data
      * @param {Object} options
      * @param {boolean} options.sort_key
      * @param {boolean} options.streaming_array
@@ -427,18 +488,17 @@
         let contentData = new Uint8Array(hexDataArray);
         return [contentData.buffer];
     }
-
-    /**
-     * Serialize Binary data
-     * @param {Binary} data
-     * @returns {ArrayBuffer[]}
-     * @private
-     */
-    function __serializeBinary(data) {
-        let dataBuffer = data.toBytes();
-        let length = dataBuffer.byteLength;
+	
+	/**
+	 * Serialize ArrayBuffer Object
+	 * @param {ArrayBuffer} data
+	 * @returns {ArrayBuffer[]}
+	 * @private
+	 */
+	function __serializeArrayBuffer(data) {
+        let length = data.byteLength;
         let lengthData = new Uint32Array([length]);
-        return [lengthData.buffer, dataBuffer];
+        return [lengthData.buffer, data];
     }
 
     /**
@@ -493,15 +553,5 @@
      */
     function __isFloat(n) {
         return (n % 1 !== 0);
-    }
-
-    /**
-     * Check it is Date object
-     * @param {Object} d
-     * @returns {boolean}
-     * @private
-     */
-    function __isDate(d) {
-        return (typeof d === 'object' && Object.prototype.toString.call(d) === '[object Date]');
     }
 })();

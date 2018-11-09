@@ -15,7 +15,7 @@
      * - result = headerBuffer + contentBuffer
      * - contentBuffer = typeBuffer + dataBuffer
      * @param {ArrayBuffer} buffer
-     * @returns {any}
+     * @returns {*}
      */
     function deserialize(buffer) {
     	if ( __BUFFER_DEFINED ) {
@@ -57,7 +57,7 @@
      * Deserialize content
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
-     * @returns {{anchor: number, value: any}}
+     * @returns {{anchor: number, value:*}}
      * @private
      */
     function __deserializeContent(buffer, start) {
@@ -94,7 +94,7 @@
      * @param {string} type
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
-     * @returns {{anchor: number, value: any}} anchor: byteOffset
+     * @returns {{anchor:number, value:*}}
      * @private
      */
     function __deserializeData(type, buffer, start) {
@@ -145,9 +145,50 @@
             result = __deserializeObjectId(buffer, start);
         }
         else if (type === DATA_TYPE.BINARY) {
-            result = __deserializeBinary(buffer, start);
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Binary(result.value);
         }
-        return { anchor: result.anchor, value: result.value };
+        else if (type === DATA_TYPE.ARRAY_BUFFER) {
+            result = __deserializeArrayBuffer(buffer, start);
+        }
+        else if (type === DATA_TYPE.DATA_VIEW) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new DataView(result.value);
+        }
+        else if (type === DATA_TYPE.UINT8_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Uint8Array(result.value);
+        }
+        else if (type === DATA_TYPE.INT8_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Int8Array(result.value);
+        }
+        else if (type === DATA_TYPE.UINT16_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Uint16Array(result.value);
+        }
+        else if (type === DATA_TYPE.INT16_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Int16Array(result.value);
+        }
+        else if (type === DATA_TYPE.UINT32_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Uint32Array(result.value);
+        }
+        else if (type === DATA_TYPE.INT32_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Int32Array(result.value);
+        }
+        else if (type === DATA_TYPE.FLOAT32_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Float32Array(result.value);
+        }
+        else if (type === DATA_TYPE.FLOAT64_ARRAY) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = new Float64Array(result.value);
+        }
+        
+        return result;
     }
 
     /**
@@ -178,7 +219,7 @@
      * Deserialize Int32 data
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
-     * @returns {{anchor: number, value: Int32}} anchor: byteOffset
+     * @returns {{anchor: number, value:number}} anchor: byteOffset
      * @private
      */
     function __deserializeInt32(buffer, start) {
@@ -328,7 +369,7 @@
      * Deserialize array data
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
-     * @returns {{anchor: number, value: any[]}} anchor: byteOffset
+     * @returns {{anchor: number, value: *[]}} anchor: byteOffset
      * @private
      */
     function __deserializeArray(buffer, start) {
@@ -350,7 +391,7 @@
      * Deserialize array data (use streaming)
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
-     * @returns {{anchor: number, value: any[]}} anchor: byteOffset
+     * @returns {{anchor: number, value: *[]}} anchor: byteOffset
      * @private
      */
     function __deserializeArrayStreaming(buffer, start) {
@@ -460,24 +501,18 @@
         return { anchor: end, value: data };
     }
 
-    /**
-     * Deserialize Binary data
-     * @param {ArrayBuffer} buffer
-     * @param {number} start - byteOffset
-     * @returns {{anchor: number, value: Binary}} anchor: byteOffset
-     * @private
-     */
-    function __deserializeBinary(buffer, start) {
-        let step = 1;
-        let dataView = new DataView(buffer);
-        let length = dataView.getUint32(start, true);
-        start += 4;
-        let end = start + length;
-        let dataArray = [];
-        for (let i = start; i < end; i += step) {
-            dataArray.push(dataView.getUint8(i, true));
-        }
-        let data = Binary.from(Uint8Array.from(dataArray).buffer);
-        return { anchor: end, value: data };
+	/**
+	 * Deserialize ArrayBuffer object
+	 * @param {ArrayBuffer} buffer
+	 * @param {Number} start
+	 * @returns {{anchor:Number, value:ArrayBuffer}}
+	 * @private
+	 */
+    function __deserializeArrayBuffer(buffer, start) {
+    	let end = start + 4;
+    	let [length] = new Uint32Array(buffer.slice(start, end));
+    	
+    	end = end + length;
+    	return {anchor:end, value:buffer.slice(start+4, end)};
     }
 })();

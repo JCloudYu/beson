@@ -199,6 +199,76 @@
                 let test = Deserialize(Serialize(origin));
                 assert(test.toString() === origin.toString());
             });
+
+            it('ArrayBuffer', () => {
+                let origin = Binary.from(Serialize(new ObjectId()));
+                let test = Deserialize(Serialize(origin._ab));
+                let result = Binary.from(test);
+                assert((test instanceof ArrayBuffer) && (result.toString() === origin.toString()));
+            });
+
+            it('DataView', () => {
+                let origin = Binary.from(Serialize(new ObjectId()));
+                let test = Deserialize(Serialize(new DataView(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof DataView) && (result.toString() === origin.toString()));
+            });
+
+            it('Uint8Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId()));
+                let test = Deserialize(Serialize(new Uint8Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Uint8Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Int8Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId()));
+                let test = Deserialize(Serialize(new Int8Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Int8Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Uint16Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId()));
+                let test = Deserialize(Serialize(new Uint16Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Uint16Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Int16Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId()));
+                let test = Deserialize(Serialize(new Int16Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Int16Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Uint32Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
+                let test = Deserialize(Serialize(new Uint32Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Uint32Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Int32Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
+                let test = Deserialize(Serialize(new Int32Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Int32Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Float32Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
+                let test = Deserialize(Serialize(new Float32Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Float32Array) && (result.toString() === origin.toString()));
+            });
+
+            it('Float64Array', () => {
+                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 8);
+                let test = Deserialize(Serialize(new Float64Array(origin._ab)));
+                let result = Binary.from(test.buffer);
+                assert((test instanceof Float64Array) && (result.toString() === origin.toString()));
+            });
         });
 
         describe('UTF8 decode data is equal to origin data', () => {

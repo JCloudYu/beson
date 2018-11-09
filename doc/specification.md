@@ -37,7 +37,17 @@ content  ::=   "\x00" "\x00"                  null
              | "\x0C" "\x00" double64         JS Date ( Unix timestamp in milliseconds )
              | "\x0D" "\x00" (byte*12)        ObjectId
              | "\x0E" "\x00" uint32 (byte*)   Binary Data
-             | "\x0F" "\x00" ~ "\x1F" "\x00"  Reserved types
+             | "\x0F" "\x00" uint32 (byte*)   ArrayBuffer Data
+             | "\x0F" "\x01" uint32 (byte*)   DataView Object
+             | "\x0F" "\x02" uint32 (byte*)   Uint8Array Object
+             | "\x0F" "\x03" uint32 (byte*)   Int8Array Object
+             | "\x0F" "\x04" uint32 (byte*)   Uint16Array Object
+             | "\x0F" "\x05" uint32 (byte*)   Int16Array Object
+             | "\x0F" "\x06" uint32 (byte*)   Uint32Array Object
+             | "\x0F" "\x07" uint32 (byte*)   Int32Array Object
+             | "\x0F" "\x08" uint32 (byte*)   Float32Array Object
+             | "\x0F" "\x09" uint32 (byte*)   Float64Array Object
+             | "\x0F" "\x0A" ~ "\x1F" "\x00"  Reserved types
              
 object  ::=    list_elm e_list 
              | list_elm ""
