@@ -1,28 +1,28 @@
 (() => {
     'use strict';
     
-    const __BUFFER_DEFINED = (typeof Buffer !== "undefined");
+    
 
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
     const { Binary } = require('../types/binary');
-    const { DATA_TYPE, TYPE_HEADER } = require('./constants');
+    const { HAS_BUFFER, DATA_TYPE, TYPE_HEADER } = require('./constants');
     const { UTF8Decode } = require('../lib/misc');
+    
+    
 
     /**
      * Deserialize ArrayBuffer
      * - result = headerBuffer + contentBuffer
      * - contentBuffer = typeBuffer + dataBuffer
-     * @param {ArrayBuffer} buffer
+     * @param {ArrayBuffer|Buffer} buffer
      * @returns {*}
      */
     function deserialize(buffer) {
-    	if ( __BUFFER_DEFINED ) {
+    	if ( HAS_BUFFER ) {
     		if ( buffer instanceof Buffer ) {
-    			let _buff = new Uint8Array(buffer.length);
-    			_buff.set(buffer);
-    			buffer = _buff.buffer;
+    			buffer = buffer.buffer;
     		}
     	}
     	
@@ -187,6 +187,10 @@
             result = __deserializeArrayBuffer(buffer, start);
             result.value = new Float64Array(result.value);
         }
+        else if (type === DATA_TYPE.SPECIAL_BUFFER) {
+            result = __deserializeArrayBuffer(buffer, start);
+            result.value = HAS_BUFFER ? Buffer.from(result.value) : new Uint8Array(result.value);
+        }
         
         return result;
     }
@@ -198,8 +202,7 @@
      * @private
      */
     function __deserializeNull(start) {
-        let end = start;
-        return { anchor: end, value: null };
+        return { anchor: start, value: null };
     }
 
     /**

@@ -1,7 +1,10 @@
 (() => {
     'use strict';
 
+	const __BUFFER_DEFINED = (typeof Buffer !== "undefined");
+
     let exportObj = {
+    	HAS_BUFFER: __BUFFER_DEFINED,
         DATA_TYPE: {
             NULL:           'null',
             FALSE:          'false',
@@ -32,7 +35,9 @@
             UINT32_ARRAY:	'uint32_array',
             INT32_ARRAY:	'int32_array',
             FLOAT32_ARRAY:	'float32_array',
-            FLOAT64_ARRAY:	'float64_array'
+            FLOAT64_ARRAY:	'float64_array',
+            
+            SPECIAL_BUFFER: 'special_buffer'
         },
         TYPE_HEADER: {
             NULL:           [0x00, 0x00],
@@ -64,7 +69,9 @@
             UINT32_ARRAY:	[0x0f, 0x06],
             INT32_ARRAY:	[0x0f, 0x07],
             FLOAT32_ARRAY:	[0x0f, 0x08],
-            FLOAT64_ARRAY:	[0x0f, 0x09]
+            FLOAT64_ARRAY:	[0x0f, 0x09],
+            
+            SPECIAL_BUFFER:	[0x0f, 0xff]
         }
     };
 

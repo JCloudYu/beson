@@ -269,6 +269,12 @@
                 let result = Binary.from(test.buffer);
                 assert((test instanceof Float64Array) && (result.toString() === origin.toString()));
             });
+
+            it('NodeJS Buffer', () => {
+            	let origin = Buffer.from(Serialize(new ObjectId()));
+                let result = Deserialize(Serialize(origin));
+                assert((result instanceof Buffer) && (result.toString('hex') === origin.toString('hex')));
+            });
         });
 
         describe('UTF8 decode data is equal to origin data', () => {

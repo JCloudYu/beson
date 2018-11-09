@@ -5,7 +5,7 @@
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
     const { Binary } = require('../types/binary');
-    const { DATA_TYPE, TYPE_HEADER } = require('./constants');
+    const { HAS_BUFFER, DATA_TYPE, TYPE_HEADER } = require('./constants');
     const { UTF8Encode } = require('../lib/misc');
 
     const DEFAULT_OPTIONS = {
@@ -115,6 +115,10 @@
         }
         else if ( data instanceof DataView) {
             type = DATA_TYPE.DATA_VIEW;
+        }
+        // NOTE: This line must be prior to Uint8Array since NodeJS Buffer is defined to be inheritance of Uint8Array
+        else if ( HAS_BUFFER && data instanceof Buffer ) {
+        	type = DATA_TYPE.SPECIAL_BUFFER;
         }
         else if ( data instanceof Uint8Array) {
             type = DATA_TYPE.UINT8_ARRAY;
@@ -247,6 +251,9 @@
         	buffers = __serializeArrayBuffer(data.buffer);
         }
         else if (type === DATA_TYPE.FLOAT64_ARRAY) {
+        	buffers = __serializeArrayBuffer(data.buffer);
+        }
+        else if (HAS_BUFFER && type === DATA_TYPE.SPECIAL_BUFFER) {
         	buffers = __serializeArrayBuffer(data.buffer);
         }
         

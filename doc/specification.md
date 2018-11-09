@@ -47,6 +47,7 @@ content  ::=   "\x00" "\x00"                  null
              | "\x0F" "\x07" uint32 (byte*)   Int32Array Object
              | "\x0F" "\x08" uint32 (byte*)   Float32Array Object
              | "\x0F" "\x09" uint32 (byte*)   Float64Array Object
+             | "\x0F" "\xFF" uint32 (byte*)  Special buffer (Uint8Array compatible)
              | "\x0F" "\x0A" ~ "\x1F" "\x00"  Reserved types
              
 object  ::=    list_elm e_list 
