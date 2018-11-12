@@ -22,7 +22,9 @@
     function deserialize(buffer) {
     	if ( HAS_BUFFER ) {
     		if ( buffer instanceof Buffer ) {
-    			buffer = buffer.buffer;
+    			let buff = Buffer.alloc(buffer.length);
+        		buffer.copy(buff, 0);
+    			buffer = buff.buffer;
     		}
     	}
     	

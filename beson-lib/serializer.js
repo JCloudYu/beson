@@ -254,7 +254,9 @@
         	buffers = __serializeArrayBuffer(data.buffer);
         }
         else if (HAS_BUFFER && type === DATA_TYPE.SPECIAL_BUFFER) {
-        	buffers = __serializeArrayBuffer(data.buffer);
+        	let buff = Buffer.alloc(data.length);
+        	data.copy(buff, 0);
+        	buffers = __serializeArrayBuffer(buff.buffer);
         }
         
         return buffers;
