@@ -1,6 +1,9 @@
 (() => {
     'use strict';
 
+	const MIN_SAFE_INT32 = -2147483648;
+	const MAX_SAFE_INT32 =  2147483647;
+
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
     const ObjectId = require('../types/objectid/index');
@@ -78,7 +81,12 @@
             type = (data) ? DATA_TYPE.TRUE : DATA_TYPE.FALSE;
         }
         else if (type === 'number' && __isInt(data)) {
-            type = DATA_TYPE.INT32;
+        	if ( data <= MAX_SAFE_INT32 && data >= MIN_SAFE_INT32 ) {
+        		type = DATA_TYPE.INT32;
+        	}
+        	else {
+        		type = DATA_TYPE.DOUBLE;
+        	}
         }
         else if (type === 'number' && __isFloat(data)) {
             type = DATA_TYPE.DOUBLE;
