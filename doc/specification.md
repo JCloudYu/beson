@@ -15,18 +15,28 @@ double64    double precesion float point value
 
 
 
-beson    ::= uint8 uint8 content
+beson    ::= content
 content  ::=   "\x00" "\x00"                  null
              | "\x01" "\x00"                  false
              | "\x01" "\x01"                  true
+             
              | "\x02" "\x00" int32            32-bits integer
              | "\x02" "\x01" int64            64-bits integer
              | "\x02" "\x02" int128           128-bits integer
-             | "\x02" "\x03" int var          n-bits integer
+             | "\x02" "\x03" int var          n-bits integer ( currently not support )
+             | "\x02" "\x04" int8             8-bits integer
+             | "\x02" "\x05" int16            16-bits integer
+             
+             | "\x03" "\x00" uint32           32-bits unsigned integer
              | "\x03" "\x01" uint64           64-bits unsigned integer
              | "\x03" "\x02" uint128          128-bits unsigned integer
-             | "\x03" "\x03" uint var         n-bits unsigned integer
-             | "\x04" "\x00" double64         64-bits floating point value
+             | "\x03" "\x03" uint var         n-bits unsigned integer ( currently not support )
+             | "\x03" "\x04" uint8            8-bits unsigned integer
+             | "\x03" "\x05" uint16           16-bits unsigned integer
+             
+             | "\x04" "\x00" float64         64-bits floating point value
+             | "\x04" "\x01" float32         32-bits floating point value
+             
              | "\x05" "\x00" string           utf8 string ( contains bad character )
              | "\x06" "\x00" uint32 array     Determinative array with fixed items
              | "\x07" "\x00" array            Non-determinative array init operator

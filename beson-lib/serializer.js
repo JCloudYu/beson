@@ -1,8 +1,12 @@
 (() => {
     'use strict';
 
-	const MIN_SAFE_INT32 = -2147483648;
-	const MAX_SAFE_INT32 =  2147483647;
+	const MIN_SAFE_INT8		= -128;
+	const MAX_SAFE_INT8		=  127;
+	const MIN_SAFE_INT16	= -32768;
+	const MAX_SAFE_INT16	=  32767;
+	const MIN_SAFE_INT32	= -2147483648;
+	const MAX_SAFE_INT32	=  2147483647;
 
     const { Int64, UInt64 } = require('../types/uint64');
     const { Int128, UInt128 } = require('../types/uint128');
@@ -10,11 +14,21 @@
     const { Binary } = require('../types/binary');
     const { HAS_BUFFER, DATA_TYPE, TYPE_HEADER } = require('./constants');
     const { UTF8Encode } = require('../lib/misc');
-
+	
+	/**
+	 * @class BESONSerializerOption
+	 * @property {Boolean} [BESONSerializerOption.sort_key=false]
+	 * @property {Boolean} [BESONSerializerOption.streaming_array=false]
+	 * @property {Boolean} [BESONSerializerOption.streaming_object=false]
+	 * @property {Boolean} [BESONSerializerOption.shrink_integer=false]
+	**/
+	
+	/** @type {BESONSerializerOption} */
     const DEFAULT_OPTIONS = {
         sort_key: false,
         streaming_array: false,
-        streaming_object: false
+        streaming_object: false,
+        shrink_integer: false
     };
     
     /**
@@ -22,10 +36,7 @@
      * - result = headerBuffer + contentBuffer
      * - contentBuffer = typeBuffer + dataBuffer
      * @param {*} data
-     * @param {Object} options
-     * @param {boolean} options.sort_key
-     * @param {boolean} options.streaming_array
-     * @param {boolean} options.streaming_object
+     * @param {BESONSerializerOption} options
      * @returns {ArrayBuffer}
      */
     function serialize(data, options=DEFAULT_OPTIONS) {
@@ -48,16 +59,13 @@
     /**
      * Serialize content
      * @param {*} data
-     * @param {Object} options
-     * @param {boolean} options.sort_key
-     * @param {boolean} options.streaming_array
-     * @param {boolean} options.streaming_object
+     * @param {BESONSerializerOption} options
      * @returns {ArrayBuffer[]}
      * @private
      */
     function __serializeContent(data, options=DEFAULT_OPTIONS) {
         let type = __getType(data, options);
-        let typeBuffer = __serializeType(type);
+        let typeBuffer = __serializeType(type, options);
         let dataBuffers = __serializeData(type, data, options);
         return [typeBuffer, ...dataBuffers];
     }
@@ -66,13 +74,11 @@
      * Get type by data
      * @param {*} data 
      * @param {Object} options
-     * @param {boolean} options.sort_key
-     * @param {boolean} options.streaming_array
-     * @param {boolean} options.streaming_object
+     * @param {BESONSerializerOption} options
      * @returns {string}
      * @private
      */
-    function __getType(data, options=DEFAULT_OPTIONS) {
+    function __getType(data, options) {
         let type = typeof data;
         if (data === null) {
             type = DATA_TYPE.NULL;
@@ -81,15 +87,28 @@
             type = (data) ? DATA_TYPE.TRUE : DATA_TYPE.FALSE;
         }
         else if (type === 'number' && __isInt(data)) {
-        	if ( data <= MAX_SAFE_INT32 && data >= MIN_SAFE_INT32 ) {
-        		type = DATA_TYPE.INT32;
+        	if ( data > MAX_SAFE_INT32 && data < MIN_SAFE_INT32 ) {
+        		type = DATA_TYPE.FLOAT64;
         	}
-        	else {
-        		type = DATA_TYPE.DOUBLE;
-        	}
+        	else
+        	if ( options.shrink_integer ) {
+				if ( data <= MAX_SAFE_INT8 && data >= MIN_SAFE_INT8 ) {
+					type = DATA_TYPE.INT8;
+				}
+				else
+				if ( data <= MAX_SAFE_INT16 && data >= MIN_SAFE_INT16 ) {
+					type = DATA_TYPE.INT16;
+				}
+				else {
+					type = DATA_TYPE.INT32;
+				}
+			}
+			else {
+				type = DATA_TYPE.INT32;
+			}
         }
         else if (type === 'number' && __isFloat(data)) {
-            type = DATA_TYPE.DOUBLE;
+            type = DATA_TYPE.FLOAT64;
         }
         else if (data instanceof Int64) {
             type = DATA_TYPE.INT64;
@@ -161,10 +180,11 @@
     /**
      * Serialize type
      * @param {string} type
+     * @param {BESONSerializerOption} options
      * @returns {ArrayBuffer}
      * @private
      */
-    function __serializeType(type) {
+    function __serializeType(type, options) {
         let typeHeader = (type) ? TYPE_HEADER[type.toUpperCase()] : [];
         let typeData = new Uint8Array(typeHeader);
         return typeData.buffer;
@@ -174,10 +194,7 @@
      * Serialize data
      * @param {string} type
      * @param {*} data
-     * @param {Object} options
-     * @param {boolean} options.sort_key
-     * @param {boolean} options.streaming_array
-     * @param {boolean} options.streaming_object
+     * @param {BESONSerializerOption} options
      * @returns {ArrayBuffer[]}
      * @private
      */
@@ -188,6 +205,12 @@
         }
         else if (type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
             buffers = __serializeBoolean();
+        }
+        else if (type === DATA_TYPE.INT8) {
+            buffers = __serializeInt8(data);
+        }
+        else if (type === DATA_TYPE.INT16) {
+            buffers = __serializeInt16(data);
         }
         else if (type === DATA_TYPE.INT32) {
             buffers = __serializeInt32(data);
@@ -204,7 +227,7 @@
         else if (type === DATA_TYPE.UINT128) {
             buffers = __serializeUInt128(data);
         }
-        else if (type === DATA_TYPE.DOUBLE) {
+        else if (type === DATA_TYPE.FLOAT64) {
             buffers = __serializeDouble(data);
         }
         else if (type === DATA_TYPE.STRING) {
@@ -286,6 +309,28 @@
      */
     function __serializeBoolean() {
         return [];
+    }
+
+    /**
+     * Serialize Int8 data
+     * @param {number} data
+     * @returns {ArrayBuffer[]}
+     * @private
+     */
+    function __serializeInt8(data) {
+        let contentData = new Int8Array([data]);
+        return [contentData.buffer];
+    }
+
+    /**
+     * Serialize Int16 data
+     * @param {number} data
+     * @returns {ArrayBuffer[]}
+     * @private
+     */
+    function __serializeInt16(data) {
+        let contentData = new Int16Array([data]);
+        return [contentData.buffer];
     }
 
     /**

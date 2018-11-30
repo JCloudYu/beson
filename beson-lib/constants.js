@@ -9,12 +9,22 @@
             NULL:           'null',
             FALSE:          'false',
             TRUE:           'true',
+            
             INT32:          'int32',
             INT64:          'int64',
-            UINT64:         'uint64',
             INT128:         'int128',
+            INT8:			'int8',
+            INT16:			'int16',
+            
+            UINT32:         'uint32',
+            UINT64:         'uint64',
             UINT128:        'uint128',
-            DOUBLE:         'double',
+            UINT8:			'uint8',
+            UINT16:			'uint16',
+            
+            FLOAT64:        'float64',
+            FLOAT32:		'float32',
+            
             STRING:         'string',
             ARRAY:          'array',
             ARRAY_START:    'array_start',
@@ -43,12 +53,22 @@
             NULL:           [0x00, 0x00],
             FALSE:          [0x01, 0x00],
             TRUE:           [0x01, 0x01],
+            
             INT32:          [0x02, 0x00],
             INT64:          [0x02, 0x01],
             INT128:         [0x02, 0x02],
+            INT8:           [0x02, 0x04],
+            INT16:          [0x02, 0x05],
+            
+            UINT32:         [0x03, 0x00],
             UINT64:         [0x03, 0x01],
             UINT128:        [0x03, 0x02],
-            DOUBLE:         [0x04, 0x00],
+            UINT8:          [0x03, 0x04],
+            UINT16:         [0x03, 0x05],
+            
+            FLOAT64:       	[0x04, 0x00],
+            FLOAT32:		[0x04, 0x01],
+            
             STRING:         [0x05, 0x00],
             ARRAY:          [0x06, 0x00],
             ARRAY_START:    [0x07, 0x00],

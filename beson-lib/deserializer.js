@@ -116,14 +116,32 @@
         else if (type === DATA_TYPE.INT128) {
             result = __deserializeInt128(buffer, start);
         }
+        else if (type === DATA_TYPE.INT8) {
+            result = __deserializeInt8(buffer, start);
+        }
+        else if (type === DATA_TYPE.INT16) {
+            result = __deserializeInt16(buffer, start);
+        }
+        else if (type === DATA_TYPE.UINT32) {
+            result = __deserializeUInt32(buffer, start);
+        }
         else if (type === DATA_TYPE.UINT64) {
             result = __deserializeUInt64(buffer, start);
         }
         else if (type === DATA_TYPE.UINT128) {
             result = __deserializeUInt128(buffer, start);
         }
-        else if (type === DATA_TYPE.DOUBLE) {
-            result = __deserializeDouble(buffer, start);
+        else if (type === DATA_TYPE.UINT8) {
+            result = __deserializeUInt8(buffer, start);
+        }
+        else if (type === DATA_TYPE.UINT16) {
+            result = __deserializeUInt16(buffer, start);
+        }
+        else if (type === DATA_TYPE.FLOAT32) {
+            result = __deserializeFloat32(buffer, start);
+        }
+        else if (type === DATA_TYPE.FLOAT64) {
+            result = __deserializeFloat64(buffer, start);
         }
         else if (type === DATA_TYPE.STRING) {
             result = __deserializeString(buffer, start);
@@ -275,6 +293,48 @@
     }
 
     /**
+     * Deserialize Int8 data
+     * @param {ArrayBuffer} buffer
+     * @param {number} start - byteOffset
+     * @returns {{anchor: number, value: Number}} anchor: byteOffset
+     * @private
+     */
+    function __deserializeInt8(buffer, start) {
+        let end = start + 1;
+        let dataView = new DataView(buffer);
+        let data = dataView.getInt8(start);
+        return { anchor: end, value: data };
+    }
+
+    /**
+     * Deserialize Int16 data
+     * @param {ArrayBuffer} buffer
+     * @param {number} start - byteOffset
+     * @returns {{anchor: number, value: Number}} anchor: byteOffset
+     * @private
+     */
+    function __deserializeInt16(buffer, start) {
+        let end = start + 2;
+        let dataView = new DataView(buffer);
+        let data = dataView.getInt16(start, true);
+        return { anchor: end, value: data };
+    }
+
+    /**
+     * Deserialize UInt32 data
+     * @param {ArrayBuffer} buffer
+     * @param {number} start - byteOffset
+     * @returns {{anchor: number, value:number}} anchor: byteOffset
+     * @private
+     */
+    function __deserializeUInt32(buffer, start) {
+        let end = start + 4;
+        let dataView = new DataView(buffer);
+        let data = dataView.getUInt32(start, true);
+        return { anchor: end, value: data };
+    }
+
+    /**
      * Deserialize UInt64 data
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
@@ -315,13 +375,55 @@
     }
 
     /**
+     * Deserialize UInt8 data
+     * @param {ArrayBuffer} buffer
+     * @param {number} start - byteOffset
+     * @returns {{anchor: number, value: Number}} anchor: byteOffset
+     * @private
+     */
+    function __deserializeUInt8(buffer, start) {
+        let end = start + 1;
+        let dataView = new DataView(buffer);
+        let data = dataView.getUint8(start);
+        return { anchor: end, value: data };
+    }
+
+    /**
+     * Deserialize UInt16 data
+     * @param {ArrayBuffer} buffer
+     * @param {number} start - byteOffset
+     * @returns {{anchor: number, value: Number}} anchor: byteOffset
+     * @private
+     */
+    function __deserializeUInt16(buffer, start) {
+        let end = start + 2;
+        let dataView = new DataView(buffer);
+        let data = dataView.getUint16(start, true);
+        return { anchor: end, value: data };
+    }
+
+    /**
+     * Deserialize float data
+     * @param {ArrayBuffer} buffer
+     * @param {number} start - byteOffset
+     * @returns {{anchor: number, value: number}} anchor: byteOffset, value: double
+     * @private
+     */
+    function __deserializeFloat32(buffer, start) {
+        let end = start + 4;
+        let dataView = new DataView(buffer);
+        let data = dataView.getFloat32(start, true);
+        return { anchor: end, value: data };
+    }
+
+    /**
      * Deserialize double data
      * @param {ArrayBuffer} buffer
      * @param {number} start - byteOffset
      * @returns {{anchor: number, value: number}} anchor: byteOffset, value: double
      * @private
      */
-    function __deserializeDouble(buffer, start) {
+    function __deserializeFloat64(buffer, start) {
         let end = start + 8;
         let dataView = new DataView(buffer);
         let data = dataView.getFloat64(start, true);
