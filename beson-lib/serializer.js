@@ -87,7 +87,7 @@
             type = (data) ? DATA_TYPE.TRUE : DATA_TYPE.FALSE;
         }
         else if (type === 'number' && __isInt(data)) {
-        	if ( data > MAX_SAFE_INT32 && data < MIN_SAFE_INT32 ) {
+        	if ( data > MAX_SAFE_INT32 || data < MIN_SAFE_INT32 ) {
         		type = DATA_TYPE.FLOAT64;
         	}
         	else
