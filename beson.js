@@ -9,7 +9,7 @@
 
     const { Serialize, Deserialize } = require( './beson-lib' );
     const BesonType = require( './types' );
-    const { UInt8, UInt16, UInt32, Int8, Int16, Int32, UInt64, Int64, UInt128, Int128, ObjectId, Binary } = BesonType;
+    const { UInt8, UInt16, UInt32, Int8, Int16, Int32, UInt64, Int64, UInt128, Int128, ObjectId, Binary, Binarized, BinarizedInt } = BesonType;
     const {
     	ExtractBuffer,
     	DumpBinaryString,
