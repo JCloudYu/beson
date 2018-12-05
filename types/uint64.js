@@ -5,9 +5,6 @@
 ((exports)=>{
 	"use strict";
 	
-	const _previous_uint64 = exports.UInt64;
-	const _previous_int64  = exports.Int64;
-	
 	// region [ Detect NodeJS Buffer implementation ]
 	let BUFFER = null;
 	if ( typeof Buffer !== "undefined" ) {
@@ -378,17 +375,6 @@
 			val.hi = 0xFFFFFFFF;
 			val.lo = 0xFFFFFFFF;
 			return val;
-		}
-		
-		/**
-		 * Revert to previous version...
-		 * @returns {UInt64}
-		**/
-		static noConflict() {
-			if ( _previous_uint64 ) {
-				exports.UInt64 = _previous_uint64;
-			}
-			return exports.UInt64;
 		}
 	}
 	exports.UInt64 = UInt64;
@@ -800,17 +786,6 @@
 			val.hi = 0x80000000;
 			val.lo = 0x00000000;
 			return val;
-		}
-		
-		/**
-		 * Revert to previous version...
-		 * @returns {Int64}
-		**/
-		static noConflict() {
-			if ( _previous_int64 ) {
-				exports.Int64 = _previous_int64;
-			}
-			return exports.Int64;
 		}
 	}
 	exports.Int64 = Int64;

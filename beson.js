@@ -8,18 +8,29 @@
     'use strict';
 
     const { Serialize, Deserialize } = require( './beson-lib' );
-    const ObjectId					 = require( './types/objectid' );
-    const { Binary }				 = require( './types/binary' );
-    const { UInt64, Int64 }			 = require( './types/uint64' );
-    const { UInt128, Int128 }		 = require( './types/uint128' );
-    
-    const { ExtractBuffer, UTF8Encode, UTF8Decode }	= require( './lib/misc' );
+    const BesonType = require( './types' );
+    const { UInt8, UInt16, UInt32, Int8, Int16, Int32, UInt64, Int64, UInt128, Int128, ObjectId, Binary } = BesonType;
+    const {
+    	ExtractBuffer,
+    	DumpBinaryString,
+    	DumpHexString,
+    	UTF8Encode,
+    	UTF8Decode
+    } = require( './lib/misc' );
     
     
     
     module.exports = {
+    	BesonType,
+    
         ObjectId,
         Binary,
+        UInt8,
+        Int8,
+        UInt16,
+        Int16,
+        UInt32,
+        Int32,
         UInt64,
         Int64,
         UInt128,
@@ -29,6 +40,8 @@
         Deserialize,
         Helper: {
             ExtractBuffer,
+            DumpBinaryString,
+            DumpHexString,
             UTF8Encode,
             UTF8Decode
         }

@@ -8,12 +8,10 @@
 	const MIN_SAFE_INT32	= -2147483648;
 	const MAX_SAFE_INT32	=  2147483647;
 
-    const { Int64, UInt64 } = require('../types/uint64');
-    const { Int128, UInt128 } = require('../types/uint128');
-    const ObjectId = require('../types/objectid/index');
-    const { Binary } = require('../types/binary');
     const { HAS_BUFFER, DATA_TYPE, TYPE_HEADER } = require('./constants');
     const { UTF8Encode } = require('../lib/misc');
+    const BesonType = require( '../types' );
+    const {Int64, UInt64, Int128, UInt128, Int32, UInt32, Int8, UInt8, Int16, UInt16, ObjectId, Binary} = BesonType;
 	
 	/**
 	 * @class BESONSerializerOption
@@ -109,6 +107,24 @@
         }
         else if (type === 'number' && __isFloat(data)) {
             type = DATA_TYPE.FLOAT64;
+        }
+        else if ( data instanceof Int8 ) {
+        	type = DATA_TYPE.INT8;
+        }
+        else if ( data instanceof UInt8 ) {
+        	type = DATA_TYPE.UINT8;
+        }
+        else if ( data instanceof Int16 ) {
+        	type = DATA_TYPE.INT16;
+        }
+        else if ( data instanceof UInt16 ) {
+        	type = DATA_TYPE.UINT16;
+        }
+        else if ( data instanceof Int32 ) {
+        	type = DATA_TYPE.INT32;
+        }
+        else if ( data instanceof UInt32 ) {
+        	type = DATA_TYPE.UINT32;
         }
         else if (data instanceof Int64) {
             type = DATA_TYPE.INT64;
@@ -206,14 +222,38 @@
         else if (type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
             buffers = __serializeBoolean();
         }
+        else if (type === DATA_TYPE.UINT8) {
+			buffers = [data._ab];
+        }
+        else if (type === DATA_TYPE.UINT16) {
+			buffers = [data._ab];
+        }
+        else if (type === DATA_TYPE.UINT32) {
+			buffers = [data._ab];
+        }
         else if (type === DATA_TYPE.INT8) {
-            buffers = __serializeInt8(data);
+        	if ( typeof data === "number" ) {
+            	buffers = __serializeInt8(data);
+			}
+			else {
+				buffers = [data._ab];
+			}
         }
         else if (type === DATA_TYPE.INT16) {
-            buffers = __serializeInt16(data);
+            if ( typeof data === "number" ) {
+            	buffers = __serializeInt16(data);
+			}
+			else {
+				buffers = [data._ab];
+			}
         }
         else if (type === DATA_TYPE.INT32) {
-            buffers = __serializeInt32(data);
+        	if ( typeof data === "number" ) {
+            	buffers = __serializeInt32(data);
+			}
+			else {
+				buffers = [data._ab];
+			}
         }
         else if (type === DATA_TYPE.INT64) {
             buffers = __serializeInt64(data);

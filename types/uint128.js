@@ -5,9 +5,6 @@
 ((exports)=>{
 	"use strict";
 	
-	const _previous_uint64 = exports.UInt128;
-	const _previous_int64  = exports.Int128;
-	
 	// region [ Detect NodeJS Buffer implementation ]
 	let BUFFER = null;
 	if ( typeof Buffer !== "undefined" ) {
@@ -350,17 +347,6 @@
 		**/
 		static get MAX() {
 			return new UInt128([0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF]);
-		}
-		
-		/**
-		 * Revert to previous version...
-		 * @returns {UInt128}
-		**/
-		static noConflict() {
-			if ( _previous_uint64 ) {
-				exports.UInt128 = _previous_uint64;
-			}
-			return exports.UInt128;
 		}
 	}
 	exports.UInt128 = UInt128;
@@ -744,17 +730,6 @@
 		**/
 		static get MIN() {
 			return new Int128([0x00000000, 0x00000000, 0x00000000, 0x80000000]);
-		}
-		
-		/**
-		 * Revert to previous version...
-		 * @returns {Int128}
-		**/
-		static noConflict() {
-			if ( _previous_int64 ) {
-				exports.Int128 = _previous_int64;
-			}
-			return exports.Int128;
 		}
 	}
 	exports.Int128 = Int128;

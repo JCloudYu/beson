@@ -3,268 +3,282 @@
 
     const stringifyObject = require('stringify-object');
     const { Serialize, Deserialize } = require('../beson');
-    const { ObjectId, Binary, Int64, UInt64, Int128, UInt128 } = require('../beson');
+    const { ObjectId, Binary, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128 } = require('../beson');
     const { UTF8Encode, UTF8Decode } = require('../beson').Helper;
+    
+    
+    const MIN_INT8	 = -128;
+	const MAX_INT8	 =  127;
+	const MAX_UINT8  =  0xFF;
+	const MIN_INT16	 = -32768;
+	const MAX_INT16	 =  32767;
+	const MAX_UINT16 =  0xFFFF;
+	const MIN_INT32	 = -2147483648;
+	const MAX_INT32	 =  2147483647;
+	const MAX_UINT32 =  0xFFFFFFFF;
 	
     const assert = require( 'assert' );
     describe('beson testing', () => {
         describe('beson deserialize data is equal to origin data', () => {
-            it('Null', () => {
-                let origin = null;
-                let test = Deserialize(Serialize(origin));
-                assert(test === origin);
-            });
-            
-            it('False', () => {
-                let origin = false;
-                let test = Deserialize(Serialize(origin));
-                assert(test === origin);
-            });
-
-            it('True', () => {
-                let origin = true;
-                let test = Deserialize(Serialize(origin));
-                assert(test === origin);
-            });
-
-            it('Int64 (positive number)', () => {
-                let origin = Int64.from(Int64.MAX);
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('Int64 (negative number)', () => {
-                let origin = Int64.from(Int64.MIN);
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('Int128 (positive number)', () => {
-                let origin = Int128.from(Int128.MAX);
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('Int128 (negative number)', () => {
-                let origin = Int128.from(Int128.MIN);
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('UInt64', () => {
-                let origin = UInt64.from(UInt64.MAX);
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('UInt128', () => {
-                let origin = UInt128.from(UInt128.MAX);
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('Double', () => {
-                let origin = Math.PI;
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('String', () => {
-                let origin = 'Hello World!!!';
-                let test = Deserialize(Serialize(origin));
-                assert(test === origin);
-            });
-
-            it('Array', () => {
-                let origin = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
-                let test = Deserialize(Serialize(origin));
-                assert(stringifyObject(test) === stringifyObject(origin));
-            });
-
-            it('Array (streaming)', () => {
-                let origin = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
-                let test = Deserialize(Serialize(origin, { streaming_array: true }));
-                assert(stringifyObject(test) === stringifyObject(origin));
-            });
-
-            it('Array (streaming + append binary origin)', () => {
-                let origin = [true, 2147483647, Math.PI, { aaa: 2147483647, bbb: Math.PI }, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
-                let buffer = Serialize(origin, { streaming_array: true });
-                let test = Deserialize(__arrayBufferConcat([buffer, new Uint8Array([123, 45, 67, 89]).buffer]));
-                assert(stringifyObject(test) === stringifyObject(origin));
-            });
-
-            it('Object', () => {
-                let origin = {
-                    z: {
-                        c: 'aaa',
-                        b: false,
-                        a: 123
-                    },
-                    b: 123,
-                    a: new Date(1539838676247),
-                    _: Int128.from(Int128.MAX),
-                    PI: Math.PI,
-                    array: ['aaa', true, 123]
-                };
-                let test = Deserialize(Serialize(origin));
-                assert(stringifyObject(test) === stringifyObject(origin));
-            });
-
-            it('Object (sort key)', () => {
-                const origin1 = {
-                    z: {
-                        c: 'aaa',
-                        b: false,
-                        a: 123
-                    },
-                    b: 123,
-                    a: new Date(1539838676247),
-                    _: Int128.from(Int128.MAX),
-                    PI: Math.PI,
-                    array: ['aaa', true, 123]
-                };
-                const origin2 = {
-                    PI: Math.PI,
-                    a: new Date(1539838676247),
-                    array: ['aaa', true, 123],
-                    z: {
-                        b: false,
-                        a: 123,
-                        c: 'aaa'
-                    },
-                    _: Int128.from(Int128.MAX),
-                    b: 123
-                };
-                const test1 = Deserialize(Serialize(origin1, { sort_key: true }));
-                const test2 = Deserialize(Serialize(origin2, { sort_key: true }));
-                assert(stringifyObject(test1) === stringifyObject(test2));
-            });
-
-            it('Object (streaming)', () => {
-                let origin = {
-                    z: {
-                        c: 'aaa',
-                        b: false,
-                        a: 123
-                    },
-                    b: 123,
-                    a: new Date(1539838676247),
-                    _: Int128.from(Int128.MAX),
-                    PI: Math.PI,
-                    array: ['aaa', true, 123]
-                };
-                const test = Deserialize(Serialize(origin, { streaming_object: true }));
-                assert(stringifyObject(test) === stringifyObject(origin));
-            });
-
-            it('Object (streaming + append binary origin)', () => {
-                let origin = {
-                    z: {
-                        c: 'aaa',
-                        b: false,
-                        a: 123
-                    },
-                    b: 123,
-                    a: new Date(1539838676247),
-                    _: Int128.from(Int128.MAX),
-                    PI: Math.PI,
-                    array: ['aaa', true, 123]
-                };
-                let buffer = Serialize(origin, { streaming_object: true });
-                let test = Deserialize(__arrayBufferConcat([buffer, new Uint8Array([123, 45, 67, 89]).buffer]));
-                assert(stringifyObject(test) === stringifyObject(origin));
-            });
-
-            it('Date', () => {
-                let origin = new Date(1539838676247);
-                let test = Deserialize(Serialize(origin));
-                assert(test.getTime() === origin.getTime());
-            });
-
-            it('ObjectId', () => {
-                let origin = new ObjectId();
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('Binary', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(origin));
-                assert(test.toString() === origin.toString());
-            });
-
-            it('ArrayBuffer', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(origin._ab));
-                let result = Binary.from(test);
-                assert((test instanceof ArrayBuffer) && (result.toString() === origin.toString()));
-            });
-
-            it('DataView', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(new DataView(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof DataView) && (result.toString() === origin.toString()));
-            });
-
-            it('Uint8Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(new Uint8Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Uint8Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Int8Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(new Int8Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Int8Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Uint16Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(new Uint16Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Uint16Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Int16Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId()));
-                let test = Deserialize(Serialize(new Int16Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Int16Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Uint32Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
-                let test = Deserialize(Serialize(new Uint32Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Uint32Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Int32Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
-                let test = Deserialize(Serialize(new Int32Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Int32Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Float32Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
-                let test = Deserialize(Serialize(new Float32Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Float32Array) && (result.toString() === origin.toString()));
-            });
-
-            it('Float64Array', () => {
-                let origin = Binary.from(Serialize(new ObjectId())).cut(0, 8);
-                let test = Deserialize(Serialize(new Float64Array(origin._ab)));
-                let result = Binary.from(test.buffer);
-                assert((test instanceof Float64Array) && (result.toString() === origin.toString()));
-            });
-
-            it('NodeJS Buffer', () => {
+			it('Null', ()=>{
+				let origin = null;
+				let test = Deserialize(Serialize(origin));
+				assert(test === origin);
+			});
+			it('False', ()=>{
+				let origin = false;
+				let test = Deserialize(Serialize(origin));
+				assert(test === origin);
+			});
+			it('True', ()=>{
+				let origin = true;
+				let test = Deserialize(Serialize(origin));
+				assert(test === origin);
+			});
+			it('Int8 (positive object)', ()=>{
+				let test = Deserialize(Serialize(Int8.MAX));
+				assert(test === MAX_INT8);
+			});
+			it('Int8 (negative object)', ()=>{
+				let test = Deserialize(Serialize(Int8.MIN));
+				assert(test === MIN_INT8);
+			});
+			it('UInt8 (object)', ()=>{
+				let test = Deserialize(Serialize(UInt8.MAX));
+				assert(test === MAX_UINT8);
+			});
+			it('Int16 (positive object)', ()=>{
+				let test = Deserialize(Serialize(Int16.MAX));
+				assert(test === MAX_INT16);
+			});
+			it('Int16 (negative object)', ()=>{
+				let test = Deserialize(Serialize(Int16.MIN));
+				assert(test === MIN_INT16);
+			});
+			it('UInt16 (object)', ()=>{
+				let test = Deserialize(Serialize(UInt16.MAX));
+				assert(test === MAX_UINT16);
+			});
+			it('Int32 (positive object)', ()=>{
+				let test = Deserialize(Serialize(Int32.MAX));
+				assert(test === MAX_INT32);
+			});
+			it('Int32 (negative object)', ()=>{
+				let test = Deserialize(Serialize(Int32.MIN));
+				assert(test === MIN_INT32);
+			});
+			it('UInt32 (object)', ()=>{
+				let test = Deserialize(Serialize(UInt32.MAX));
+				assert(+test === MAX_UINT32);
+			});
+			it('Int64 (positive number)', ()=>{
+				let origin = Int64.from(Int64.MAX);
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('Int64 (negative number)', ()=>{
+				let origin = Int64.from(Int64.MIN);
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('Int128 (positive number)', ()=>{
+				let origin = Int128.from(Int128.MAX);
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('Int128 (negative number)', ()=>{
+				let origin = Int128.from(Int128.MIN);
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('UInt64', ()=>{
+				let origin = UInt64.from(UInt64.MAX);
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('UInt128', ()=>{
+				let origin = UInt128.from(UInt128.MAX);
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('Double', ()=>{
+				let origin = Math.PI;
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('String', ()=>{
+				let origin = 'Hello World!!!';
+				let test = Deserialize(Serialize(origin));
+				assert(test === origin);
+			});
+			it('Array', ()=>{
+				let origin = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
+				let test = Deserialize(Serialize(origin));
+				assert(stringifyObject(test) === stringifyObject(origin));
+			});
+			it('Array (streaming)', ()=>{
+				let origin = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
+				let test = Deserialize(Serialize(origin, {streaming_array: true}));
+				assert(stringifyObject(test) === stringifyObject(origin));
+			});
+			it('Array (streaming + append binary origin)', ()=>{
+				let origin = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.from(Int128.MAX)]];
+				let buffer = Serialize(origin, {streaming_array: true});				let test = Deserialize(__arrayBufferConcat([buffer, new Uint8Array([123, 45, 67, 89]).buffer]));
+				assert(stringifyObject(test) === stringifyObject(origin));
+			});
+			it('Object', ()=>{
+				let origin = {
+					z: {
+						c: 'aaa',
+						b: false,
+						a: 123
+					},
+					b: 123,
+					a: new Date(1539838676247),
+					_: Int128.from(Int128.MAX),
+					PI: Math.PI,
+					array: ['aaa', true, 123]
+				};
+				let test = Deserialize(Serialize(origin));
+				assert(stringifyObject(test) === stringifyObject(origin));
+			});
+			it('Object (sort key)', ()=>{
+				const origin1 = {
+					z: {
+						c: 'aaa',
+						b: false,
+						a: 123
+					},
+					b: 123,
+					a: new Date(1539838676247),
+					_: Int128.from(Int128.MAX),
+					PI: Math.PI,
+					array: ['aaa', true, 123]
+				};
+				const origin2 = {
+					PI: Math.PI,
+					a: new Date(1539838676247),
+					array: ['aaa', true, 123],
+					z: {
+						b: false,
+						a: 123,
+						c: 'aaa'
+					},
+					_: Int128.from(Int128.MAX),
+					b: 123
+				};
+				const test1 = Deserialize(Serialize(origin1, {sort_key: true}));
+				const test2 = Deserialize(Serialize(origin2, {sort_key: true}));
+				assert(stringifyObject(test1) === stringifyObject(test2));
+			});
+			it('Object (streaming)', ()=>{
+				let origin = {
+					z: {
+						c: 'aaa',
+						b: false,
+						a: 123
+					},
+					b: 123,
+					a: new Date(1539838676247),
+					_: Int128.from(Int128.MAX),
+					PI: Math.PI,
+					array: ['aaa', true, 123]
+				};
+				const test = Deserialize(Serialize(origin, {streaming_object: true}));
+				assert(stringifyObject(test) === stringifyObject(origin));
+			});
+			it('Object (streaming + append binary origin)', ()=>{
+				let origin = {
+					z: {
+						c: 'aaa',
+						b: false,
+						a: 123
+					},
+					b: 123,
+					a: new Date(1539838676247),
+					_: Int128.from(Int128.MAX),
+					PI: Math.PI,
+					array: ['aaa', true, 123]
+				};
+				let buffer = Serialize(origin, {streaming_object: true});				let test = Deserialize(__arrayBufferConcat([buffer, new Uint8Array([123, 45, 67, 89]).buffer]));
+				assert(stringifyObject(test) === stringifyObject(origin));
+			});
+			it('Date', ()=>{
+				let origin = new Date(1539838676247);
+				let test = Deserialize(Serialize(origin));
+				assert(test.getTime() === origin.getTime());
+			});
+			it('ObjectId', ()=>{
+				let origin = new ObjectId();
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('Binary', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(origin));
+				assert(test.toString() === origin.toString());
+			});
+			it('ArrayBuffer', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(origin._ab));
+				let result = Binary.from(test);
+				assert((test instanceof ArrayBuffer) && (result.toString() === origin.toString()));
+			});
+			it('DataView', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(new DataView(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof DataView) && (result.toString() === origin.toString()));
+			});
+			it('Uint8Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(new Uint8Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Uint8Array) && (result.toString() === origin.toString()));
+			});
+			it('Int8Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(new Int8Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Int8Array) && (result.toString() === origin.toString()));
+			});
+			it('Uint16Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(new Uint16Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Uint16Array) && (result.toString() === origin.toString()));
+			});
+			it('Int16Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId()));
+				let test = Deserialize(Serialize(new Int16Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Int16Array) && (result.toString() === origin.toString()));
+			});
+			it('Uint32Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
+				let test = Deserialize(Serialize(new Uint32Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Uint32Array) && (result.toString() === origin.toString()));
+			});
+			it('Int32Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
+				let test = Deserialize(Serialize(new Int32Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Int32Array) && (result.toString() === origin.toString()));
+			});
+			it('Float32Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId())).cut(0, 12);
+				let test = Deserialize(Serialize(new Float32Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Float32Array) && (result.toString() === origin.toString()));
+			});
+			it('Float64Array', ()=>{
+				let origin = Binary.from(Serialize(new ObjectId())).cut(0, 8);
+				let test = Deserialize(Serialize(new Float64Array(origin._ab)));
+				let result = Binary.from(test.buffer);
+				assert((test instanceof Float64Array) && (result.toString() === origin.toString()));
+			});
+			it('NodeJS Buffer', () => {
             	let origin = Buffer.from(Serialize(new ObjectId()));
                 let result = Deserialize(Serialize(origin));
                 assert((result instanceof Buffer) && (result.toString('hex') === origin.toString('hex')));
@@ -354,6 +368,42 @@
             	let serialized = Binary.fromHex("0x04013BAFEF4B")._ab;
             	let original = 31415926;
                 assert(Deserialize(serialized) === original);
+            });
+            it('int8 to Int8 ( positive )', ()=>{
+            	let test = Deserialize(Serialize(Int8.MAX), {use_native_types:false});
+				assert(test instanceof Int8 && +test === MAX_INT8);
+            });
+            it('int8 to Int8 ( negative )', ()=>{
+            	let test = Deserialize(Serialize(Int8.MIN), {use_native_types:false});
+				assert(test instanceof Int8 && +test === MIN_INT8);
+            });
+            it('uint8 to UInt8', ()=>{
+            	let test = Deserialize(Serialize(UInt8.MAX), {use_native_types:false});
+				assert(test instanceof UInt8 && +test === MAX_UINT8);
+            });
+            it('int16 to Int16 ( positive )', ()=>{
+            	let test = Deserialize(Serialize(Int16.MAX), {use_native_types:false});
+				assert(test instanceof Int16 && +test === MAX_INT16);
+            });
+            it('int16 to Int16 ( negative )', ()=>{
+            	let test = Deserialize(Serialize(Int16.MIN), {use_native_types:false});
+				assert(test instanceof Int16 && +test === MIN_INT16);
+            });
+            it('uint16 to UInt16', ()=>{
+            	let test = Deserialize(Serialize(UInt16.MAX), {use_native_types:false});
+				assert(test instanceof UInt16 && +test === MAX_UINT16);
+            });
+            it('int32 to Int32 ( positive )', ()=>{
+            	let test = Deserialize(Serialize(Int32.MAX), {use_native_types:false});
+				assert(test instanceof Int32 && +test === MAX_INT32);
+            });
+            it('int32 to Int32 ( negative )', ()=>{
+            	let test = Deserialize(Serialize(Int32.MIN), {use_native_types:false});
+				assert(test instanceof Int32 && +test === MIN_INT32);
+            });
+            it('uint32 to UInt32', ()=>{
+            	let test = Deserialize(Serialize(UInt32.MAX), {use_native_types:false});
+				assert(test instanceof UInt32 && +test === MAX_UINT32);
             });
         });
     });

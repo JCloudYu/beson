@@ -118,7 +118,7 @@
 		}
 	}
 
-	module.exports = ObjectId;
+	module.exports = {ObjectId};
 	
 	
 	
