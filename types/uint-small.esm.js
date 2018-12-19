@@ -2,8 +2,8 @@
 *	Author: JCloudYu
 *	Create: 2018/12/04
 **/
-import {ExtractBuffer} from "../helper.js";
-import {BinarizedInt} from "./core-interfaces.js";
+import {ExtractBuffer} from "../helper.esm.js";
+import {BinarizedInt} from "./core-interfaces.esm.js";
 
 
 

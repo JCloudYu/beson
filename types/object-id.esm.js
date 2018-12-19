@@ -8,8 +8,8 @@ import {
 	Uint8ArrayFromHex,
 	DumpHexString,
 	DumpBinaryString
-} from "../helper/misc.js";
-import {fnv1a24 as FNV1A24} from "../helper/hash.js";
+} from "../helper/misc.esm.js";
+import {fnv1a24 as FNV1A24} from "../helper/hash.esm.js";
 
 
 

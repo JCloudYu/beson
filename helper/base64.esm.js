@@ -2,7 +2,7 @@
  *	Author: JCloudYu
  *	Create: 2018/12/18
 **/
-import {ExtractBuffer} from "./misc.js";
+import {ExtractBuffer} from "./misc.esm.js";
 
 
 

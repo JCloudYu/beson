@@ -1,8 +1,8 @@
 /**
-*    Author: JCloudYu
-*    Create: 2018/10/30
+ * Author: JCloudYu
+ * Create: 2018/10/30
 **/
-import {HAS_NODE_BUFFER} from "../constants.js";
+import {HAS_NODE_BUFFER} from "../constants.esm.js";
 
 const INT8_RANGE	= [-128, 127];
 const INT16_RANGE	= [-32768, 32767];

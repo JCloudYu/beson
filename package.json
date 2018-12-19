@@ -4,7 +4,7 @@
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
-		"test-mocha": "mocha ./test/test-mocha.js"
+		"test": "node --experimental-modules --loader ./_supportive/loader.mjs ./node_modules/.bin/_mocha"
 	},
 	"repository": {
 		"type": "git",
@@ -22,6 +22,6 @@
 	},
 	"homepage": "https://github.com/JCloudYu/beson#readme",
 	"devDependencies": {
-		"stringify-object": "^3.3.0"
+		"mocha": "^5.2.0"
 	}
 }

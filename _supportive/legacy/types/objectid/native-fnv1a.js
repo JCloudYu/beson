@@ -3,7 +3,7 @@
  * File: fnv1a.js
  * Author: JCloudYu
  * Create Date: Sep. 03, 2018
- */
+**/
 (()=>{
 	"use strict";
 	

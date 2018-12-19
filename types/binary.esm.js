@@ -8,7 +8,7 @@ import {
 	DumpHexString,
 	DumpBinaryString,
 	ConcatBuffers
-} from "../helper.js";
+} from "../helper.esm.js";
 
 
 export class Binary {
