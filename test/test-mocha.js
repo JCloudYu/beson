@@ -22,7 +22,6 @@
 	const assert = require('assert');
 	describe('beson testing', ()=>{
 		describe('beson deserialize data is equal to origin data', ()=>{
-		console.log("IN!");
 			it('Null', ()=>{
 				let origin = null;
 				let test = Deserialize(Serialize(origin));
