@@ -12,14 +12,15 @@ import {
 **/
 
 /**
- * Deserialize ArrayBuffer
- * - result = headerBuffer + contentBuffer
- * - contentBuffer = typeBuffer + dataBuffer
+ * Function for sequential deserialization
+ *
  * @param {ArrayBuffer|Buffer} buffer
+ * @param {Number} [anchor=0]
  * @param {DeserializeOptions} options
- * @returns {*}
- */
-export function deserialize(buffer, options={use_native_types:true}) {
+ * @return {{value:*, buffer:ArrayBuffer}|undefined}
+ * @private
+**/
+export function _deserialize(buffer, anchor=0, options={use_native_types:true}) {
 	if ( HAS_NODE_BUFFER ) {
 		if ( buffer instanceof Buffer ) {
 			let buff = Buffer.alloc(buffer.length);
@@ -28,16 +29,27 @@ export function deserialize(buffer, options={use_native_types:true}) {
 		}
 	}
 	
-	
-	
-	let anchor = 0;
+	let value;
 	({ anchor } = __deserializeHeader(buffer, anchor));
-	let content;
-	({ anchor, value: content } = __deserializeContent(buffer, anchor, options));
-	if (content === undefined) {
+	({ anchor, value } = __deserializeContent(buffer, anchor, options));
+	return (value === undefined) ? undefined : {value, anchor};
+}
+
+/**
+ * Deserialize ArrayBuffer
+ * - result = headerBuffer + contentBuffer
+ * - contentBuffer = typeBuffer + dataBuffer
+ * @param {ArrayBuffer|Buffer} buffer
+ * @param {DeserializeOptions} options
+ * @returns {*}
+ */
+export function deserialize(buffer, options={use_native_types:true}) {
+	const result = _deserialize(buffer, 0, options);
+	if ( result === undefined ) {
 		throw new TypeError('Wrong data format');
 	}
-	return content;
+	
+	return result.value;
 }
 
 /**
@@ -80,14 +92,18 @@ function __deserializeContent(buffer, start, options) {
 function __deserializeType(buffer, start, options) {
 	let length = 2;
 	let end = start + length;
-	let type;
-	let typeData = new Uint8Array(buffer, start, length);
-	Object.entries(TYPE_HEADER).forEach(([headerKey, headerVal]) => {
-		let headerData = new Uint8Array(headerVal);
-		if ((typeData[0] === headerData[0]) && (typeData[1] === headerData[1])) {
-			type = headerKey.toLowerCase();
-		}
-	});
+	let type = null;
+
+	
+	if ( (buffer.byteLength - start) >= length ) {
+		let typeData = new Uint8Array(buffer, start, length);
+		Object.entries(TYPE_HEADER).forEach(([headerKey, headerVal]) => {
+			let headerData = new Uint8Array(headerVal);
+			if ((typeData[0] === headerData[0]) && (typeData[1] === headerData[1])) {
+				type = headerKey.toLowerCase();
+			}
+		});
+	}
 	return { anchor: end, value: type };
 }
 
@@ -101,7 +117,7 @@ function __deserializeType(buffer, start, options) {
  * @private
  */
 function __deserializeData(type, buffer, start, options) {
-	let result = {};
+	let result = {anchor:start, value:undefined};
 	if (type === DATA_TYPE.NULL) {
 		result = __deserializeNull(start, options);
 	}

@@ -4,9 +4,10 @@
 **/
 import * as Helper from "./helper.esm.js"
 import * as BesonType from "./types.esm.js";
-export {serialize as Serialize} from "./serialize.esm.js";
-export {deserialize as Deserialize} from "./deserialize.esm.js";
+import {deserialize} from "./deserialize.esm.js";
+import {serialize} from "./serialize.esm.js";
 
 
 
 export { Helper, BesonType };
+export { deserialize as Deserialize, serialize as Serialize };

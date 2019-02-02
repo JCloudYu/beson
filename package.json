@@ -1,6 +1,6 @@
 {
 	"name": "beson",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
@@ -20,8 +20,5 @@
 	"bugs": {
 		"url": "https://github.com/JCloudYu/beson/issues"
 	},
-	"homepage": "https://github.com/JCloudYu/beson#readme",
-	"devDependencies": {
-		"mocha": "^5.2.0"
-	}
+	"homepage": "https://github.com/JCloudYu/beson#readme"
 }
