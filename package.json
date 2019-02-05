@@ -1,11 +1,9 @@
 {
 	"name": "beson",
-	"version": "0.9.17",
+	"version": "0.9.18",
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
-	"scripts": {
-		"test-mocha": "mocha ./test/test-mocha.js"
-	},
+	"scripts": {},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/JCloudYu/beson.git"
@@ -20,8 +18,5 @@
 	"bugs": {
 		"url": "https://github.com/JCloudYu/beson/issues"
 	},
-	"homepage": "https://github.com/JCloudYu/beson#readme",
-	"devDependencies": {
-		"stringify-object": "^3.3.0"
-	}
+	"homepage": "https://github.com/JCloudYu/beson#readme"
 }
