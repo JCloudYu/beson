@@ -8,28 +8,18 @@ import {
 
 
 
-const MIN_SAFE_INT8		= -128;
-const MAX_SAFE_INT8		=  127;
-const MIN_SAFE_INT16	= -32768;
-const MAX_SAFE_INT16	=  32767;
-const MIN_SAFE_INT32	= -2147483648;
-const MAX_SAFE_INT32	=  2147483647;
-
-
 /**
  * @class BESONSerializerOption
  * @property {Boolean} [BESONSerializerOption.sort_key=false]
  * @property {Boolean} [BESONSerializerOption.streaming_array=false]
  * @property {Boolean} [BESONSerializerOption.streaming_object=false]
- * @property {Boolean} [BESONSerializerOption.shrink_integer=false]
 **/
 
 /** @type {BESONSerializerOption} */
 const DEFAULT_OPTIONS = {
 	sort_key: false,
 	streaming_array: false,
-	streaming_object: false,
-	shrink_integer: false
+	streaming_object: false
 };
 
 /**
@@ -86,28 +76,7 @@ function __getType(data, options) {
 	else if (type === 'boolean') {
 		type = (data) ? DATA_TYPE.TRUE : DATA_TYPE.FALSE;
 	}
-	else if (type === 'number' && __isInt(data)) {
-		if ( data > MAX_SAFE_INT32 || data < MIN_SAFE_INT32 ) {
-			type = DATA_TYPE.FLOAT64;
-		}
-		else
-		if ( options.shrink_integer ) {
-			if ( data <= MAX_SAFE_INT8 && data >= MIN_SAFE_INT8 ) {
-				type = DATA_TYPE.INT8;
-			}
-			else
-			if ( data <= MAX_SAFE_INT16 && data >= MIN_SAFE_INT16 ) {
-				type = DATA_TYPE.INT16;
-			}
-			else {
-				type = DATA_TYPE.INT32;
-			}
-		}
-		else {
-			type = DATA_TYPE.INT32;
-		}
-	}
-	else if (type === 'number' && __isFloat(data)) {
+	else if ( type === "number" ) {
 		type = DATA_TYPE.FLOAT64;
 	}
 	else if ( data instanceof Int8 ) {
@@ -234,28 +203,13 @@ function __serializeData(type, data, options=DEFAULT_OPTIONS) {
 		buffers = [data._ab];
 	}
 	else if (type === DATA_TYPE.INT8) {
-		if ( typeof data === "number" ) {
-			buffers = __serializeInt8(data);
-		}
-		else {
-			buffers = [data._ab];
-		}
+		buffers = [data._ab];
 	}
 	else if (type === DATA_TYPE.INT16) {
-		if ( typeof data === "number" ) {
-			buffers = __serializeInt16(data);
-		}
-		else {
-			buffers = [data._ab];
-		}
+		buffers = [data._ab];
 	}
 	else if (type === DATA_TYPE.INT32) {
-		if ( typeof data === "number" ) {
-			buffers = __serializeInt32(data);
-		}
-		else {
-			buffers = [data._ab];
-		}
+		buffers = [data._ab];
 	}
 	else if (type === DATA_TYPE.INT64) {
 		buffers = __serializeInt64(data);
@@ -351,39 +305,6 @@ function __serializeNull() {
  */
 function __serializeBoolean() {
 	return [];
-}
-
-/**
- * Serialize Int8 data
- * @param {number} data
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeInt8(data) {
-	let contentData = new Int8Array([data]);
-	return [contentData.buffer];
-}
-
-/**
- * Serialize Int16 data
- * @param {number} data
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeInt16(data) {
-	let contentData = new Int16Array([data]);
-	return [contentData.buffer];
-}
-
-/**
- * Serialize Int32 data
- * @param {number} data
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeInt32(data) {
-	let contentData = new Int32Array([data]);
-	return [contentData.buffer];
 }
 
 /**
@@ -632,24 +553,4 @@ function __arrayBufferConcat(buffers) {
 		offset += buffer.byteLength;
 	}
 	return result.buffer;
-}
-
-/**
- * Check it is Int number
- * @param {number} n
- * @returns {boolean}
- * @private
- */
-function __isInt(n) {
-	return (n % 1 === 0);
-}
-
-/**
- * Check it is Float number
- * @param {number} n
- * @returns {boolean}
- * @private
- */
-function __isFloat(n) {
-	return (n % 1 !== 0);
 }
