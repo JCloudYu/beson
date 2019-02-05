@@ -69,8 +69,31 @@ export class Binarized {
 		}
 	}
 	
+	/**
+	 * Set the array buffer
+	 * @param {ArrayBuffer} array_buffer
+	**/
+	_set_ab(array_buffer) {
+		if ( !(array_buffer instanceof ArrayBuffer) ) {
+			throw new TypeError( "Given input must be an ArrayBuffer!" );
+		}
+		
+		this._ab = array_buffer;
+		this._ba = new Uint8Array(this._ab);
+		return this;
+	}
 	
+	/**
+	 * Returns the size of the carried data
+	 * @return {number}
+	**/
+	get size() {
+		return this._ab.byteLength;
+	}
 	
+	[Symbol.toPrimitive](hint) {
+		return this.toString(16);
+	}
 	
 	
 	
@@ -80,21 +103,27 @@ export class Binarized {
 	 * @returns {Boolean}
 	**/
 	static IsBinarized(input){
+		return input instanceof Binarized;
+	}
+	
+	static [Symbol.hasInstance](input) {
 		if ( Object(input) !== input ) {
 			return false;
 		}
 		
-		if ( input instanceof Binarized ) {
-			return true;
-		}
-		
-		let check = input._ab instanceof ArrayBuffer;
+		let check = true;
+		check = check && (input._ab instanceof ArrayBuffer);
 		check = check && (input._ba instanceof Uint8Array);
 		check = check && (typeof input.toBytes === "function");
 		return check;
 	}
 }
 export class BinarizedInt extends Binarized {
+	constructor() {
+		super();
+		this._ta = this._ba;
+	}
+
 	/**
 	 * Return a copy of the contained binary data and resize the data into specific size
 	 *
@@ -130,8 +159,13 @@ export class BinarizedInt extends Binarized {
 		return false;
 	}
 	
-	
-	
+	[Symbol.toPrimitive](hint) {
+		if( hint === 'string' ){
+			return this.toString(10);
+		}
+		
+		return this._ta[0];
+	}
 	
 	
 	
@@ -141,17 +175,14 @@ export class BinarizedInt extends Binarized {
 	 * @returns {Boolean}
 	**/
 	static IsBinarizedInt(input) {
-		if ( !Binarized.IsBinarized() ) return false;
-		return input.hasOwnProperty('isSignedInt');
+		return input instanceof BinarizedInt;
 	};
 	
-	
-	
-	[Symbol.toPrimitive](hint) {
-		if( hint === 'string' ){
-			return this.toString(10);
+	static [Symbol.hasInstance](input) {
+		if ( !(input instanceof Binarized) ) {
+			return false;
 		}
 		
-		return this._ta[0];
+		return input.hasOwnProperty('isSignedInt');
 	}
 }
