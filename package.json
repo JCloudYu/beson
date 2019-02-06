@@ -4,7 +4,7 @@
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
-		"test": "node --experimental-modules --loader ./_supportive/loader.mjs ./node_modules/mocha/bin/_mocha"
+		"test": "node --experimental-modules --loader ./_supportive/loader.mjs ./unit-test.mjs"
 	},
 	"repository": {
 		"type": "git",
