@@ -506,7 +506,7 @@ function __serializeDate(data) {
  * @private
  */
 function __serializeObjectId(data) {
-	return [data._dv.buffer];
+	return [data._ab];
 }
 
 /**

@@ -183,7 +183,7 @@ function __deserializeData(type, buffer, start, options) {
 	}
 	else if (type === DATA_TYPE.BINARY) {
 		result = __deserializeArrayBuffer(buffer, start, options);
-		result.value = new Binary(result.value);
+		result.value = Binary.FromArrayBuffer(result.value);
 	}
 	else if (type === DATA_TYPE.ARRAY_BUFFER) {
 		result = __deserializeArrayBuffer(buffer, start, options);
