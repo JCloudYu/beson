@@ -3,6 +3,9 @@
  * Create: 2018/10/30
 **/
 import {HAS_NODE_BUFFER} from "../constants.esm.js";
+import {Binarized} from "../types/core-interfaces.esm.js";
+
+
 
 const INT8_RANGE	= [-128, 127];
 const INT16_RANGE	= [-32768, 32767];
@@ -32,7 +35,7 @@ const HEX_MAP_INVERSE = {
 
 /**
  * Get buffers from input
- * @param {ArrayBuffer|TypedArray|DataView} input
+ * @param {ArrayBuffer|TypedArray|DataView|Binarized} input
  * @return {ArrayBuffer|null}
 **/
 export function ObtainBuffer(input) {
@@ -50,6 +53,10 @@ export function ObtainBuffer(input) {
 	
 	if ( input instanceof ArrayBuffer ) {
 		return input;
+	}
+	
+	if ( input instanceof Binarized ) {
+		return input._ab;
 	}
 	
 	return null;
@@ -542,29 +549,6 @@ export function RandomBytes(length) {
 	}
 	
 	return buffer.buffer;
-}
-
-/**
- * Get current execution environment's corresponding hostname string
- * @return {String}
- * @constructor
-**/
-export function GetEnvHostName() {
-	try {
-		if ( HAS_NODE_BUFFER ) {
-			return require( 'os' ).hostname;
-		}
-		else
-		if ( typeof window !== "undefined" ) {
-			return window.location.hostname;
-		}
-		else {
-			throw new Error("");
-		}
-	}
-	catch(e) {
-		return 'unknown.' + DumpHexString(RandomBytes(32));
-	}
 }
 
 

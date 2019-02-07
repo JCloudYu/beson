@@ -2,7 +2,7 @@
  *	Author: JCloudYu
  *	Create: 2018/12/04
 **/
-import {DumpBinaryString, DumpHexString} from "../helper.esm.js";
+import {DumpBinaryString, DumpHexString} from "../helper/misc.esm.js";
 
 const DEFAULT_AB  = new ArrayBuffer(0);
 const DEFAULT_BA  = new Uint8Array(DEFAULT_AB);

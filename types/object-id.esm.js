@@ -3,18 +3,20 @@
 *	Create: 2018/12/18
 **/
 import {
-	RandomBytes,
-	GetEnvHostName,
-	Uint8ArrayFromHex,
-	DumpHexString,
-	DumpBinaryString
+	ObtainBuffer, RandomBytes, DumpHexString, HexToBuffer
 } from "../helper/misc.esm.js";
+
+import {HAS_NODE_BUFFER} from "../constants.esm.js";
+import {Binarized} from "./core-interfaces.esm.js";
 import {fnv1a24 as FNV1A24} from "../helper/hash.esm.js";
 
 
 
-const PID			= (new Uint16Array(RandomBytes(2)))[0];
-const MACHINE_ID	= FNV1A24(GetEnvHostName());
+
+
+
+const PID = (new Uint16Array(RandomBytes(2)))[0];
+const MACHINE_ID = FNV1A24(___GET_ENV_HOSTNAME());
 
 
 
@@ -22,50 +24,51 @@ const MACHINE_ID	= FNV1A24(GetEnvHostName());
 
 
 let SEQ_NUMBER = (new Uint32Array(RandomBytes(4)))[0];
-const _PROPS = new WeakMap();
-export class ObjectId {
+export class ObjectId extends Binarized {
+	/**
+	 * @param {String|Number|null|TypedArray|ArrayBuffer|DataView|Binarized} id
+	**/
 	constructor(id=null) {
-		// region [ Default Constructor ]
+		super();
+		
+		if ( id instanceof Date ) { id = id.getTime(); }
 		if ( id === null || typeof id === 'number' ) {
-			this._dv = ___GEN_OBJECT_ID(id);
+			this._set_ab(___GEN_OBJECT_ID(id));
 			return;
 		}
-		// endregion
+	
+	
 		
-		// region [ Copy Constructor ]
-		if ( id instanceof ObjectId ) {
-			const OTHER	 = _PROPS.get(id);
-			this._dv = new DataView(OTHER._dv.buffer.slice(0));
+		this._set_ab(RandomBytes(12));
+
+		// Convert from other binary sources
+		let buffer = ObtainBuffer(id);
+		if ( buffer !== null ) {
+			const source = new Uint8Array(buffer);
+			this._ba.set(source, 0);
 			return;
 		}
-		// endregion
 		
-		// region [ Cast other type or error... ]
-		const RAW_ID = ___CAST_OBJECT_ID(id);
-		if ( RAW_ID === null ) {
-			throw new TypeError(
-				'Argument passed in must be either a buffer, a number, a date object, a binary string of 12 bytes or a hex string with 24 characters.'
-			);
+		// Convert from hex string
+		const type = typeof id;
+		if ( type === "string" ) {
+			if ( id.substring(0, 2) !== "0x" ) {
+				id = "0x" + id;
+			}
+			
+			const source = new Uint8Array(HexToBuffer(id));
+			this._ba.set(source, 0);
+			return;
 		}
 		
-		this._dv = new DataView(RAW_ID);
-		// endregion
-	}
-	toString(bits=16) {
-		switch(bits) {
-			case 2:
-				return DumpBinaryString(this._dv.buffer);
-				
-			case 16:
-			default:
-				return DumpHexString(this._dv.buffer);
-		}
-	}
-	toJSON() {
-		return this.toString(16);
+		
+		
+		throw new TypeError(
+			'Argument passed in must be either a buffer, a number, a date object, a binary string of 12 bytes or a hex string with 24 characters.'
+		);
 	}
 	
-	static Generate(id=null) {
+	static Create(id=null) {
 		return new ObjectId(id);
 	}
 }
@@ -74,65 +77,50 @@ export class ObjectId {
 
 
 
-
+/**
+ * Generate an array buffer that contains random ObjectId
+ * @param {Number} [initTime=null]
+ * @return {ArrayBuffer}
+ * @private
+**/
 function ___GEN_OBJECT_ID(initTime=null) {
-	const time	= initTime || ((Date.now()/1000)|0);
+	const time	= initTime || Math.floor(Date.now()/1000);
 	const pid	= PID;
 	const inc	= (SEQ_NUMBER=(SEQ_NUMBER+1) % 0xffffff);
 
 
 
 	const buffer = new DataView(new ArrayBuffer(12));
-	// region [ Fill in the id information ]
-	// Fill in the info in reversed order to prevent byte-wise assignments
+	
+	// NOTE: Fill in the id information
+	// NOTE: Following statements' order should not be modified!
 	buffer.setUint32(8, inc, false);		// [9-11] seq
 	buffer.setUint16(7, pid, false);		// [7-8] pid
 	buffer.setUint32(3, MACHINE_ID, false);	// [4-6] machine id
 	buffer.setUint32(0, time, false);		// [0-3] epoch time
-	// endregion
 	
-	
-	
-	return buffer;
+	return buffer.buffer;
 }
-function ___CAST_OBJECT_ID(candidate) {
-	if ( candidate instanceof ArrayBuffer ) {
-		if ( candidate.byteLength >= 12 ) {
-			return candidate.slice(0, 12);
+
+/**
+ * Get current execution environment's corresponding hostname string
+ * @return {String}
+ * @private
+**/
+function ___GET_ENV_HOSTNAME() {
+	try {
+		if ( HAS_NODE_BUFFER ) {
+			return require( 'os' ).hostname;
 		}
-		
-		return null;
-	}
-	else
-	if ( ArrayBuffer.isView(candidate) ) {
-		if ( candidate.byteLength >= 12 ) {
-			return candidate.buffer.slice(0, 12);
+		else
+		if ( typeof window !== "undefined" ) {
+			return window.location.hostname;
 		}
-		
-		return null;
-	}
-	
-	
-	
-	const type = typeof candidate;
-	if ( type === "string" ) {
-		if ( candidate.substring(0, 2) !== "0x" ) {
-			candidate = "0x" + candidate;
+		else {
+			throw new Error("");
 		}
-	
-		if ( candidate.length !== 26 ) {
-			return null;
-		}
-		
-		return Uint8ArrayFromHex(candidate).buffer;
 	}
-	
-	if ( candidate instanceof Date ) {
-		candidate = candidate.getTime();
+	catch(e) {
+		return 'unknown.' + DumpHexString(RandomBytes(32));
 	}
-	if ( candidate === null || type === "number" ) {
-		return ___GEN_OBJECT_ID(candidate);
-	}
-	
-	return null;
 }
