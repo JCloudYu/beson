@@ -20,28 +20,51 @@
      * @param {DeserializeOptions} options
      * @returns {*}
      */
-    function deserialize(buffer, options={use_native_types:true}) {
-    	if ( HAS_BUFFER ) {
-    		if ( buffer instanceof Buffer ) {
-    			let buff = Buffer.alloc(buffer.length);
-        		buffer.copy(buff, 0);
-    			buffer = buff.buffer;
-    		}
-    	}
-    	
-    	
-    	
-        let anchor = 0;
+
+    /**
+     * Function for sequential deserialization
+     *
+     * @param {ArrayBuffer|Buffer} buffer
+     * @param {Number} [anchor=0]
+     * @param {DeserializeOptions} options
+     * @return {{value:*, buffer:ArrayBuffer}|undefined}
+     * @private
+    **/
+    function _deserialize(buffer, anchor=0, options={use_native_types:true}) {
+        if ( HAS_BUFFER ) {
+            if ( buffer instanceof Buffer ) {
+                let buff = Buffer.alloc(buffer.length);
+                buffer.copy(buff, 0);
+                buffer = buff.buffer;
+            }
+        }
+        
+        let value;
         ({ anchor } = __deserializeHeader(buffer, anchor));
-        let content;
-        ({ anchor, value: content } = __deserializeContent(buffer, anchor, options));
-        if (content === undefined) {
+        ({ anchor, value } = __deserializeContent(buffer, anchor, options));
+        return (value === undefined) ? undefined : {value, anchor};
+    }
+
+    /**
+     * Deserialize ArrayBuffer
+     * - result = headerBuffer + contentBuffer
+     * - contentBuffer = typeBuffer + dataBuffer
+     * @param {ArrayBuffer|Buffer} buffer
+     * @param {DeserializeOptions} options
+     * @returns {*}
+     */
+    function deserialize(buffer, options={use_native_types:true}) {
+        const result = _deserialize(buffer, 0, options);
+        if ( result === undefined ) {
             throw new TypeError('Wrong data format');
         }
-        return content;
+        
+        return result.value;
     }
-    module.exports = deserialize;
 
+    module.exports = deserialize;
+    module.exports._deserialize = _deserialize;
+    
     /**
      * Deserialize header (it is empty now)
      * @param {ArrayBuffer} buffer
