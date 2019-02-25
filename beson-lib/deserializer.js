@@ -38,6 +38,9 @@
                 buffer = buff.buffer;
             }
         }
+        if ( anchor >= buffer.byteLength ) {
+            return undefined;
+        }
         
         let value;
         ({ anchor } = __deserializeHeader(buffer, anchor));
