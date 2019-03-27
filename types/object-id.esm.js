@@ -3,7 +3,7 @@
 *	Create: 2018/12/18
 **/
 import {
-	ObtainBuffer, RandomBytes, DumpHexString, HexToBuffer
+	ReadBuffer, RandomBytes, DumpHexStringLE, HexToBuffer
 } from "../helper/misc.esm.js";
 
 import {HAS_NODE_BUFFER} from "../constants.esm.js";
@@ -26,38 +26,31 @@ const MACHINE_ID = FNV1A24(___GET_ENV_HOSTNAME());
 let SEQ_NUMBER = (new Uint32Array(RandomBytes(4)))[0];
 export class ObjectId extends Binarized {
 	/**
-	 * @param {String|Number|null|TypedArray|ArrayBuffer|DataView|Binarized} id
+	 * @param {Date|Number|null|BinarizedData} id
 	**/
 	constructor(id=null) {
 		super();
 		
 		if ( id instanceof Date ) { id = id.getTime(); }
 		if ( id === null || typeof id === 'number' ) {
-			this._set_ab(___GEN_OBJECT_ID(id));
+			this.__set_ab(___GEN_OBJECT_ID(id));
 			return;
 		}
 	
 	
 		
-		this._set_ab(RandomBytes(12));
+		this.__set_ab(RandomBytes(12));
 
 		// Convert from other binary sources
-		let buffer = ObtainBuffer(id);
+		let buffer = ReadBuffer(id);
 		if ( buffer !== null ) {
 			const source = new Uint8Array(buffer);
 			this._ba.set(source, 0);
 			return;
 		}
 		
-		// Convert from hex string
-		const type = typeof id;
-		if ( type === "string" ) {
-			if ( id.substring(0, 2) !== "0x" ) {
-				id = "0x" + id;
-			}
-			
-			const source = new Uint8Array(HexToBuffer(id));
-			this._ba.set(source, 0);
+		if ( Binarized.IsBinarized(id) ) {
+			this._ba.set(id._ba, 0);
 			return;
 		}
 		
@@ -70,6 +63,10 @@ export class ObjectId extends Binarized {
 	
 	static Create(id=null) {
 		return new ObjectId(id);
+	}
+	
+	static FromHex(hexStr) {
+		return new ObjectId(HexToBuffer(hexStr));
 	}
 }
 
@@ -121,6 +118,6 @@ function ___GET_ENV_HOSTNAME() {
 		}
 	}
 	catch(e) {
-		return 'unknown.' + DumpHexString(RandomBytes(32));
+		return 'unknown.' + DumpHexStringLE(RandomBytes(32));
 	}
 }

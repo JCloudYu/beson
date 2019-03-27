@@ -2,10 +2,6 @@
  *	Author: JCloudYu
  *	Create: 2018/12/18
 **/
-import {ExtractBuffer} from "./misc.esm.js";
-
-
-
 const BASE64_ENCODE_CHAR = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
 const BASE64URL_ENCODE_CHAR = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'.split('');
 const BASE64_DECODE_CHAR = {
@@ -27,7 +23,7 @@ const BASE64_DECODE_CHAR = {
  * @return {string}
 **/
 export function Base64Encode(input) {
-	let bytes = new Uint8Array(ExtractBuffer(input));
+	let bytes = new Uint8Array(ReadBuffer(input));
 
 	var v1, v2, v3, base64Str = '', length = bytes.length;
 	for( var i = 0, count = ((length/3)>>>0) * 3; i < count; ){
@@ -65,7 +61,7 @@ export function Base64Encode(input) {
  * @return {String}
 **/
 export function Base64URLEncode(input) {
-	let bytes = new Uint8Array(ExtractBuffer(input));
+	let bytes = new Uint8Array(ReadBuffer(input));
 
 	var v1, v2, v3, base64Str = '', length = bytes.length;
 	for( var i = 0, count = ((length/3)>>>0) * 3; i < count; ){

@@ -9,6 +9,7 @@ import os from "os";
 (async()=>{
 	const __dirname = path.dirname((import.meta.url).substring(os.platform()==="win32"?8:7));
 	
+	const TEST_SCRIPTS = process.argv.slice(2);
 	
 	const root_group = __CREATE_GROUP();
 	let current_scope = root_group;
@@ -20,18 +21,26 @@ import os from "os";
 	
 	// region [ Load all modules ended with .test.js ]
 	try {
-		const TEST_PATH = `${__dirname}/tests`;
-		const dir_list = fs.readdirSync(TEST_PATH, {withFileTypes:true});
-		for(const fInfo of dir_list) {
-			const path = `${TEST_PATH}/${fInfo.name}`;
-			if ( !fInfo.isFile() ) continue;
-			if ( path.substr(-8) !== ".test.js" && path.substr(-9) !== ".test.mjs" ) continue;
-			
-			await import( path );
+		if ( TEST_SCRIPTS.length === 0 ) {
+			const TEST_PATH = `${__dirname}/tests`;
+			const dir_list = fs.readdirSync(TEST_PATH, {withFileTypes:true});
+			for(const fInfo of dir_list) {
+				const fPath = `${TEST_PATH}/${fInfo.name}`;
+				if ( !fInfo.isFile() ) continue;
+				if ( fPath.substr(-8) !== ".test.js" && fPath.substr(-9) !== ".test.mjs" ) continue;
+
+				await import( fPath );
+			}
+		}
+		else {
+			for ( const SCRIPT of TEST_SCRIPTS ) {
+				const SCRIPT_PATH = path.resolve(`${__dirname}`, SCRIPT);
+				await import( SCRIPT_PATH );
+			}
 		}
 	}
 	catch(e) {
-		if ( e.code !== "ENOENT" ) { throw e; }
+		throw e;
 	}
 	// endregion
 	
@@ -124,7 +133,7 @@ import os from "os";
 			throw new SyntaxError( "`test_group` can only be invoked within another `test_group` call!" );
 		}
 		
-		if ( current_scope.level >= 2 ) {
+		if ( current_scope.level >= 4 ) {
 			throw new RangeError( "Maximum nested level has been reached!" );
 		}
 		

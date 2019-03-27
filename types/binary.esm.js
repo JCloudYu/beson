@@ -4,7 +4,7 @@
 **/
 import {
 	ConcatBuffers, HexToBuffer,
-	BitwiseNot, BitwiseCompare, BitwiseLeftShift, BitwiseRightShift
+	BitwiseNot, BitwiseCompareBE, BitwiseLeftShiftBE, BitwiseRightShiftBE
 } from "../helper.esm.js";
 import {Binarized} from "./core-interfaces.esm.js";
 
@@ -20,11 +20,11 @@ export class Binary extends Binarized {
 	}
 	cut(begin, end) {
 		const args = Array.prototype.slice.call(arguments, 0);
-		return this._set_ab(this._ab.slice(...args));
+		return this.__set_ab(this._ab.slice(...args));
 	}
 	append(...segments) {
 		segments.unshift(this._ab);
-		return this._set_ab(ConcatBuffers(segments));
+		return this.__set_ab(ConcatBuffers(segments));
 	}
 	set(array, offset) {
 		const args = Array.prototype.slice.call(arguments, 0);
@@ -48,31 +48,31 @@ export class Binary extends Binarized {
 		
 		// NOTE: Shrink data size
 		if ( length < this._ab.byteLength ) {
-			return this._set_ab(this._ab.slice(0, length));
+			return this.__set_ab(this._ab.slice(0, length));
 		}
 		
 		// NOTE: Expand data size
 		const buff = new Uint8Array(length);
 		buff.set(this._ba, 0);
-		return this._set_ab(buff.buffer);
+		return this.__set_ab(buff.buffer);
 	}
 	
 	
 	
 	lshift(bits, padding=0) {
-		BitwiseLeftShift(this._ab, bits, padding);
+		BitwiseLeftShiftBE(this._ab, bits, padding);
 		return this;
 	}
 	rshift(bits, padding=0) {
-		BitwiseRightShift(this._ab, bits, padding);
+		BitwiseRightShiftBE(this._ab, bits, padding);
 		return this;
 	}
 	not() {
 		BitwiseNot(this._ab);
 		return this;
 	}
-	compare(value, align_cmp=true) {
-		return BitwiseCompare(this._ab, value, align_cmp);
+	compare(value) {
+		return BitwiseCompareBE(this._ab, value);
 	}
 	
 	
@@ -96,6 +96,6 @@ export class Binary extends Binarized {
 			return inst;
 		}
 	
-		return inst._set_ab(array_buffer);
+		return inst.__set_ab(array_buffer);
 	}
 }

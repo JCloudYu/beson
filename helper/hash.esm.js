@@ -2,7 +2,7 @@
  *	Author: JCloudYu
  *	Create: 2018/12/18
 **/
-import {ExtractBuffer} from "./misc.esm.js";
+import {ReadBuffer} from "./misc.esm.js";
 
 // See http://www.isthe.com/chongo/tech/comp/fnv/#FNV-param for the definition of these parameters;
 const FNV_PRIME_HIGH = 0x0100, FNV_PRIME_LOW = 0x0193;				// 16777619 0x01000193
@@ -16,7 +16,7 @@ const OFFSET_BASIS	 = 0x811C9DC5;
  * @private
 **/
 export function fnv1a32(input){
-	let octets = new Uint8Array(ExtractBuffer(input));
+	let octets = new Uint8Array(ReadBuffer(input));
 	
 	const HASH_RESULT = Uint32Array.from([OFFSET_BASIS]);
 	const RESULT_PROC = new Uint16Array(HASH_RESULT.buffer);

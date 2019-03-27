@@ -30,7 +30,6 @@ export function _deserialize(buffer, anchor=0, options={use_native_types:true}) 
 	}
 	
 	let value;
-	({ anchor } = __deserializeHeader(buffer, anchor));
 	({ anchor, value } = __deserializeContent(buffer, anchor, options));
 	return (value === undefined) ? undefined : {value, anchor};
 }
@@ -50,20 +49,6 @@ export function deserialize(buffer, options={use_native_types:true}) {
 	}
 	
 	return result.value;
-}
-
-/**
- * Deserialize header (it is empty now)
- * @param {ArrayBuffer} buffer
- * @param {number} start - byteOffset
- * @returns {{anchor: number, value: undefined}}
- * @private
- */
-function __deserializeHeader(buffer, start) {
-	let length = 0;
-	let end = start + length;
-	let data;
-	return { anchor: end, value: data };
 }
 
 /**
@@ -289,7 +274,7 @@ function __deserializeInt64(buffer, start, options) {
 	for (let i = start; i < end; i += step) {
 		dataArray.push(dataView.getUint32(i, true));
 	}
-	let data = new Int64(dataArray);
+	let data = new Int64(new Uint32Array(dataArray));
 	return { anchor: end, value: data };
 }
 
@@ -310,7 +295,7 @@ function __deserializeInt128(buffer, start, options) {
 	for (let i = start; i < end; i += step) {
 		dataArray.push(dataView.getUint32(i, true));
 	}
-	let data = new Int128(dataArray);
+	let data = new Int128(new Uint32Array(dataArray));
 	return { anchor: end, value: data };
 }
 
@@ -376,7 +361,7 @@ function __deserializeUInt64(buffer, start, options) {
 	for (let i = start; i < end; i += step) {
 		dataArray.push(dataView.getUint32(i, true));
 	}
-	let data = new UInt64(dataArray);
+	let data = new UInt64(new Uint32Array(dataArray));
 	return { anchor: end, value: data };
 }
 
@@ -397,7 +382,7 @@ function __deserializeUInt128(buffer, start, options) {
 	for (let i = start; i < end; i += step) {
 		dataArray.push(dataView.getUint32(i, true));
 	}
-	let data = new UInt128(dataArray);
+	let data = new UInt128(new Uint32Array(dataArray));
 	return { anchor: end, value: data };
 }
 

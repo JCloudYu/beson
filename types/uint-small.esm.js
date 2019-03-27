@@ -2,9 +2,8 @@
 *	Author: JCloudYu
 *	Create: 2018/12/04
 **/
-import {ExtractBuffer} from "../helper.esm.js";
-import {BinarizedInt} from "./core-interfaces.esm.js";
-
+import {ReadBuffer} from "../helper.esm.js";
+import {Binarized, BinarizedInt} from "./core-interfaces.esm.js";
 
 
 
@@ -18,18 +17,19 @@ const MIN_INT32	 = -2147483648;
 const MAX_INT32	 =  2147483647;
 const MAX_UINT32 =  0xFFFFFFFF;
 
+
+
 export class UInt32 extends BinarizedInt {
 	/**
 	 * UInt32 Constructor
-	 * @param {String|Number|{toBytes:Function}|Uint8Array|Uint16Array|Uint32Array|ArrayBuffer|Number[]} value
+	 * @param {Number|BinarizedData} value
 	**/
 	constructor(value=0){
 		super();
-		this._ab = new ArrayBuffer(4);
-		this._ba = new Uint8Array(this._ab);
+		this.__set_ab(new ArrayBuffer(4));
 		this._ta = new Uint32Array(this._ab);
 		
-		this.value = value;
+		this.__set_value(value);
 	}
 	
 	/**
@@ -39,40 +39,53 @@ export class UInt32 extends BinarizedInt {
 	**/
 	toString(bits=10) {
 		if ( bits === 10 ) {
-			return this._ba[0].toString();
+			return this._ta[0].toString();
 		}
 		
 		return super.toString(bits);
 	}
 	
 	get isSignedInt() { return false; }
-	set value(val) {
-		const ta = new Uint32Array(1);
+	
+	/**
+	 * Set the stored data with value
+	 * @param {Number|BinarizedData} val
+	 * @private
+	**/
+	__set_value(val) {
 		if ( typeof val === "number" ) {
 			this._ta[0] = val;
 			return;
 		}
 		
-		const _val = ExtractBuffer(val);
-		if ( _val === null ) {
-			throw new TypeError( "Given value is not a valid UInt32 representation!" );
+		
+		
+		let _val = null;
+		if ( Binarized.IsBinarized(val) ) {
+			_val = val._ab;
 		}
+		else {
+			_val = ReadBuffer(val);
+		}
+		
+		if ( _val === null ) {
+			throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
+		}
+		
+		
 		
 		const buff = new Uint32Array(_val.slice(0, 1));
 		this._ta[0] = buff[0];
 	}
-	
 	
 	/**
 	 * Instantiate a UInt32 base on input value
 	 * @param {String|Number|UInt32|Uint8Array|Uint16Array|Uint32Array|ArrayBuffer|Number[]} value
 	 * @returns {UInt32}
 	**/
-	static from(value=0) {
+	static From(value=0) {
 		return new UInt32(value);
 	}
-	
-	
 	
 	/**
 	 * Return a maximum UInt32 value
@@ -85,15 +98,14 @@ export class UInt32 extends BinarizedInt {
 export class Int32 extends BinarizedInt {
 	/**
 	 * Int32 Constructor
-	 * @param {String|Number|{toBytes:Function}|Uint8Array|Uint16Array|Uint32Array|ArrayBuffer|Number[]} value
+	 * @param {Number|BinarizedData} value
 	**/
 	constructor(value=0){
 		super();
-		this._ab = new ArrayBuffer(4);
-		this._ba = new Uint8Array(this._ab);
+		this.__set_ab(new ArrayBuffer(4));
 		this._ta = new Int32Array(this._ab);
 		
-		this.value = value;
+		this.__set_value(value);
 	}
 	
 	/**
@@ -103,7 +115,7 @@ export class Int32 extends BinarizedInt {
 	**/
 	toString(bits=10) {
 		if ( bits === 10 ) {
-			return this._ba[0].toString();
+			return this._ta[0].toString();
 		}
 		
 		return super.toString(bits);
@@ -111,32 +123,47 @@ export class Int32 extends BinarizedInt {
 	
 	get isSignedInt() { return true; }
 	
-	set value(val) {
-		const ta = new Int32Array(1);
+	/**
+	 * Set the stored data with value
+	 * @param {Number|ArrayBuffer|TypedArray|DataView|Binarized} val
+	 * @private
+	**/
+	__set_value(val) {
 		if ( typeof val === "number" ) {
 			this._ta[0] = val;
 			return;
 		}
 		
-		const _val = ExtractBuffer(val);
-		if ( _val === null ) {
-			throw new TypeError( "Given value is not a valid UInt32 representation!" );
+		
+		
+		let _val = null;
+		if ( Binarized.IsBinarized(val) ) {
+			_val = val._ab;
 		}
+		else {
+			_val = ReadBuffer(val);
+		}
+		
+		if ( _val === null ) {
+			throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
+		}
+		
+		
 		
 		const buff = new Int32Array(_val.slice(0, 1));
 		this._ta[0] = buff[0];
 	}
+	
+	
 	
 	/**
 	 * Instantiate a Int32 base on input value
 	 * @param {String|Number|UInt32|Uint8Array|Uint16Array|Uint32Array|ArrayBuffer|Number[]} value
 	 * @returns {Int32}
 	**/
-	static from(value=0) {
+	static From(value=0) {
 		return new Int32(value);
 	}
-	
-	
 	
 	/**
 	 * Return a maximum Int32 value
@@ -158,15 +185,14 @@ export class Int32 extends BinarizedInt {
 export class UInt16 extends BinarizedInt {
 	/**
 	 * UInt16 Constructor
-	 * @param {String|Number|{toBytes:Function}|Uint8Array|Uint16Array|Uint16Array|ArrayBuffer|Number[]} value
+	 * @param {Number|BinarizedData} value
 	**/
 	constructor(value=0){
 		super();
-		this._ab = new ArrayBuffer(2);
-		this._ba = new Uint8Array(this._ab);
+		this.__set_ab(new ArrayBuffer(2));
 		this._ta = new Uint16Array(this._ab);
 		
-		this.value = value;
+		this.__set_value(value);
 	}
 	
 	/**
@@ -176,7 +202,7 @@ export class UInt16 extends BinarizedInt {
 	**/
 	toString(bits=10) {
 		if ( bits === 10 ) {
-			return this._ba[0].toString();
+			return this._ta[0].toString();
 		}
 		
 		return super.toString(bits);
@@ -184,17 +210,32 @@ export class UInt16 extends BinarizedInt {
 	
 	get isSignedInt() { return false; }
 	
-	set value(val) {
-		const ta = new Uint16Array(1);
+	/**
+	 * Set the stored data with value
+	 * @param {Number|ArrayBuffer|TypedArray|DataView|Binarized} val
+	 * @private
+	**/
+	__set_value(val) {
 		if ( typeof val === "number" ) {
 			this._ta[0] = val;
 			return;
 		}
 		
-		const _val = ExtractBuffer(val);
-		if ( _val === null ) {
-			throw new TypeError( "Given value is not a valid UInt16 representation!" );
+		
+		
+		let _val = null;
+		if ( Binarized.IsBinarized(val) ) {
+			_val = val._ab;
 		}
+		else {
+			_val = ReadBuffer(val);
+		}
+		
+		if ( _val === null ) {
+			throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
+		}
+		
+		
 		
 		const buff = new Uint16Array(_val.slice(0, 1));
 		this._ta[0] = buff[0];
@@ -205,11 +246,9 @@ export class UInt16 extends BinarizedInt {
 	 * @param {String|Number|UInt16|Uint8Array|Uint16Array|Uint16Array|ArrayBuffer|Number[]} value
 	 * @returns {UInt16}
 	**/
-	static from(value=0) {
+	static From(value=0) {
 		return new UInt16(value);
 	}
-	
-	
 	
 	/**
 	 * Return a maximum UInt16 value
@@ -222,15 +261,14 @@ export class UInt16 extends BinarizedInt {
 export class Int16 extends BinarizedInt {
 	/**
 	 * Int16 Constructor
-	 * @param {String|Number|{toBytes:Function}|Uint8Array|Uint16Array|Uint16Array|ArrayBuffer|Number[]} value
+	 * @param {Number|BinarizedData} value
 	**/
 	constructor(value=0){
 		super();
-		this._ab = new ArrayBuffer(2);
-		this._ba = new Uint8Array(this._ab);
+		this.__set_ab(new ArrayBuffer(2));
 		this._ta = new Int16Array(this._ab);
 		
-		this.value = value;
+		this.__set_value(value);
 	}
 	
 	/**
@@ -240,7 +278,7 @@ export class Int16 extends BinarizedInt {
 	**/
 	toString(bits=10) {
 		if ( bits === 10 ) {
-			return this._ba[0].toString();
+			return this._ta[0].toString();
 		}
 		
 		return super.toString(bits);
@@ -248,17 +286,32 @@ export class Int16 extends BinarizedInt {
 	
 	get isSignedInt() { return true; }
 	
-	set value(val) {
-		const ta = new Int16Array(1);
+	/**
+	 * Set the stored data with value
+	 * @param {Number|ArrayBuffer|TypedArray|DataView|Binarized} val
+	 * @private
+	**/
+	__set_value(val) {
 		if ( typeof val === "number" ) {
 			this._ta[0] = val;
 			return;
 		}
 		
-		const _val = ExtractBuffer(val);
-		if ( _val === null ) {
-			throw new TypeError( "Given value is not a valid UInt16 representation!" );
+		
+		
+		let _val = null;
+		if ( Binarized.IsBinarized(val) ) {
+			_val = val._ab;
 		}
+		else {
+			_val = ReadBuffer(val);
+		}
+		
+		if ( _val === null ) {
+			throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
+		}
+		
+		
 		
 		const buff = new Int16Array(_val.slice(0, 1));
 		this._ta[0] = buff[0];
@@ -269,11 +322,9 @@ export class Int16 extends BinarizedInt {
 	 * @param {String|Number|UInt16|Uint8Array|Uint16Array|Uint16Array|ArrayBuffer|Number[]} value
 	 * @returns {Int16}
 	**/
-	static from(value=0) {
+	static From(value=0) {
 		return new Int16(value);
 	}
-	
-	
 	
 	/**
 	 * Return a maximum Int16 value
@@ -295,14 +346,14 @@ export class Int16 extends BinarizedInt {
 export class UInt8 extends BinarizedInt {
 	/**
 	 * UInt8 Constructor
-	 * @param {String|Number|{toBytes:Function}|Uint8Array|Uint16Array|Uint8Array|ArrayBuffer|Number[]} value
+	 * @param {Number|BinarizedData} value
 	**/
 	constructor(value=0){
 		super();
-		this._ab = new ArrayBuffer(1);
+		this.__set_ab(new ArrayBuffer(1));
 		this._ta = this._ba = new Uint8Array(this._ab);
 		
-		this.value = value;
+		this.__set_value(value);
 	}
 	
 	/**
@@ -312,7 +363,7 @@ export class UInt8 extends BinarizedInt {
 	**/
 	toString(bits=10) {
 		if ( bits === 10 ) {
-			return this._ba[0].toString();
+			return this._ta[0].toString();
 		}
 		
 		return super.toString(bits);
@@ -320,17 +371,32 @@ export class UInt8 extends BinarizedInt {
 	
 	get isSignedInt() { return false; }
 	
-	set value(val) {
-		const ta = new Uint8Array(1);
+	/**
+	 * Set the stored data with value
+	 * @param {Number|ArrayBuffer|TypedArray|DataView|Binarized} val
+	 * @private
+	**/
+	__set_value(val) {
 		if ( typeof val === "number" ) {
 			this._ta[0] = val;
 			return;
 		}
 		
-		const _val = ExtractBuffer(val);
-		if ( _val === null ) {
-			throw new TypeError( "Given value is not a valid UInt8 representation!" );
+		
+		
+		let _val = null;
+		if ( Binarized.IsBinarized(val) ) {
+			_val = val._ab;
 		}
+		else {
+			_val = ReadBuffer(val);
+		}
+		
+		if ( _val === null ) {
+			throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
+		}
+		
+		
 		
 		const buff = new Uint8Array(_val.slice(0, 1));
 		this._ta[0] = buff[0];
@@ -341,11 +407,9 @@ export class UInt8 extends BinarizedInt {
 	 * @param {String|Number|UInt8|Uint8Array|Uint16Array|Uint8Array|ArrayBuffer|Number[]} value
 	 * @returns {UInt8}
 	**/
-	static from(value=0) {
+	static From(value=0) {
 		return new UInt8(value);
 	}
-	
-	
 	
 	/**
 	 * Return a maximum UInt8 value
@@ -358,15 +422,14 @@ export class UInt8 extends BinarizedInt {
 export class Int8 extends BinarizedInt {
 	/**
 	 * Int8 Constructor
-	 * @param {String|Number|{toBytes:Function}|Uint8Array|Uint16Array|Uint8Array|ArrayBuffer|Number[]} value
+	 * @param {Number|BinarizedData} value
 	**/
 	constructor(value=0){
 		super();
-		this._ab = new ArrayBuffer(1);
-		this._ba = new Uint8Array(this._ab);
+		this.__set_ab(new ArrayBuffer(1));
 		this._ta = new Int8Array(this._ab);
 		
-		this.value = value;
+		this.__set_value(value);
 	}
 	
 	/**
@@ -376,7 +439,7 @@ export class Int8 extends BinarizedInt {
 	**/
 	toString(bits=10) {
 		if ( bits === 10 ) {
-			return this._ba[0].toString();
+			return this._ta[0].toString();
 		}
 		
 		return super.toString(bits);
@@ -384,16 +447,32 @@ export class Int8 extends BinarizedInt {
 	
 	get isSignedInt() { return true; }
 	
-	set value(val) {
+	/**
+	 * Set the stored data with value
+	 * @param {Number|ArrayBuffer|TypedArray|DataView|Binarized} val
+	 * @private
+	**/
+	__set_value(val) {
 		if ( typeof val === "number" ) {
 			this._ta[0] = val;
 			return;
 		}
 		
-		const _val = ExtractBuffer(val);
-		if ( _val === null ) {
-			throw new TypeError( "Given value is not a valid UInt8 representation!" );
+		
+		
+		let _val = null;
+		if ( Binarized.IsBinarized(val) ) {
+			_val = val._ab;
 		}
+		else {
+			_val = ReadBuffer(val);
+		}
+		
+		if ( _val === null ) {
+			throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
+		}
+		
+		
 		
 		const buff = new Int8Array(_val.slice(0, 1));
 		this._ta[0] = buff[0];
@@ -404,11 +483,9 @@ export class Int8 extends BinarizedInt {
 	 * @param {String|Number|UInt8|Uint8Array|Uint16Array|Uint8Array|ArrayBuffer|Number[]} value
 	 * @returns {Int8}
 	**/
-	static from(value=0) {
+	static From(value=0) {
 		return new Int8(value);
 	}
-	
-	
 	
 	/**
 	 * Return a maximum Int8 value

@@ -31,19 +31,8 @@ const DEFAULT_OPTIONS = {
  * @returns {ArrayBuffer}
  */
 export function serialize(data, options=DEFAULT_OPTIONS) {
-	let headerBuffer = __serializeHeader();
 	let contentBuffers = __serializeContent(data, options);
-	return __arrayBufferConcat([headerBuffer, ...contentBuffers]);
-}
-
-/**
- * Serialize header (it is empty now)
- * @returns {ArrayBuffer}
- * @private
- */
-function __serializeHeader() {
-	let headerData = new Uint8Array([]);
-	return headerData.buffer;
+	return __arrayBufferConcat(contentBuffers);
 }
 
 /**
@@ -55,7 +44,7 @@ function __serializeHeader() {
  */
 function __serializeContent(data, options=DEFAULT_OPTIONS) {
 	let type = __getType(data, options);
-	let typeBuffer = __serializeType(type, options);
+	let typeBuffer	= __serializeType(type, options);
 	let dataBuffers = __serializeData(type, data, options);
 	return [typeBuffer, ...dataBuffers];
 }
@@ -314,7 +303,7 @@ function __serializeBoolean() {
  * @private
  */
 function __serializeInt64(data) {
-	return [data.toBytes()];
+	return [data.toBytes().buffer];
 }
 
 /**
@@ -324,7 +313,7 @@ function __serializeInt64(data) {
  * @private
  */
 function __serializeInt128(data) {
-	return [data.toBytes()];
+	return [data.toBytes().buffer];
 }
 
 /**
@@ -334,7 +323,7 @@ function __serializeInt128(data) {
  * @private
  */
 function __serializeUInt64(data) {
-	return [data.toBytes()];
+	return [data.toBytes().buffer];
 }
 
 /**
@@ -344,7 +333,7 @@ function __serializeUInt64(data) {
  * @private
  */
 function __serializeUInt128(data) {
-	return [data.toBytes()];
+	return [data.toBytes().buffer];
 }
 
 /**
