@@ -3,7 +3,7 @@ import {UTF8Decode} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
-	Binary, ObjectId
+	Binary, ObjectId, Int256, Int512, UInt256, UInt512
 } from "./types.esm.js";
 
 
@@ -109,6 +109,12 @@ function __deserializeData(type, buffer, start, options) {
 	else if (type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
 		result = __deserializeBoolean(type, start, options);
 	}
+	else if (type === DATA_TYPE.INT8) {
+		result = __deserializeInt8(buffer, start, options);
+	}
+	else if (type === DATA_TYPE.INT16) {
+		result = __deserializeInt16(buffer, start, options);
+	}
 	else if (type === DATA_TYPE.INT32) {
 		result = __deserializeInt32(buffer, start, options);
 	}
@@ -118,11 +124,17 @@ function __deserializeData(type, buffer, start, options) {
 	else if (type === DATA_TYPE.INT128) {
 		result = __deserializeInt128(buffer, start, options);
 	}
-	else if (type === DATA_TYPE.INT8) {
-		result = __deserializeInt8(buffer, start, options);
+	else if (type === DATA_TYPE.INT256) {
+		result = __deserializeInt256(buffer, start, options);
 	}
-	else if (type === DATA_TYPE.INT16) {
-		result = __deserializeInt16(buffer, start, options);
+	else if (type === DATA_TYPE.INT512) {
+		result = __deserializeInt512(buffer, start, options);
+	}
+	else if (type === DATA_TYPE.UINT8) {
+		result = __deserializeUInt8(buffer, start, options);
+	}
+	else if (type === DATA_TYPE.UINT16) {
+		result = __deserializeUInt16(buffer, start, options);
 	}
 	else if (type === DATA_TYPE.UINT32) {
 		result = __deserializeUInt32(buffer, start, options);
@@ -133,11 +145,11 @@ function __deserializeData(type, buffer, start, options) {
 	else if (type === DATA_TYPE.UINT128) {
 		result = __deserializeUInt128(buffer, start, options);
 	}
-	else if (type === DATA_TYPE.UINT8) {
-		result = __deserializeUInt8(buffer, start, options);
+	else if (type === DATA_TYPE.UINT256) {
+		result = __deserializeUInt256(buffer, start, options);
 	}
-	else if (type === DATA_TYPE.UINT16) {
-		result = __deserializeUInt16(buffer, start, options);
+	else if (type === DATA_TYPE.UINT512) {
+		result = __deserializeUInt512(buffer, start, options);
 	}
 	else if (type === DATA_TYPE.FLOAT32) {
 		result = __deserializeFloat32(buffer, start, options);
@@ -300,6 +312,48 @@ function __deserializeInt128(buffer, start, options) {
 }
 
 /**
+ * Deserialize Int256 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: Int256}} anchor: byteOffset
+ * @private
+ */
+function __deserializeInt256(buffer, start, options) {
+	let step = 4;
+	let length = 8;
+	let end = start + (step * length);
+	let dataView = new DataView(buffer);
+	let dataArray = [];
+	for (let i = start; i < end; i += step) {
+		dataArray.push(dataView.getUint32(i, true));
+	}
+	let data = new Int256(new Uint32Array(dataArray));
+	return { anchor: end, value: data };
+}
+
+/**
+ * Deserialize Int512 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: Int512}} anchor: byteOffset
+ * @private
+ */
+function __deserializeInt512(buffer, start, options) {
+	let step = 4;
+	let length = 16;
+	let end = start + (step * length);
+	let dataView = new DataView(buffer);
+	let dataArray = [];
+	for (let i = start; i < end; i += step) {
+		dataArray.push(dataView.getUint32(i, true));
+	}
+	let data = new Int512(new Uint32Array(dataArray));
+	return { anchor: end, value: data };
+}
+
+/**
  * Deserialize Int8 data
  * @param {ArrayBuffer} buffer
  * @param {number} start - byteOffset
@@ -383,6 +437,48 @@ function __deserializeUInt128(buffer, start, options) {
 		dataArray.push(dataView.getUint32(i, true));
 	}
 	let data = new UInt128(new Uint32Array(dataArray));
+	return { anchor: end, value: data };
+}
+
+/**
+ * Deserialize UInt256 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: UInt256}} anchor: byteOffset
+ * @private
+ */
+function __deserializeUInt256(buffer, start, options) {
+	let step = 4;
+	let length = 8;
+	let end = start + (step * length);
+	let dataView = new DataView(buffer);
+	let dataArray = [];
+	for (let i = start; i < end; i += step) {
+		dataArray.push(dataView.getUint32(i, true));
+	}
+	let data = new UInt256(new Uint32Array(dataArray));
+	return { anchor: end, value: data };
+}
+
+/**
+ * Deserialize UInt512 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: UInt512}} anchor: byteOffset
+ * @private
+ */
+function __deserializeUInt512(buffer, start, options) {
+	let step = 4;
+	let length = 16;
+	let end = start + (step * length);
+	let dataView = new DataView(buffer);
+	let dataArray = [];
+	for (let i = start; i < end; i += step) {
+		dataArray.push(dataView.getUint32(i, true));
+	}
+	let data = new UInt512(new Uint32Array(dataArray));
 	return { anchor: end, value: data };
 }
 

@@ -3,7 +3,7 @@ import {ConcatBuffers} from "../helper/misc.esm.js";
 import assert from "assert";
 
 
-const {ObjectId, Binary, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128} = BesonType;
+const {ObjectId, Binary, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128, Int256, UInt256, Int512, UInt512} = BesonType;
 const {UTF8Encode, UTF8Decode} = Helper;
 
 
@@ -83,6 +83,11 @@ test_group('beson testing', ()=>{
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
+		unit_test('UInt64', ()=>{
+			let original = UInt64.From(UInt64.MAX);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
 		unit_test('Int128 (positive number)', ()=>{
 			let original = Int128.From(Int128.MAX);
 			let test = Deserialize(Serialize(original));
@@ -93,13 +98,38 @@ test_group('beson testing', ()=>{
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
-		unit_test('UInt64', ()=>{
-			let original = UInt64.From(UInt64.MAX);
+		unit_test('UInt128', ()=>{
+			let original = UInt128.From(UInt128.MAX);
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
-		unit_test('UInt128', ()=>{
-			let original = UInt128.From(UInt128.MAX);
+		unit_test('Int256 (positive number)', ()=>{
+			let original = Int256.From(Int256.MAX);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('Int256 (negative number)', ()=>{
+			let original = Int256.From(Int256.MIN);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('UInt256', ()=>{
+			let original = UInt256.From(UInt256.MAX);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('Int512 (positive number)', ()=>{
+			let original = Int512.From(Int512.MAX);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('Int512 (negative number)', ()=>{
+			let original = Int512.From(Int512.MIN);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('UInt512', ()=>{
+			let original = UInt512.From(UInt512.MAX);
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});

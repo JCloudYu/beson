@@ -386,7 +386,7 @@ export class BinarizedInt extends Binarized {
 	toString(bits=10) {
 		switch(bits) {
 			case 10:
-				return DumpIntStringLE(this._ab);
+				return DumpIntStringLE(this._ab, !this.isSignedInt);
 				
 			case 2:
 			case 16:

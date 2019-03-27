@@ -3,7 +3,7 @@ import {UTF8Encode} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
-	Binary, ObjectId
+	Binary, ObjectId, UInt256, UInt512, Int256, Int512
 } from "./types.esm.js";
 
 
@@ -85,6 +85,18 @@ function __getType(data, options) {
 	}
 	else if ( data instanceof UInt32 ) {
 		type = DATA_TYPE.UINT32;
+	}
+	else if ( data instanceof Int256 ) {
+		type = DATA_TYPE.INT256;
+	}
+	else if ( data instanceof UInt256 ) {
+		type = DATA_TYPE.UINT256;
+	}
+	else if ( data instanceof Int512 ) {
+		type = DATA_TYPE.INT512;
+	}
+	else if ( data instanceof UInt512 ) {
+		type = DATA_TYPE.UINT512;
 	}
 	else if (data instanceof Int64) {
 		type = DATA_TYPE.INT64;
@@ -206,11 +218,23 @@ function __serializeData(type, data, options=DEFAULT_OPTIONS) {
 	else if (type === DATA_TYPE.INT128) {
 		buffers = __serializeInt128(data);
 	}
+	else if (type === DATA_TYPE.INT256) {
+		buffers = __serializeInt256(data);
+	}
+	else if (type === DATA_TYPE.INT512) {
+		buffers = __serializeInt512(data);
+	}
 	else if (type === DATA_TYPE.UINT64) {
 		buffers = __serializeUInt64(data);
 	}
 	else if (type === DATA_TYPE.UINT128) {
 		buffers = __serializeUInt128(data);
+	}
+	else if (type === DATA_TYPE.UINT256) {
+		buffers = __serializeUInt256(data);
+	}
+	else if (type === DATA_TYPE.UINT512) {
+		buffers = __serializeUInt512(data);
 	}
 	else if (type === DATA_TYPE.FLOAT64) {
 		buffers = __serializeDouble(data);
@@ -317,6 +341,26 @@ function __serializeInt128(data) {
 }
 
 /**
+ * Serialize Int256 data
+ * @param {Int256} data
+ * @returns {ArrayBuffer[]}
+ * @private
+ */
+function __serializeInt256(data) {
+	return [data.toBytes().buffer];
+}
+
+/**
+ * Serialize Int512 data
+ * @param {Int512} data
+ * @returns {ArrayBuffer[]}
+ * @private
+ */
+function __serializeInt512(data) {
+	return [data.toBytes().buffer];
+}
+
+/**
  * Serialize UInt64 data
  * @param {UInt64} data
  * @returns {ArrayBuffer[]}
@@ -333,6 +377,26 @@ function __serializeUInt64(data) {
  * @private
  */
 function __serializeUInt128(data) {
+	return [data.toBytes().buffer];
+}
+
+/**
+ * Serialize UInt256 data
+ * @param {UInt256} data
+ * @returns {ArrayBuffer[]}
+ * @private
+ */
+function __serializeUInt256(data) {
+	return [data.toBytes().buffer];
+}
+
+/**
+ * Serialize UInt512 data
+ * @param {UInt512} data
+ * @returns {ArrayBuffer[]}
+ * @private
+ */
+function __serializeUInt512(data) {
 	return [data.toBytes().buffer];
 }
 
