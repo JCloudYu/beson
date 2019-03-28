@@ -11,6 +11,7 @@ export const DATA_TYPE = {
 	INT128:         'int128',
 	INT256:         'int256',
 	INT512:         'int512',
+	INTVAR:         'intvar',
 	
 	UINT8:			'uint8',
 	UINT16:			'uint16',
@@ -19,6 +20,7 @@ export const DATA_TYPE = {
 	UINT128:        'uint128',
 	UINT256:        'uint256',
 	UINT512:        'uint512',
+	UINTVAR:		'uintvar',
 	
 	FLOAT64:        'float64',
 	FLOAT32:		'float32',
@@ -60,6 +62,7 @@ export const TYPE_HEADER = {
 	INT16:          [0x02, 0x05],
 	INT256:         [0x02, 0x06],
 	INT512:         [0x02, 0x07],
+	INTVAR:         [0x02, 0xFF],
 	
 	UINT32:         [0x03, 0x00],
 	UINT64:         [0x03, 0x01],
@@ -68,6 +71,7 @@ export const TYPE_HEADER = {
 	UINT16:         [0x03, 0x05],
 	UINT256:        [0x03, 0x06],
 	UINT512:        [0x03, 0x07],
+	UINTVAR:        [0x03, 0xFF],
 	
 	FLOAT64:       	[0x04, 0x00],
 	FLOAT32:		[0x04, 0x01],

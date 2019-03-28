@@ -5,6 +5,7 @@ import {
 	UInt8, UInt16, UInt32, UInt64, UInt128,
 	Binary, ObjectId, Int256, Int512, UInt256, UInt512
 } from "./types.esm.js";
+import {IntVar, UIntVar} from "./types/uint-var.esm.js";
 
 
 /**
@@ -130,6 +131,9 @@ function __deserializeData(type, buffer, start, options) {
 	else if (type === DATA_TYPE.INT512) {
 		result = __deserializeInt512(buffer, start, options);
 	}
+	else if (type === DATA_TYPE.INTVAR) {
+		result = __deserializeIntVar(buffer, start, options);
+	}
 	else if (type === DATA_TYPE.UINT8) {
 		result = __deserializeUInt8(buffer, start, options);
 	}
@@ -150,6 +154,9 @@ function __deserializeData(type, buffer, start, options) {
 	}
 	else if (type === DATA_TYPE.UINT512) {
 		result = __deserializeUInt512(buffer, start, options);
+	}
+	else if (type === DATA_TYPE.UINTVAR) {
+		result = __deserializeUIntVar(buffer, start, options);
 	}
 	else if (type === DATA_TYPE.FLOAT32) {
 		result = __deserializeFloat32(buffer, start, options);
@@ -255,6 +262,36 @@ function __deserializeBoolean(type, start, options) {
 }
 
 /**
+ * Deserialize Int8 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: Number|Int8}} anchor: byteOffset
+ * @private
+ */
+function __deserializeInt8(buffer, start, options) {
+	let end = start + 1;
+	let dataView = new DataView(buffer);
+	let data = dataView.getInt8(start);
+	return { anchor: end, value:options.use_native_types ? data : Int8.from(data) };
+}
+
+/**
+ * Deserialize Int16 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: Number|Int16}} anchor: byteOffset
+ * @private
+ */
+function __deserializeInt16(buffer, start, options) {
+	let end = start + 2;
+	let dataView = new DataView(buffer);
+	let data = dataView.getInt16(start, true);
+	return { anchor: end, value:options.use_native_types ? data : Int16.from(data) };
+}
+
+/**
  * Deserialize Int32 data
  * @param {ArrayBuffer} buffer
  * @param {number} start - byteOffset
@@ -354,33 +391,61 @@ function __deserializeInt512(buffer, start, options) {
 }
 
 /**
- * Deserialize Int8 data
+ * Deserialize IntVar data
  * @param {ArrayBuffer} buffer
  * @param {number} start - byteOffset
  * @param {DeserializeOptions} options
- * @returns {{anchor: number, value: Number|Int8}} anchor: byteOffset
+ * @returns {{anchor: number, value: IntVar}} anchor: byteOffset
  * @private
  */
-function __deserializeInt8(buffer, start, options) {
-	let end = start + 1;
-	let dataView = new DataView(buffer);
-	let data = dataView.getInt8(start);
-	return { anchor: end, value:options.use_native_types ? data : Int8.from(data) };
+function __deserializeIntVar(buffer, start, options) {
+	const dataBuff = new Uint8Array(buffer);
+	if ( dataBuff[start] > 127 ) {
+		throw new Error( "Cannot support IntVar whose size is greater than 127 bytes" );
+	}
+	
+	
+	
+	let index = 0, data_size = dataBuff[start], end = start + 1;
+	const result_buffer = new Uint8Array(data_size);
+	while( data_size-- > 0 ) {
+		result_buffer[index] = dataBuff[end];
+		index++; end++;
+	}
+
+
+	let data = new IntVar(result_buffer);
+	return { anchor: end, value: data };
 }
 
 /**
- * Deserialize Int16 data
+ * Deserialize UInt8 data
  * @param {ArrayBuffer} buffer
  * @param {number} start - byteOffset
  * @param {DeserializeOptions} options
- * @returns {{anchor: number, value: Number|Int16}} anchor: byteOffset
+ * @returns {{anchor: number, value: Number|UInt8}} anchor: byteOffset
  * @private
  */
-function __deserializeInt16(buffer, start, options) {
+function __deserializeUInt8(buffer, start, options) {
+	let end = start + 1;
+	let dataView = new DataView(buffer);
+	let data = dataView.getUint8(start);
+	return { anchor: end, value:options.use_native_types ? data : UInt8.from(data) };
+}
+
+/**
+ * Deserialize UInt16 data
+ * @param {ArrayBuffer} buffer
+ * @param {number} start - byteOffset
+ * @param {DeserializeOptions} options
+ * @returns {{anchor: number, value: Number|UInt16}} anchor: byteOffset
+ * @private
+ */
+function __deserializeUInt16(buffer, start, options) {
 	let end = start + 2;
 	let dataView = new DataView(buffer);
-	let data = dataView.getInt16(start, true);
-	return { anchor: end, value:options.use_native_types ? data : Int16.from(data) };
+	let data = dataView.getUint16(start, true);
+	return { anchor: end, value:options.use_native_types ? data : UInt16.from(data) };
 }
 
 /**
@@ -483,33 +548,31 @@ function __deserializeUInt512(buffer, start, options) {
 }
 
 /**
- * Deserialize UInt8 data
+ * Deserialize UIntVar data
  * @param {ArrayBuffer} buffer
  * @param {number} start - byteOffset
  * @param {DeserializeOptions} options
- * @returns {{anchor: number, value: Number|UInt8}} anchor: byteOffset
+ * @returns {{anchor: number, value: UIntVar}} anchor: byteOffset
  * @private
  */
-function __deserializeUInt8(buffer, start, options) {
-	let end = start + 1;
-	let dataView = new DataView(buffer);
-	let data = dataView.getUint8(start);
-	return { anchor: end, value:options.use_native_types ? data : UInt8.from(data) };
-}
+function __deserializeUIntVar(buffer, start, options) {
+	const dataBuff = new Uint8Array(buffer);
+	if ( dataBuff[start] > 127 ) {
+		throw new Error( "Cannot support UIntVar whose size is greater than 127 bytes" );
+	}
+	
+	
+	
+	let index = 0, data_size = dataBuff[start], end = start + 1;
+	const result_buffer = new Uint8Array(data_size);
+	while( data_size-- > 0 ) {
+		result_buffer[index] = dataBuff[end];
+		index++; end++;
+	}
 
-/**
- * Deserialize UInt16 data
- * @param {ArrayBuffer} buffer
- * @param {number} start - byteOffset
- * @param {DeserializeOptions} options
- * @returns {{anchor: number, value: Number|UInt16}} anchor: byteOffset
- * @private
- */
-function __deserializeUInt16(buffer, start, options) {
-	let end = start + 2;
-	let dataView = new DataView(buffer);
-	let data = dataView.getUint16(start, true);
-	return { anchor: end, value:options.use_native_types ? data : UInt16.from(data) };
+
+	let data = new UIntVar(result_buffer);
+	return { anchor: end, value: data };
 }
 
 /**

@@ -3,7 +3,7 @@ import {ConcatBuffers} from "../helper/misc.esm.js";
 import assert from "assert";
 
 
-const {ObjectId, Binary, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128, Int256, UInt256, Int512, UInt512} = BesonType;
+const {ObjectId, Binary, Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Int128, UInt128, Int256, UInt256, Int512, UInt512, IntVar, UIntVar} = BesonType;
 const {UTF8Encode, UTF8Decode} = Helper;
 
 
@@ -130,6 +130,21 @@ test_group('beson testing', ()=>{
 		});
 		unit_test('UInt512', ()=>{
 			let original = UInt512.From(UInt512.MAX);
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('IntVar (positive number)', ()=>{
+			let original = IntVar.From(IntVar.MAX(100));
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('IntVar (negative number)', ()=>{
+			let original = IntVar.From(IntVar.MIN(100));
+			let test = Deserialize(Serialize(original));
+			assert(test.toString() === original.toString());
+		});
+		unit_test('UIntVar', ()=>{
+			let original = UIntVar.From(UIntVar.MAX(100));
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});

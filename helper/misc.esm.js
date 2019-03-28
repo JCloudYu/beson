@@ -586,9 +586,10 @@ export function BufferFromIntStrLE(inputStr, size=null) {
 	}
 	
 	
-	
+	let force_size = true;
 	let inputLen = Math.ceil( Math.ceil(inputStr.length * Math.log2(10))/8 );
 	if ( arguments.length <= 1 ) {
+		force_size = false;
 		size = inputLen;
 	}
 	else
@@ -616,11 +617,23 @@ export function BufferFromIntStrLE(inputStr, size=null) {
 	}
 	
 	
-	if ( negative ) {
-		BitwiseTwoComplimentLE(buffer);
+	// NOTE: In case that the highest bit is 1 ( the size is not efficient to represent the value )
+	let _result = buffer;
+	if ( !force_size ) {
+		let real_len = size-1;
+		while( (real_len > 0) && ((buffer[real_len] & 0xFF) === 0) ) { real_len--; }
+		if ( (buffer[real_len] & 0x80) !== 0 ) {
+			real_len++;
+		}
+		_result = (real_len === size) ? buffer : buffer.slice(0, real_len+1);
 	}
 	
-	return buffer;
+	
+	if ( negative ) {
+		BitwiseTwoComplimentLE(_result);
+	}
+	
+	return _result;
 }
 
 /**

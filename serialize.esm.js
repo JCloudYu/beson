@@ -3,7 +3,7 @@ import {UTF8Encode} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
-	Binary, ObjectId, UInt256, UInt512, Int256, Int512
+	Binary, ObjectId, UInt256, UInt512, Int256, Int512, UIntVar, IntVar
 } from "./types.esm.js";
 
 
@@ -86,6 +86,12 @@ function __getType(data, options) {
 	else if ( data instanceof UInt32 ) {
 		type = DATA_TYPE.UINT32;
 	}
+	else if ( data instanceof Int64 ) {
+		type = DATA_TYPE.INT64;
+	}
+	else if ( data instanceof UInt64 ) {
+		type = DATA_TYPE.UINT64;
+	}
 	else if ( data instanceof Int256 ) {
 		type = DATA_TYPE.INT256;
 	}
@@ -98,17 +104,17 @@ function __getType(data, options) {
 	else if ( data instanceof UInt512 ) {
 		type = DATA_TYPE.UINT512;
 	}
-	else if (data instanceof Int64) {
-		type = DATA_TYPE.INT64;
-	}
-	else if (data instanceof Int128) {
+	else if ( data instanceof Int128 ) {
 		type = DATA_TYPE.INT128;
 	}
-	else if (data instanceof UInt64) {
-		type = DATA_TYPE.UINT64;
-	}
-	else if (data instanceof UInt128) {
+	else if ( data instanceof UInt128 ) {
 		type = DATA_TYPE.UINT128;
+	}
+	else if ( data instanceof IntVar ) {
+		type = DATA_TYPE.INTVAR;
+	}
+	else if ( data instanceof UIntVar ) {
+		type = DATA_TYPE.UINTVAR;
 	}
 	else if (type === 'string') {
 		type = DATA_TYPE.STRING;
@@ -224,6 +230,9 @@ function __serializeData(type, data, options=DEFAULT_OPTIONS) {
 	else if (type === DATA_TYPE.INT512) {
 		buffers = __serializeInt512(data);
 	}
+	else if (type === DATA_TYPE.INTVAR) {
+		buffers = __serializeIntVar(data);
+	}
 	else if (type === DATA_TYPE.UINT64) {
 		buffers = __serializeUInt64(data);
 	}
@@ -235,6 +244,9 @@ function __serializeData(type, data, options=DEFAULT_OPTIONS) {
 	}
 	else if (type === DATA_TYPE.UINT512) {
 		buffers = __serializeUInt512(data);
+	}
+	else if (type === DATA_TYPE.UINTVAR) {
+		buffers = __serializeUIntVar(data);
 	}
 	else if (type === DATA_TYPE.FLOAT64) {
 		buffers = __serializeDouble(data);
@@ -361,6 +373,21 @@ function __serializeInt512(data) {
 }
 
 /**
+ * Serialize IntVar data
+ * @param {IntVar} data
+ * @returns {ArrayBuffer[]}
+ * @private
+ */
+function __serializeIntVar(data) {
+	if ( data.size > 127 ) {
+		throw new Error( "Cannot support IntVar whose size is greater than 127 bytes" );
+	}
+
+	const size = new Uint8Array([data.size]);
+	return [size.buffer, data.toBytes().buffer];
+}
+
+/**
  * Serialize UInt64 data
  * @param {UInt64} data
  * @returns {ArrayBuffer[]}
@@ -398,6 +425,21 @@ function __serializeUInt256(data) {
  */
 function __serializeUInt512(data) {
 	return [data.toBytes().buffer];
+}
+
+/**
+ * Serialize UIntVar data
+ * @param {UIntVar} data
+ * @returns {ArrayBuffer[]}
+ * @private
+ */
+function __serializeUIntVar(data) {
+	if ( data.size > 127 ) {
+		throw new Error( "Cannot support UIntVar whose size is greater than 127 bytes" );
+	}
+
+	const size = new Uint8Array([data.size]);
+	return [size.buffer, data.toBytes().buffer];
 }
 
 /**
