@@ -74,77 +74,77 @@ test_group('beson testing', ()=>{
 			assert(+test === MAX_UINT32);
 		});
 		unit_test('Int64 (positive number)', ()=>{
-			let original = Int64.From(Int64.MAX);
+			let original = Int64.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int64 (negative number)', ()=>{
-			let original = Int64.From(Int64.MIN);
+			let original = Int64.MIN;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('UInt64', ()=>{
-			let original = UInt64.From(UInt64.MAX);
+			let original = UInt64.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int128 (positive number)', ()=>{
-			let original = Int128.From(Int128.MAX);
+			let original = Int128.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int128 (negative number)', ()=>{
-			let original = Int128.From(Int128.MIN);
+			let original = Int128.MIN;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('UInt128', ()=>{
-			let original = UInt128.From(UInt128.MAX);
+			let original = UInt128.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int256 (positive number)', ()=>{
-			let original = Int256.From(Int256.MAX);
+			let original = Int256.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int256 (negative number)', ()=>{
-			let original = Int256.From(Int256.MIN);
+			let original = Int256.MIN;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('UInt256', ()=>{
-			let original = UInt256.From(UInt256.MAX);
+			let original = UInt256.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int512 (positive number)', ()=>{
-			let original = Int512.From(Int512.MAX);
+			let original = Int512.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('Int512 (negative number)', ()=>{
-			let original = Int512.From(Int512.MIN);
+			let original = Int512.MIN;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('UInt512', ()=>{
-			let original = UInt512.From(UInt512.MAX);
+			let original = UInt512.MAX;
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('IntVar (positive number)', ()=>{
-			let original = IntVar.From(IntVar.MAX(100));
+			let original = IntVar.MAX(100);
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('IntVar (negative number)', ()=>{
-			let original = IntVar.From(IntVar.MIN(100));
+			let original = IntVar.MIN(100);
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
 		unit_test('UIntVar', ()=>{
-			let original = UIntVar.From(UIntVar.MAX(100));
+			let original = UIntVar.MAX(100);
 			let test = Deserialize(Serialize(original));
 			assert(test.toString() === original.toString());
 		});
@@ -159,17 +159,17 @@ test_group('beson testing', ()=>{
 			assert(test === original);
 		});
 		unit_test('Array', ()=>{
-			let original = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.From(Int128.MAX)]];
+			let original = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.MAX]];
 			let test = Deserialize(Serialize(original));
 			assert(stringifyObject(test) === stringifyObject(original));
 		});
 		unit_test('Array (streaming)', ()=>{
-			let original = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.From(Int128.MAX)]];
+			let original = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.MAX]];
 			let test = Deserialize(Serialize(original, {streaming_array: true}));
 			assert(stringifyObject(test) === stringifyObject(original));
 		});
 		unit_test('Array (streaming + append binary original)', ()=>{
-			let original = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.From(Int128.MAX)]];
+			let original = [true, 2147483647, Math.PI, {aaa: 2147483647, bbb: Math.PI}, [false, 'Hello World', new Date(1539838676247), Int128.MAX]];
 			let buffer = Serialize(original, {streaming_array: true});
 			let test = Deserialize(ConcatBuffers([buffer, new Uint8Array([123, 45, 67, 89]).buffer]));
 			assert(stringifyObject(test) === stringifyObject(original));
@@ -183,7 +183,7 @@ test_group('beson testing', ()=>{
 				},
 				b: 123,
 				a: new Date(1539838676247),
-				_: Int128.From(Int128.MAX),
+				_: Int128.MAX,
 				PI: Math.PI,
 				array: ['aaa', true, 123]
 			};
@@ -199,7 +199,7 @@ test_group('beson testing', ()=>{
 				},
 				b: 123,
 				a: new Date(1539838676247),
-				_: Int128.From(Int128.MAX),
+				_: Int128.MAX,
 				PI: Math.PI,
 				array: ['aaa', true, 123]
 			};
@@ -212,7 +212,7 @@ test_group('beson testing', ()=>{
 					a: 123,
 					c: 'aaa'
 				},
-				_: Int128.From(Int128.MAX),
+				_: Int128.MAX,
 				b: 123
 			};
 			const test1 = Deserialize(Serialize(origin1, {sort_key: true}));
@@ -228,7 +228,7 @@ test_group('beson testing', ()=>{
 				},
 				b: 123,
 				a: new Date(1539838676247),
-				_: Int128.From(Int128.MAX),
+				_: Int128.MAX,
 				PI: Math.PI,
 				array: ['aaa', true, 123]
 			};
@@ -244,7 +244,7 @@ test_group('beson testing', ()=>{
 				},
 				b: 123,
 				a: new Date(1539838676247),
-				_: Int128.From(Int128.MAX),
+				_: Int128.MAX,
 				PI: Math.PI,
 				array: ['aaa', true, 123]
 			};
