@@ -17,8 +17,8 @@ import {
 	BitwiseTwoComplimentLE,
 	BitwiseXor,
 	BufferFromBinStrLE,
-	BufferFromHexStrLE, BufferFromIntStrLE,
-	DumpBinaryStringLE,
+	BufferFromHexStrLE, BufferFromIntStrLE, DumpBinaryStringBE,
+	DumpBinaryStringLE, DumpHexStringBE,
 	DumpHexStringLE,
 	DumpIntStringLE, ReadBuffer
 } from "../helper/misc.esm.js";
@@ -102,10 +102,10 @@ export class Binarized {
 	toString(bits=16) {
 		switch(bits) {
 			case 2:
-				return DumpBinaryStringLE(this._ab);
+				return DumpBinaryStringBE(this._ab);
 				
 			case 16:
-				return DumpHexStringLE(this._ab);
+				return DumpHexStringBE(this._ab);
 				
 			default:
 				throw new RangeError( "Binarized.toString only supports binary & hex representation!" );
@@ -389,8 +389,10 @@ export class BinarizedInt extends Binarized {
 				return DumpIntStringLE(this._ab, !this.isSignedInt);
 				
 			case 2:
+				return DumpBinaryStringLE(this._ab);
+				
 			case 16:
-				return super.toString(bits);
+				return DumpHexStringLE(this._ab);
 				
 			default:
 				throw new RangeError( "Binarized.toString only supports binary & hex representation!" );
