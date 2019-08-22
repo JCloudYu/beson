@@ -2,18 +2,15 @@
 * Author: JCloudYu
 * Create: 2018/09/24
 **/
-import {BinarizedInt} from "./core-interfaces.esm.js";
+import {BinaryInt} from "./_core-types.esm.js";
+import {___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 
 
-export class UInt512 extends BinarizedInt {
-	/**
-	 * UInt512 Constructor
-	 * @param {String|Number|Number[]|BinarizedData} value
-	**/
+export class UInt512 extends BinaryInt {
 	constructor(value=0) {
 		super();
-		this.__set_ab(new ArrayBuffer(64));
+		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(64));
 		this._ta = new Uint32Array(this._ab);
 		
 		this.__set_value(value);
@@ -21,27 +18,12 @@ export class UInt512 extends BinarizedInt {
 	
 	
 	
-	/**
-	 * Instantiate a UInt512 base on input value
-	 * @param {String|Number|Number[]|BinarizedData} value
-	 * @returns {UInt512}
-	**/
-	static From(value=0) {
+	static from(value=0) {
 		return new UInt512(value);
 	}
-	
-	/**
-	 * Return an UInt512 instance with value 0
-	 * @returns {UInt512}
-	**/
 	static get ZERO() {
 		return new UInt512();
 	}
-	
-	/**
-	 * Return an UInt512 instance with value 0xFFFFFFFFFFFFFFFF
-	 * @returns {UInt512}
-	**/
 	static get MAX() {
 		return new UInt512([
 			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -55,14 +37,10 @@ export class UInt512 extends BinarizedInt {
 		]);
 	}
 }
-export class Int512 extends BinarizedInt  {
-	/**
-	 * Int512 Constructor
-	 * @param {String|Number|Number[]|BinarizedData} value
-	**/
+export class Int512 extends BinaryInt  {
 	constructor(value=0){
 		super();
-		this.__set_ab(new ArrayBuffer(64));
+		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(64));
 		this._ta = new Uint32Array(this._ab);
 		
 		this.__set_value(value);
@@ -72,27 +50,12 @@ export class Int512 extends BinarizedInt  {
 	
 	
 	
-	/**
-	 * Instantiate a Int512 base on input value
-	 * @param {String|Number|Number[]|BinarizedData} value
-	 * @returns {Int512}
-	**/
-	static From(value=0) {
+	static from(value=0) {
 		return new Int512(value);
 	}
-	
-	/**
-	 * Return an Int512 instance with value 0
-	 * @returns {Int512}
-	**/
 	static get ZERO() {
 		return new Int512();
 	}
-	
-	/**
-	 * Return an Int512 instance with value 0xFFFFFFFFFFFFFFFF
-	 * @returns {Int512}
-	**/
 	static get MAX() {
 		return new Int512([
 			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -105,11 +68,6 @@ export class Int512 extends BinarizedInt  {
 			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F,
 		]);
 	}
-	
-	/**
-	 * Return an Int512 instance with value 0xFFFFFFFFFFFFFFFF
-	 * @returns {Int512}
-	**/
 	static get MIN() {
 		return new Int512([
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

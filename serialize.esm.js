@@ -1,63 +1,25 @@
-import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER} from "./constants.esm.js";
-import {UTF8Encode} from "./helper.esm.js";
+import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Encode} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
-	Binary, ObjectId, UInt256, UInt512, Int256, Int512, UIntVar, IntVar
-} from "./types.esm.js";
+	Binary, UInt256, UInt512, Int256, Int512,
+	UIntVar, IntVar, Float32
+} from "./beson-types.esm.js";
 
 
 
-/**
- * @class BESONSerializerOption
- * @property {Boolean} [BESONSerializerOption.sort_key=false]
- * @property {Boolean} [BESONSerializerOption.streaming_array=false]
- * @property {Boolean} [BESONSerializerOption.streaming_object=false]
-**/
-
-/** @type {BESONSerializerOption} */
-const DEFAULT_OPTIONS = {
-	sort_key: false,
-	streaming_array: false,
-	streaming_object: false
-};
-
-/**
- * Serialize any type data
- * - result = headerBuffer + contentBuffer
- * - contentBuffer = typeBuffer + dataBuffer
- * @param {*} data
- * @param {BESONSerializerOption} options
- * @returns {ArrayBuffer}
- */
-export function serialize(data, options=DEFAULT_OPTIONS) {
-	let contentBuffers = __serializeContent(data, options);
+export function Serialize(data) {
+	let contentBuffers = __serializeContent(data);
 	return __arrayBufferConcat(contentBuffers);
 }
 
-/**
- * Serialize content
- * @param {*} data
- * @param {BESONSerializerOption} options
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeContent(data, options=DEFAULT_OPTIONS) {
-	let type = __getType(data, options);
-	let typeBuffer	= __serializeType(type, options);
-	let dataBuffers = __serializeData(type, data, options);
+function __serializeContent(data) {
+	let type = __getType(data);
+	let typeBuffer	= __serializeType(type);
+	let dataBuffers = __serializeData(type, data);
 	return [typeBuffer, ...dataBuffers];
 }
-
-/**
- * Get type by data
- * @param {*} data
- * @param {Object} options
- * @param {BESONSerializerOption} options
- * @returns {string}
- * @private
- */
-function __getType(data, options) {
+function __getType(data) {
 	let type = typeof data;
 	if (data === null) {
 		type = DATA_TYPE.NULL;
@@ -116,17 +78,17 @@ function __getType(data, options) {
 	else if ( data instanceof UIntVar ) {
 		type = DATA_TYPE.UINTVAR;
 	}
+	else if ( data instanceof Float32 ) {
+		type = DATA_TYPE.FLOAT32;
+	}
 	else if (type === 'string') {
 		type = DATA_TYPE.STRING;
 	}
 	else if (Array.isArray(data)) {
-		type = (options.streaming_array === true) ? DATA_TYPE.ARRAY_START : DATA_TYPE.ARRAY;
+		type = DATA_TYPE.ARRAY;
 	}
 	else if (data instanceof Date) {
 		type = DATA_TYPE.DATE;
-	}
-	else if (data instanceof ObjectId) {
-		type = DATA_TYPE.OBJECTID;
 	}
 	else if (data instanceof Binary) {
 		type = DATA_TYPE.BINARY;
@@ -166,33 +128,16 @@ function __getType(data, options) {
 		type = DATA_TYPE.FLOAT64_ARRAY;
 	}
 	else if (type === 'object') {
-		type = (options.streaming_object === true) ? DATA_TYPE.OBJECT_START : DATA_TYPE.OBJECT;
+		type = DATA_TYPE.OBJECT;
 	}
 	return type;
 }
-
-/**
- * Serialize type
- * @param {string} type
- * @param {BESONSerializerOption} options
- * @returns {ArrayBuffer}
- * @private
- */
-function __serializeType(type, options) {
+function __serializeType(type) {
 	let typeHeader = (type) ? TYPE_HEADER[type.toUpperCase()] : [];
 	let typeData = new Uint8Array(typeHeader);
 	return typeData.buffer;
 }
-
-/**
- * Serialize data
- * @param {string} type
- * @param {*} data
- * @param {BESONSerializerOption} options
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeData(type, data, options=DEFAULT_OPTIONS) {
+function __serializeData(type, data) {
 	let buffers = [];
 	if (type === DATA_TYPE.NULL) {
 		buffers = __serializeNull();
@@ -248,23 +193,26 @@ function __serializeData(type, data, options=DEFAULT_OPTIONS) {
 	else if (type === DATA_TYPE.UINTVAR) {
 		buffers = __serializeUIntVar(data);
 	}
+	else if (type === DATA_TYPE.FLOAT32) {
+		buffers = __serializeFloat32(data);
+	}
 	else if (type === DATA_TYPE.FLOAT64) {
-		buffers = __serializeDouble(data);
+		buffers = __serializeFloat64(data);
 	}
 	else if (type === DATA_TYPE.STRING) {
 		buffers = __serializeString(data);
 	}
 	else if (type === DATA_TYPE.ARRAY) {
-		buffers = __serializeArray(data, options);
+		buffers = __serializeArray(data);
 	}
 	else if (type === DATA_TYPE.ARRAY_START) {
-		buffers = __serializeArrayStreaming(data, options);
+		buffers = __serializeArrayStreaming(data);
 	}
 	else if (type === DATA_TYPE.OBJECT) {
-		buffers = __serializeObject(data, options);
+		buffers = __serializeObject(data);
 	}
 	else if (type === DATA_TYPE.OBJECT_START) {
-		buffers = __serializeObjectStreaming(data, options);
+		buffers = __serializeObjectStreaming(data);
 	}
 	else if (type === DATA_TYPE.DATE) {
 		buffers = __serializeDate(data);
@@ -313,71 +261,24 @@ function __serializeData(type, data, options=DEFAULT_OPTIONS) {
 	
 	return buffers;
 }
-
-/**
- * Serialize null data
- * @returns {[]}
- * @private
- */
 function __serializeNull() {
 	return [];
 }
-
-/**
- * Serialize boolean data
- * @returns {[]}
- * @private
- */
 function __serializeBoolean() {
 	return [];
 }
-
-/**
- * Serialize Int64 data
- * @param {Int64} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeInt64(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize Int128 data
- * @param {Int128} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeInt128(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize Int256 data
- * @param {Int256} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeInt256(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize Int512 data
- * @param {Int512} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeInt512(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize IntVar data
- * @param {IntVar} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeIntVar(data) {
 	if ( data.size > 127 ) {
 		throw new Error( "Cannot support IntVar whose size is greater than 127 bytes" );
@@ -386,53 +287,18 @@ function __serializeIntVar(data) {
 	const size = new Uint8Array([data.size]);
 	return [size.buffer, data.toBytes().buffer];
 }
-
-/**
- * Serialize UInt64 data
- * @param {UInt64} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeUInt64(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize UInt128 data
- * @param {UInt128} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeUInt128(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize UInt256 data
- * @param {UInt256} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeUInt256(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize UInt512 data
- * @param {UInt512} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeUInt512(data) {
 	return [data.toBytes().buffer];
 }
-
-/**
- * Serialize UIntVar data
- * @param {UIntVar} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeUIntVar(data) {
 	if ( data.size > 127 ) {
 		throw new Error( "Cannot support UIntVar whose size is greater than 127 bytes" );
@@ -441,187 +307,99 @@ function __serializeUIntVar(data) {
 	const size = new Uint8Array([data.size]);
 	return [size.buffer, data.toBytes().buffer];
 }
-
-/**
- * Serialize double data
- * @param {number} data - double number
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeDouble(data) {
+function __serializeFloat32(data) {
+	let contentData = new Float32Array([data]);
+	return [contentData.buffer];
+}
+function __serializeFloat64(data) {
 	let contentData = new Float64Array([data]);
 	return [contentData.buffer];
 }
-
-/**
- * Serialize string data (use UTF8 encode)
- * @param {string} data - 32-bits length string
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeString(data) {
 	let dataBuffer = UTF8Encode(data);
 	let length = dataBuffer.byteLength;
 	let lengthData = new Uint32Array([length]);
 	return [lengthData.buffer, dataBuffer];
 }
-
-/**
- * Serialize short string data (use UTF8 encode)
- * @param {string} data - 16-bits length string
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeShortString(data) {
 	let dataBuffer = UTF8Encode(data);
 	let length = dataBuffer.byteLength;
 	let lengthData = new Uint16Array([length]);
 	return [lengthData.buffer, dataBuffer];
 }
-
-/**
- * Serialize array data
- * @param {*[]} data
- * @param {Object} options
- * @param {boolean} options.sort_key
- * @param {boolean} options.streaming_array
- * @param {boolean} options.streaming_object
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeArray(data, options=DEFAULT_OPTIONS) {
+function __serializeArray(data) {
 	let dataBuffers = [];
 	// ignore undefined value
 	for (let key in data) {
 		let subData = data[key];
-		let subType = __getType(subData, options);
+		let subType = __getType(subData);
 		let subTypeBuffer = __serializeType(subType);
-		let subDataBuffers = __serializeData(subType, subData, options);
+		let subDataBuffers = __serializeData(subType, subData);
 		dataBuffers.push(subTypeBuffer, ...subDataBuffers);
 	}
 	let length = __getLengthByArrayBuffers(dataBuffers);
 	let lengthData = new Uint32Array([length]);
 	return [lengthData.buffer, ...dataBuffers];
 }
-
-/**
- * Serialize array data (use streaming)
- * @param {*[]} data
- * @param {Object} options
- * @param {boolean} options.sort_key
- * @param {boolean} options.streaming_array
- * @param {boolean} options.streaming_object
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeArrayStreaming(data, options=DEFAULT_OPTIONS) {
+function __serializeArrayStreaming(data) {
 	let dataBuffers = [];
 	// ignore undefined value
 	for (let key in data) {
 		let subData = data[key];
-		let subType = __getType(subData, options);
+		let subType = __getType(subData);
 		let subTypeBuffer = __serializeType(subType);
-		let subDataBuffers = __serializeData(subType, subData, options);
+		let subDataBuffers = __serializeData(subType, subData);
 		dataBuffers.push(subTypeBuffer, ...subDataBuffers);
 	}
 	return [...dataBuffers, TYPE_HEADER.ARRAY_END];
 }
-
-/**
- * Serialize object data
- * @param {Object} data
- * @param {Object} options
- * @param {boolean} options.sort_key
- * @param {boolean} options.streaming_array
- * @param {boolean} options.streaming_object
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeObject(data, options=DEFAULT_OPTIONS) {
+function __serializeObject(data) {
 	let dataBuffers = [];
-	let allKeys = (options.sort_key === true) ? Object.keys(data).sort() : Object.keys(data);
-	// ignore undefined value
-	for (let key of allKeys) {
+	for (let key of Object.keys(data)) {
 		let subData = data[key];
+		
+		// ignore undefined value
 		if (subData === undefined) continue;
 
-		let subType = __getType(subData, options);
+		let subType = __getType(subData);
 		let subTypeBuffer = __serializeType(subType);
 		let keyBuffers = __serializeShortString(key);
-		let subDataBuffers = __serializeData(subType, subData, options);
+		let subDataBuffers = __serializeData(subType, subData);
 		dataBuffers.push(subTypeBuffer, ...keyBuffers, ...subDataBuffers);
 	}
 	let length = __getLengthByArrayBuffers(dataBuffers);
 	let lengthData = new Uint32Array([length]);
 	return [lengthData.buffer, ...dataBuffers];
 }
-
-/**
- * Serialize object data (use streaming)
- * @param {Object} data
- * @param {Object} options
- * @param {boolean} options.sort_key
- * @param {boolean} options.streaming_array
- * @param {boolean} options.streaming_object
- * @returns {ArrayBuffer[]}
- * @private
- */
-function __serializeObjectStreaming(data, options=DEFAULT_OPTIONS) {
+function __serializeObjectStreaming(data) {
 	let dataBuffers = [];
-	let allKeys = (options.sort_key === true) ? Object.keys(data).sort() : Object.keys(data);
-	// ignore undefined value
-	for (let key of allKeys) {
+	
+	for (let key of Object.keys(data)) {
 		let subData = data[key];
+		
+		// ignore undefined value
 		if (subData === undefined) continue;
 
-		let subType = __getType(subData, options);
+		let subType = __getType(subData);
 		let subTypeBuffer = __serializeType(subType);
 		let keyBuffers = __serializeShortString(key);
-		let subDataBuffers = __serializeData(subType, subData, options);
+		let subDataBuffers = __serializeData(subType, subData);
 		dataBuffers.push(subTypeBuffer, ...keyBuffers, ...subDataBuffers);
 	}
 	return [...dataBuffers, TYPE_HEADER.OBJECT_END];
 }
-
-/**
- * Serialize date data
- * @param {Date} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeDate(data) {
 	let contentData = new Float64Array([data.getTime()]);
 	return [contentData.buffer];
 }
-
-/**
- * Serialize ObjectId data
- * @param {ObjectId} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeObjectId(data) {
 	return [data._ab];
 }
-
-/**
- * Serialize ArrayBuffer Object
- * @param {ArrayBuffer} data
- * @returns {ArrayBuffer[]}
- * @private
- */
 function __serializeArrayBuffer(data) {
 	let length = data.byteLength;
 	let lengthData = new Uint32Array([length]);
 	return [lengthData.buffer, data];
 }
-
-/**
- * Get length of ArrayBufer[]
- * @param {ArrayBuffer[]} data
- * @returns {number}
- * @private
- */
 function __getLengthByArrayBuffers(data) {
 	let length = 0;
 	for (let key in data) {
@@ -629,13 +407,6 @@ function __getLengthByArrayBuffers(data) {
 	}
 	return length;
 }
-
-/**
- * Concat ArrayBuffer[] (based on http://exploringjs.com/es6/ch_typed-arrays.html#_concatenating-typed-arrays)
- * @param {ArrayBuffer[]} buffers
- * @returns {ArrayBuffer}
- * @private
- */
 function __arrayBufferConcat(buffers) {
 	let totalLength = 0;
 	for (const buffer of buffers) {

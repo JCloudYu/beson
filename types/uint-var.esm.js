@@ -2,22 +2,17 @@
 * Author: JCloudYu
 * Create: 2018/09/24
 **/
-import {Binarized, BinarizedInt} from "./core-interfaces.esm.js";
-import {BufferFromBinStrLE, BufferFromHexStrLE, BufferFromIntStrLE, ReadBuffer} from "../helper/misc.esm.js";
+import {BinaryData, BinaryInt} from "./_core-types.esm.js";
+import {BufferFromBinStrLE, BufferFromHexStrLE, BufferFromIntStrLE, ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 
 
-class BinarizedVariableInteger extends BinarizedInt {
-	/**
-	 * BinarizedVariableInteger Constructor
-	 * @param {String|Number|Number[]|BinarizedData} value
-	 * @param {Number} size
-	**/
+class BinaryVariableLengthInt extends BinaryInt {
 	constructor(value=0, size=null) {
 		super();
 		
 		if ( size !== null ) {
-			this.__set_ab(new ArrayBuffer(size));
+			___SET_BINARY_BUFFER.call(this, new ArrayBuffer(size));
 			this._ta = this._ba;
 			
 			this.__set_value(value);
@@ -33,7 +28,7 @@ class BinarizedVariableInteger extends BinarizedInt {
 				}
 			}
 			
-			this.__set_ab(new ArrayBuffer(value.length));
+			___SET_BINARY_BUFFER.call(this, new ArrayBuffer(value.length));
 			this._ba.set(value);
 			this._ta = this._ba;
 			return;
@@ -43,7 +38,7 @@ class BinarizedVariableInteger extends BinarizedInt {
 		
 		let buffer = ReadBuffer(value);
 		if ( buffer !== null ) {
-			this.__set_ab(new ArrayBuffer(buffer.byteLength));
+			___SET_BINARY_BUFFER.call(this, new ArrayBuffer(buffer.byteLength));
 			this._ba.set(new Uint8Array(buffer));
 			this._ta = this._ba;
 			return;
@@ -51,7 +46,7 @@ class BinarizedVariableInteger extends BinarizedInt {
 		
 		
 		
-		if ( Binarized.IsBinarized(value)) {
+		if ( BinaryData.isBinaryData(value)) {
 			this._ta = this._ba = value.toBytes();
 			this._ab = this._ba.buffer;
 			return;
@@ -88,13 +83,12 @@ class BinarizedVariableInteger extends BinarizedInt {
 		
 		throw new TypeError( "Given value cannot be casted into ArrayBuffer!" );
 	}
-	
 	resize(size) {
 		if ( size === this.size ) return;
 	
 		
 		let original = this._ba;
-		this.__set_ab(new ArrayBuffer(size));
+		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(size));
 		this._ba.set(original);
 		this._ta = this._ba;
 	}
@@ -102,21 +96,10 @@ class BinarizedVariableInteger extends BinarizedInt {
 
 
 
-export class UIntVar extends BinarizedVariableInteger {
-	/**
-	 * Instantiate a UIntVar base on input value
-	 * @param {String|Number|Number[]|BinarizedData} value
-	 * @returns {UIntVar}
-	**/
-	static From(value=0) {
+export class UIntVar extends BinaryVariableLengthInt {
+	static from(value=0) {
 		return new UIntVar(value);
 	}
-	
-	/**
-	 * Return an UIntVar instance with value 0 represented by specific size of bytes
-	 * @param {Number} size
-	 * @returns {UIntVar}
-	**/
 	static ZERO(size) {
 		if ( typeof size !== "number" && size <= 0 ) {
 			throw new Error( "Given size must be a number greater than zero!" );
@@ -129,12 +112,6 @@ export class UIntVar extends BinarizedVariableInteger {
 		
 		return new UIntVar(input);
 	}
-	
-	/**
-	 * Return an UIntVar instance with MAX valid value represented by specific size of bytes
-	 * @param {Number} size
-	 * @returns {UIntVar}
-	**/
 	static MAX(size) {
 		if ( typeof size !== "number" && size <= 0 ) {
 			throw new Error( "Given size must be a number greater than zero!" );
@@ -148,25 +125,14 @@ export class UIntVar extends BinarizedVariableInteger {
 		return new UIntVar(input);
 	}
 }
-export class IntVar extends BinarizedVariableInteger {
+export class IntVar extends BinaryVariableLengthInt {
 	get isSignedInt() { return true; }
 	
 	
 	
-	/**
-	 * Instantiate a IntVar base on input value
-	 * @param {String|Number|Number[]|BinarizedData} value
-	 * @returns {IntVar}
-	**/
-	static From(value=0) {
+	static from(value=0) {
 		return new IntVar(value);
 	}
-	
-	/**
-	 * Return an IntVar instance with value 0 represented by specific size of bytes
-	 * @param {Number} size
-	 * @returns {IntVar}
-	**/
 	static ZERO(size) {
 		if ( typeof size !== "number" && size <= 0 ) {
 			throw new Error( "Given size must be a number greater than zero!" );
@@ -179,12 +145,6 @@ export class IntVar extends BinarizedVariableInteger {
 		
 		return new IntVar(input);
 	}
-	
-	/**
-	 * Return an IntVar instance with MAX valid value represented by specific size of bytes
-	 * @param {Number} size
-	 * @returns {IntVar}
-	**/
 	static MAX(size) {
 		if ( typeof size !== "number" && size <= 0 ) {
 			throw new Error( "Given size must be a number greater than zero!" );
@@ -198,12 +158,6 @@ export class IntVar extends BinarizedVariableInteger {
 		
 		return new IntVar(input);
 	}
-	
-	/**
-	 * Return an IntVar instance with MIN valid value represented by specific size of bytes
-	 * @param {Number} size
-	 * @returns {IntVar}
-	**/
 	static MIN(size) {
 		if ( typeof size !== "number" && size <= 0 ) {
 			throw new Error( "Given size must be a number greater than zero!" );
