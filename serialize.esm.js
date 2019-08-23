@@ -1,422 +1,322 @@
-import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Encode} from "./helper.esm.js";
+import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Encode, ConcatBuffers} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
-	Binary, UInt256, UInt512, Int256, Int512,
-	UIntVar, IntVar, Float32
+	UInt256, UInt512, Int256, Int512, Float32, BinaryData
 } from "./beson-types.esm.js";
 
 
 
+const SEQUENCE_END = (new Uint8Array([0x00]).buffer);
+
 export function Serialize(data) {
-	let contentBuffers = __serializeContent(data);
-	return __arrayBufferConcat(contentBuffers);
+	const chunks = [];
+	SerializeData(data, (chunk)=>{
+		chunks.push(chunk);
+	});
+	return ConcatBuffers(chunks);
 }
 
-function __serializeContent(data) {
-	let type = __getType(data);
-	let typeBuffer	= __serializeType(type);
-	let dataBuffers = __serializeData(type, data);
-	return [typeBuffer, ...dataBuffers];
+
+
+function SerializeData(data, data_cb) {
+	const type = SerializeType(data, data_cb);
+	SerializeDataBaseOnType(type, data, data_cb);
 }
-function __getType(data) {
-	let type = typeof data;
-	if (data === null) {
-		type = DATA_TYPE.NULL;
+function SerializeType(data, data_cb) {
+	if ( data === null ) {
+		data_cb(Uint8Array.from([TYPE_HEADER.NULL]).buffer);
+		return DATA_TYPE.NULL;
 	}
-	else if (type === 'boolean') {
-		type = (data) ? DATA_TYPE.TRUE : DATA_TYPE.FALSE;
+	
+	const data_type = typeof data;
+	if ( data_type === 'boolean') {
+		data_cb(Uint8Array.from([data ? TYPE_HEADER.TRUE : TYPE_HEADER.FALSE]).buffer);
+		return data ? DATA_TYPE.TRUE : DATA_TYPE.FALSE;
 	}
-	else if ( type === "number" ) {
-		type = DATA_TYPE.FLOAT64;
+	if ( data_type === "number" ) {
+		data_cb(Uint8Array.from([TYPE_HEADER.FLOAT64]).buffer);
+		return DATA_TYPE.FLOAT64;
 	}
-	else if ( data instanceof Int8 ) {
-		type = DATA_TYPE.INT8;
+	if ( data_type === "string" ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.STRING ]).buffer);
+		return DATA_TYPE.STRING;
 	}
-	else if ( data instanceof UInt8 ) {
-		type = DATA_TYPE.UINT8;
+	
+	if (Array.isArray(data)) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.ARRAY ]).buffer);
+		return DATA_TYPE.ARRAY;
 	}
-	else if ( data instanceof Int16 ) {
-		type = DATA_TYPE.INT16;
+	
+	if ( data instanceof Int8 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT8 ]).buffer);
+		return DATA_TYPE.INT8;
 	}
-	else if ( data instanceof UInt16 ) {
-		type = DATA_TYPE.UINT16;
+	if ( data instanceof UInt8 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT8 ]).buffer);
+		return DATA_TYPE.UINT8;
 	}
-	else if ( data instanceof Int32 ) {
-		type = DATA_TYPE.INT32;
+	if ( data instanceof Int16 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT16 ]).buffer);
+		return DATA_TYPE.INT16;
 	}
-	else if ( data instanceof UInt32 ) {
-		type = DATA_TYPE.UINT32;
+	if ( data instanceof UInt16 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT16 ]).buffer);
+		return DATA_TYPE.UINT16;
 	}
-	else if ( data instanceof Int64 ) {
-		type = DATA_TYPE.INT64;
+	if ( data instanceof Int32 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT32 ]).buffer);
+		return DATA_TYPE.INT32;
 	}
-	else if ( data instanceof UInt64 ) {
-		type = DATA_TYPE.UINT64;
+	if ( data instanceof UInt32 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT32 ]).buffer);
+		return DATA_TYPE.UINT32;
 	}
-	else if ( data instanceof Int256 ) {
-		type = DATA_TYPE.INT256;
+	if ( data instanceof Int64 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT64 ]).buffer);
+		return DATA_TYPE.INT64;
 	}
-	else if ( data instanceof UInt256 ) {
-		type = DATA_TYPE.UINT256;
+	if ( data instanceof UInt64 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT64 ]).buffer);
+		return DATA_TYPE.UINT64;
 	}
-	else if ( data instanceof Int512 ) {
-		type = DATA_TYPE.INT512;
+	if ( data instanceof Int128 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT128 ]).buffer);
+		return DATA_TYPE.INT128;
 	}
-	else if ( data instanceof UInt512 ) {
-		type = DATA_TYPE.UINT512;
+	if ( data instanceof UInt128 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT128 ]).buffer);
+		return DATA_TYPE.UINT128;
 	}
-	else if ( data instanceof Int128 ) {
-		type = DATA_TYPE.INT128;
+	if ( data instanceof Int256 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT256 ]).buffer);
+		return DATA_TYPE.INT256;
 	}
-	else if ( data instanceof UInt128 ) {
-		type = DATA_TYPE.UINT128;
+	if ( data instanceof UInt256 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT256 ]).buffer);
+		return DATA_TYPE.UINT256;
 	}
-	else if ( data instanceof IntVar ) {
-		type = DATA_TYPE.INTVAR;
+	if ( data instanceof Int512 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT512 ]).buffer);
+		return DATA_TYPE.INT512;
 	}
-	else if ( data instanceof UIntVar ) {
-		type = DATA_TYPE.UINTVAR;
+	if ( data instanceof UInt512 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT512 ]).buffer);
+		return DATA_TYPE.UINT512;
 	}
-	else if ( data instanceof Float32 ) {
-		type = DATA_TYPE.FLOAT32;
+	if ( data instanceof Float32 ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.FLOAT32 ]).buffer);
+		return DATA_TYPE.FLOAT32;
 	}
-	else if (type === 'string') {
-		type = DATA_TYPE.STRING;
+	
+	if (data instanceof Date) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.DATE ]).buffer);
+		return DATA_TYPE.DATE;
 	}
-	else if (Array.isArray(data)) {
-		type = DATA_TYPE.ARRAY;
+	if (data instanceof RegExp) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.REGEX ]).buffer);
+		return DATA_TYPE.REGEX;
 	}
-	else if (data instanceof Date) {
-		type = DATA_TYPE.DATE;
+	if (data instanceof Map) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.MAP ]).buffer);
+		return DATA_TYPE.MAP;
 	}
-	else if (data instanceof Binary) {
-		type = DATA_TYPE.BINARY;
+	if (data instanceof Set) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.SET ]).buffer);
+		return DATA_TYPE.SET;
 	}
-	else if ( data instanceof ArrayBuffer) {
-		type = DATA_TYPE.ARRAY_BUFFER;
+	
+	if ( data instanceof ArrayBuffer) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.ARRAY_BUFFER ]).buffer);
+		return DATA_TYPE.ARRAY_BUFFER;
 	}
-	else if ( data instanceof DataView) {
-		type = DATA_TYPE.DATA_VIEW;
+	if ( data instanceof DataView) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.DATA_VIEW ]).buffer);
+		return DATA_TYPE.DATA_VIEW;
 	}
 	// NOTE: This line must be prior to Uint8Array since NodeJS Buffer is defined to be inheritance of Uint8Array
-	else if ( HAS_NODE_BUFFER && data instanceof Buffer ) {
-		type = DATA_TYPE.SPECIAL_BUFFER;
+	if ( HAS_NODE_BUFFER && data instanceof Buffer ) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.SPECIAL_BUFFER ]).buffer);
+		return DATA_TYPE.SPECIAL_BUFFER;
 	}
-	else if ( data instanceof Uint8Array) {
-		type = DATA_TYPE.UINT8_ARRAY;
+	if ( data instanceof Uint8Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT8_ARRAY ]).buffer);
+		return DATA_TYPE.UINT8_ARRAY;
 	}
-	else if ( data instanceof Int8Array) {
-		type = DATA_TYPE.INT8_ARRAY;
+	if ( data instanceof Int8Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT8_ARRAY ]).buffer);
+		return DATA_TYPE.INT8_ARRAY;
 	}
-	else if ( data instanceof Uint16Array) {
-		type = DATA_TYPE.UINT16_ARRAY;
+	if ( data instanceof Uint16Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT16_ARRAY ]).buffer);
+		return DATA_TYPE.UINT16_ARRAY;
 	}
-	else if ( data instanceof Int16Array) {
-		type = DATA_TYPE.INT16_ARRAY;
+	if ( data instanceof Int16Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT16_ARRAY ]).buffer);
+		return DATA_TYPE.INT16_ARRAY;
 	}
-	else if ( data instanceof Uint32Array) {
-		type = DATA_TYPE.UINT32_ARRAY;
+	if ( data instanceof Uint32Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.UINT32_ARRAY ]).buffer);
+		return DATA_TYPE.UINT32_ARRAY;
 	}
-	else if ( data instanceof Int32Array) {
-		type = DATA_TYPE.INT32_ARRAY;
+	if ( data instanceof Int32Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.INT32_ARRAY ]).buffer);
+		return DATA_TYPE.INT32_ARRAY;
 	}
-	else if ( data instanceof Float32Array) {
-		type = DATA_TYPE.FLOAT32_ARRAY;
+	if ( data instanceof Float32Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.FLOAT32_ARRAY ]).buffer);
+		return DATA_TYPE.FLOAT32_ARRAY;
 	}
-	else if ( data instanceof Float64Array) {
-		type = DATA_TYPE.FLOAT64_ARRAY;
-	}
-	else if (type === 'object') {
-		type = DATA_TYPE.OBJECT;
-	}
-	return type;
-}
-function __serializeType(type) {
-	let typeHeader = (type) ? TYPE_HEADER[type.toUpperCase()] : [];
-	let typeData = new Uint8Array(typeHeader);
-	return typeData.buffer;
-}
-function __serializeData(type, data) {
-	let buffers = [];
-	if (type === DATA_TYPE.NULL) {
-		buffers = __serializeNull();
-	}
-	else if (type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
-		buffers = __serializeBoolean();
-	}
-	else if (type === DATA_TYPE.UINT8) {
-		buffers = [data._ab];
-	}
-	else if (type === DATA_TYPE.UINT16) {
-		buffers = [data._ab];
-	}
-	else if (type === DATA_TYPE.UINT32) {
-		buffers = [data._ab];
-	}
-	else if (type === DATA_TYPE.INT8) {
-		buffers = [data._ab];
-	}
-	else if (type === DATA_TYPE.INT16) {
-		buffers = [data._ab];
-	}
-	else if (type === DATA_TYPE.INT32) {
-		buffers = [data._ab];
-	}
-	else if (type === DATA_TYPE.INT64) {
-		buffers = __serializeInt64(data);
-	}
-	else if (type === DATA_TYPE.INT128) {
-		buffers = __serializeInt128(data);
-	}
-	else if (type === DATA_TYPE.INT256) {
-		buffers = __serializeInt256(data);
-	}
-	else if (type === DATA_TYPE.INT512) {
-		buffers = __serializeInt512(data);
-	}
-	else if (type === DATA_TYPE.INTVAR) {
-		buffers = __serializeIntVar(data);
-	}
-	else if (type === DATA_TYPE.UINT64) {
-		buffers = __serializeUInt64(data);
-	}
-	else if (type === DATA_TYPE.UINT128) {
-		buffers = __serializeUInt128(data);
-	}
-	else if (type === DATA_TYPE.UINT256) {
-		buffers = __serializeUInt256(data);
-	}
-	else if (type === DATA_TYPE.UINT512) {
-		buffers = __serializeUInt512(data);
-	}
-	else if (type === DATA_TYPE.UINTVAR) {
-		buffers = __serializeUIntVar(data);
-	}
-	else if (type === DATA_TYPE.FLOAT32) {
-		buffers = __serializeFloat32(data);
-	}
-	else if (type === DATA_TYPE.FLOAT64) {
-		buffers = __serializeFloat64(data);
-	}
-	else if (type === DATA_TYPE.STRING) {
-		buffers = __serializeString(data);
-	}
-	else if (type === DATA_TYPE.ARRAY) {
-		buffers = __serializeArray(data);
-	}
-	else if (type === DATA_TYPE.ARRAY_START) {
-		buffers = __serializeArrayStreaming(data);
-	}
-	else if (type === DATA_TYPE.OBJECT) {
-		buffers = __serializeObject(data);
-	}
-	else if (type === DATA_TYPE.OBJECT_START) {
-		buffers = __serializeObjectStreaming(data);
-	}
-	else if (type === DATA_TYPE.DATE) {
-		buffers = __serializeDate(data);
-	}
-	else if (type === DATA_TYPE.OBJECTID) {
-		buffers = __serializeObjectId(data);
-	}
-	else if (type === DATA_TYPE.BINARY) {
-		buffers = __serializeArrayBuffer(data.toBytes());
-	}
-	else if (type === DATA_TYPE.ARRAY_BUFFER) {
-		buffers = __serializeArrayBuffer(data);
-	}
-	else if (type === DATA_TYPE.DATA_VIEW) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.UINT8_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.INT8_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.UINT16_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.INT16_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.UINT32_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.INT32_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.FLOAT32_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (type === DATA_TYPE.FLOAT64_ARRAY) {
-		buffers = __serializeArrayBuffer(data.buffer);
-	}
-	else if (HAS_NODE_BUFFER && type === DATA_TYPE.SPECIAL_BUFFER) {
-		let buff = Buffer.alloc(data.length);
-		data.copy(buff, 0);
-		buffers = __serializeArrayBuffer(buff.buffer);
+	if ( data instanceof Float64Array) {
+		data_cb(Uint8Array.from([ TYPE_HEADER.FLOAT64_ARRAY ]).buffer);
+		return DATA_TYPE.FLOAT64_ARRAY;
 	}
 	
-	return buffers;
-}
-function __serializeNull() {
-	return [];
-}
-function __serializeBoolean() {
-	return [];
-}
-function __serializeInt64(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeInt128(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeInt256(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeInt512(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeIntVar(data) {
-	if ( data.size > 127 ) {
-		throw new Error( "Cannot support IntVar whose size is greater than 127 bytes" );
+	if (data_type === 'object') {
+		data_cb(Uint8Array.from([ TYPE_HEADER.OBJECT ]).buffer);
+		return DATA_TYPE.OBJECT;
 	}
-
-	const size = new Uint8Array([data.size]);
-	return [size.buffer, data.toBytes().buffer];
-}
-function __serializeUInt64(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeUInt128(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeUInt256(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeUInt512(data) {
-	return [data.toBytes().buffer];
-}
-function __serializeUIntVar(data) {
-	if ( data.size > 127 ) {
-		throw new Error( "Cannot support UIntVar whose size is greater than 127 bytes" );
-	}
-
-	const size = new Uint8Array([data.size]);
-	return [size.buffer, data.toBytes().buffer];
-}
-function __serializeFloat32(data) {
-	let contentData = new Float32Array([data]);
-	return [contentData.buffer];
-}
-function __serializeFloat64(data) {
-	let contentData = new Float64Array([data]);
-	return [contentData.buffer];
-}
-function __serializeString(data) {
-	let dataBuffer = UTF8Encode(data);
-	let length = dataBuffer.byteLength;
-	let lengthData = new Uint32Array([length]);
-	return [lengthData.buffer, dataBuffer];
-}
-function __serializeShortString(data) {
-	let dataBuffer = UTF8Encode(data);
-	let length = dataBuffer.byteLength;
-	let lengthData = new Uint16Array([length]);
-	return [lengthData.buffer, dataBuffer];
-}
-function __serializeArray(data) {
-	let dataBuffers = [];
-	// ignore undefined value
-	for (let key in data) {
-		let subData = data[key];
-		let subType = __getType(subData);
-		let subTypeBuffer = __serializeType(subType);
-		let subDataBuffers = __serializeData(subType, subData);
-		dataBuffers.push(subTypeBuffer, ...subDataBuffers);
-	}
-	let length = __getLengthByArrayBuffers(dataBuffers);
-	let lengthData = new Uint32Array([length]);
-	return [lengthData.buffer, ...dataBuffers];
-}
-function __serializeArrayStreaming(data) {
-	let dataBuffers = [];
-	// ignore undefined value
-	for (let key in data) {
-		let subData = data[key];
-		let subType = __getType(subData);
-		let subTypeBuffer = __serializeType(subType);
-		let subDataBuffers = __serializeData(subType, subData);
-		dataBuffers.push(subTypeBuffer, ...subDataBuffers);
-	}
-	return [...dataBuffers, TYPE_HEADER.ARRAY_END];
-}
-function __serializeObject(data) {
-	let dataBuffers = [];
-	for (let key of Object.keys(data)) {
-		let subData = data[key];
-		
-		// ignore undefined value
-		if (subData === undefined) continue;
-
-		let subType = __getType(subData);
-		let subTypeBuffer = __serializeType(subType);
-		let keyBuffers = __serializeShortString(key);
-		let subDataBuffers = __serializeData(subType, subData);
-		dataBuffers.push(subTypeBuffer, ...keyBuffers, ...subDataBuffers);
-	}
-	let length = __getLengthByArrayBuffers(dataBuffers);
-	let lengthData = new Uint32Array([length]);
-	return [lengthData.buffer, ...dataBuffers];
-}
-function __serializeObjectStreaming(data) {
-	let dataBuffers = [];
 	
-	for (let key of Object.keys(data)) {
-		let subData = data[key];
+	
+	
+	const error = new TypeError( "Given data cannot be serialized as beson!" );
+	error.detail = data;
+	
+	throw error;
+}
+function SerializeDataBaseOnType(type, data, data_cb) {
+	if (type === DATA_TYPE.NULL || type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
+		// null and boolean has no data payload
+		return;
+	}
+	
+	if ( BinaryData.isBinaryData(data) ) {
+		data_cb(data._ab);
+		return;
+	}
+	
+	if ( type === DATA_TYPE.FLOAT64 ) {
+		const buff = new Float64Array([data]);
+		data_cb(buff.buffer);
+		return;
+	}
+	
+	if ( type === DATA_TYPE.STRING ) {
+		const dataBuffer = UTF8Encode(data);
+		const lengthData = new Uint32Array([dataBuffer.byteLength]);
+		data_cb(lengthData.buffer);
+		data_cb(dataBuffer);
+		return;
+	}
+	
+	if ( type === DATA_TYPE.DATE ) {
+		const dateData = new Float64Array([data.getTime()]);
+		data_cb(dateData.buffer);
+		return;
+	}
+	
+	if ( type === DATA_TYPE.SPECIAL_BUFFER ) {
+		const buff = new Uint8Array(data.length);
+		buff.set(data);
 		
-		// ignore undefined value
-		if (subData === undefined) continue;
+		const lengthData = new Uint32Array([buff.length]);
+		data_cb(lengthData);
+		data_cb(buff.buffer);
+		return;
+	}
+	
+	if ( data instanceof ArrayBuffer ) {
+		const lengthData = new Uint32Array([data.byteLength]);
+		data_cb(lengthData);
+		data_cb(data);
+		return;
+	}
+	
+	if ( ArrayBuffer.isView(data) ) {
+		const buffer = data.buffer;
+		const lengthData = new Uint32Array([buffer.byteLength]);
+		data_cb(lengthData);
+		data_cb(buffer);
+		return;
+	}
+	
+	if ( type === DATA_TYPE.REGEX ) {
+		const sourceBuffer = UTF8Encode(data.source);
+		if ( sourceBuffer.byteLength > 65535 ) {
+			throw new RangeError( "Beson can only accept regex with source string not longer than 65535 bytes!" );
+		}
+		
+		
+		const flagBuffer = UTF8Encode(data.flags);
+		if ( flagBuffer.byteLength > 255 ) {
+			throw new RangeError( "Beson can only accept regex with flag string not longer than 255 bytes!" );
+		}
+		
+		data_cb(Uint16Array.from([sourceBuffer.byteLength]).buffer);
+		data_cb(sourceBuffer);
+		
+		data_cb(Uint8Array.from([flagBuffer.byteLength]).buffer);
+		data_cb(flagBuffer);
+		return;
+	}
+	
+	if (type === DATA_TYPE.ARRAY || type === DATA_TYPE.SET) {
+		return SerializeArrayAndSet(data, data_cb);
+	}
+	
+	if (type === DATA_TYPE.OBJECT) {
+		return SerializeObject(data, data_cb);
+	}
+	
+	if (type === DATA_TYPE.MAP) {
+		return SerializeMap(data, data_cb);
+	}
+}
 
-		let subType = __getType(subData);
-		let subTypeBuffer = __serializeType(subType);
-		let keyBuffers = __serializeShortString(key);
-		let subDataBuffers = __serializeData(subType, subData);
-		dataBuffers.push(subTypeBuffer, ...keyBuffers, ...subDataBuffers);
+
+
+
+function SerializeArrayAndSet(array, data_cb) {
+	for ( let data of array ) {
+		if ( data === undefined ) { data = null; }
+		const type = SerializeType(data, data_cb);
+		SerializeDataBaseOnType(type, data, data_cb);
 	}
-	return [...dataBuffers, TYPE_HEADER.OBJECT_END];
+	data_cb(SEQUENCE_END);
 }
-function __serializeDate(data) {
-	let contentData = new Float64Array([data.getTime()]);
-	return [contentData.buffer];
-}
-function __serializeObjectId(data) {
-	return [data._ab];
-}
-function __serializeArrayBuffer(data) {
-	let length = data.byteLength;
-	let lengthData = new Uint32Array([length]);
-	return [lengthData.buffer, data];
-}
-function __getLengthByArrayBuffers(data) {
-	let length = 0;
-	for (let key in data) {
-		length += data[key].byteLength;
+function SerializeShortString(data, data_cb) {
+	const buffer = UTF8Encode(data);
+	if ( buffer.byteLength > 65535 ) {
+		throw new RangeError("Given key cannot be larger than 65565 bytes!");
 	}
-	return length;
+	
+	const length_data = Uint16Array.from([buffer.byteLength]).buffer;
+	data_cb(length_data);
+	data_cb(buffer);
 }
-function __arrayBufferConcat(buffers) {
-	let totalLength = 0;
-	for (const buffer of buffers) {
-		totalLength += buffer.byteLength;
+function SerializeObject(object, data_cb) {
+	for ( let key in object ) {
+		const data = object[key];
+		if ( data === undefined ) continue;
+		
+		const type = SerializeType(data, data_cb);
+		SerializeShortString(`${key}`, data_cb);
+		SerializeDataBaseOnType(type, data, data_cb);
 	}
-	const result = new Uint8Array(totalLength);
-	let offset = 0;
-	for (const buffer of buffers) {
-		result.set(new Uint8Array(buffer), offset);
-		offset += buffer.byteLength;
+	data_cb(SEQUENCE_END);
+}
+function SerializeMap(map, data_cb) {
+	for ( let [key, data] of map ) {
+		if ( data === undefined ) continue;
+		
+		if ( Object(key) === key ) {
+			console.error( "You're serializing a Map that contains object key!" );
+		}
+		const key_type = SerializeType(key, data_cb);
+		SerializeDataBaseOnType(key_type, key, data_cb);
+		
+		const data_type = SerializeType(data, data_cb);
+		SerializeDataBaseOnType(data_type, data, data_cb);
 	}
-	return result.buffer;
+	data_cb(SEQUENCE_END);
 }

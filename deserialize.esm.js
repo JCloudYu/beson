@@ -1,15 +1,16 @@
-import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Decode} from "./helper.esm.js";
+import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Decode, __COPY_BYTES} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
-	Binary, Int256, Int512, UInt256, UInt512,
-	IntVar, UIntVar, Float32
+	Int256, Int512, UInt256, UInt512, Float32
 } from "./beson-types.esm.js";
 
 
 export function Deserialize(buffer) {
+	buffer = new Uint8Array(buffer);
+
 	const result = _deserialize(buffer, 0);
-	if ( result === undefined ) {
+	if ( !result ) {
 		throw new TypeError('Wrong data format');
 	}
 	
@@ -24,462 +25,580 @@ export function _deserialize(buffer, anchor=0) {
 		}
 	}
 	
-	let value;
-	({ anchor, value } = __deserializeContent(buffer, anchor));
-	return (value === undefined) ? undefined : {value, anchor};
+	return __deserializeContent(buffer, anchor);
 }
 
 
 
 function __deserializeContent(buffer, start) {
-	let type, data;
-	({ anchor: start, value: type } = __deserializeType(buffer, start));
-	({ anchor: start, value: data } = __deserializeData(type, buffer, start));
-	return { anchor: start, value: data };
+	const result = DeserializeType(buffer, start);
+	if ( !result ) { return null; }
+	
+	return DeserializeDataBaseOnType(result.value, buffer, result.anchor);
 }
-function __deserializeType(buffer, start) {
-	let length = 2;
-	let end = start + length;
+
+
+function DeserializeType(buffer, start) {
+	if ( buffer.length < start+1 ) {
+		return null;
+	}
+	
+	const type_val = buffer[start];
 	let type = null;
-
-	
-	if ( (buffer.byteLength - start) >= length ) {
-		let typeData = new Uint8Array(buffer, start, length);
-		Object.entries(TYPE_HEADER).forEach(([headerKey, headerVal]) => {
-			let headerData = new Uint8Array(headerVal);
-			if ((typeData[0] === headerData[0]) && (typeData[1] === headerData[1])) {
-				type = headerKey.toLowerCase();
-			}
-		});
+	for ( const type_name in TYPE_HEADER ) {
+		const header_val = TYPE_HEADER[type_name];
+		if ( type_val !== header_val ) continue;
+		
+		type = DATA_TYPE[type_name];
 	}
-	return { anchor: end, value: type };
+	
+	if ( !type ) {
+		throw new TypeError( "Invalid beson type header!" );
+	}
+	
+	return {anchor:start+1, value:type};
 }
-function __deserializeData(type, buffer, start) {
-	let result = {anchor:start, value:undefined};
+function DeserializeDataBaseOnType(type, buffer, start) {
 	if (type === DATA_TYPE.NULL) {
-		result = __deserializeNull(start, );
+		return {anchor:start, value:null};
 	}
-	else if (type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
-		result = __deserializeBoolean(type, start, );
+	if (type === DATA_TYPE.TRUE) {
+		return {anchor:start, value:true};
 	}
-	else if (type === DATA_TYPE.INT8) {
-		result = __deserializeInt8(buffer, start, );
+	if (type === DATA_TYPE.FALSE) {
+		return {anchor:start, value:false};
 	}
-	else if (type === DATA_TYPE.INT16) {
-		result = __deserializeInt16(buffer, start, );
+	if (type === DATA_TYPE.INT8) {
+		return __deserializeInt8(buffer, start);
 	}
-	else if (type === DATA_TYPE.INT32) {
-		result = __deserializeInt32(buffer, start, );
+	if (type === DATA_TYPE.INT16) {
+		return __deserializeInt16(buffer, start);
 	}
-	else if (type === DATA_TYPE.INT64) {
-		result = __deserializeInt64(buffer, start, );
+	if (type === DATA_TYPE.INT32) {
+		return __deserializeInt32(buffer, start);
 	}
-	else if (type === DATA_TYPE.INT128) {
-		result = __deserializeInt128(buffer, start, );
+	if (type === DATA_TYPE.INT64) {
+		return __deserializeInt64(buffer, start);
 	}
-	else if (type === DATA_TYPE.INT256) {
-		result = __deserializeInt256(buffer, start, );
+	if (type === DATA_TYPE.INT128) {
+		return __deserializeInt128(buffer, start);
 	}
-	else if (type === DATA_TYPE.INT512) {
-		result = __deserializeInt512(buffer, start, );
+	if (type === DATA_TYPE.INT256) {
+		return __deserializeInt256(buffer, start);
 	}
-	else if (type === DATA_TYPE.INTVAR) {
-		result = __deserializeIntVar(buffer, start, );
+	if (type === DATA_TYPE.INT512) {
+		return __deserializeInt512(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT8) {
-		result = __deserializeUInt8(buffer, start, );
+	if (type === DATA_TYPE.UINT8) {
+		return __deserializeUInt8(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT16) {
-		result = __deserializeUInt16(buffer, start, );
+	if (type === DATA_TYPE.UINT16) {
+		return __deserializeUInt16(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT32) {
-		result = __deserializeUInt32(buffer, start, );
+	if (type === DATA_TYPE.UINT32) {
+		return __deserializeUInt32(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT64) {
-		result = __deserializeUInt64(buffer, start, );
+	if (type === DATA_TYPE.UINT64) {
+		return __deserializeUInt64(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT128) {
-		result = __deserializeUInt128(buffer, start, );
+	if (type === DATA_TYPE.UINT128) {
+		return __deserializeUInt128(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT256) {
-		result = __deserializeUInt256(buffer, start, );
+	if (type === DATA_TYPE.UINT256) {
+		return __deserializeUInt256(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINT512) {
-		result = __deserializeUInt512(buffer, start, );
+	if (type === DATA_TYPE.UINT512) {
+		return __deserializeUInt512(buffer, start);
 	}
-	else if (type === DATA_TYPE.UINTVAR) {
-		result = __deserializeUIntVar(buffer, start, );
+	if (type === DATA_TYPE.FLOAT32) {
+		return __deserializeFloat32(buffer, start);
 	}
-	else if (type === DATA_TYPE.FLOAT32) {
-		result = __deserializeFloat32(buffer, start, );
+	if (type === DATA_TYPE.FLOAT64) {
+		return __deserializeFloat64(buffer, start);
 	}
-	else if (type === DATA_TYPE.FLOAT64) {
-		result = __deserializeFloat64(buffer, start, );
+	if (type === DATA_TYPE.STRING) {
+		return __deserializeString(buffer, start);
 	}
-	else if (type === DATA_TYPE.STRING) {
-		result = __deserializeString(buffer, start, );
+	if (type === DATA_TYPE.DATE) {
+		return __deserializeDate(buffer, start);
 	}
-	else if (type === DATA_TYPE.ARRAY) {
-		result = __deserializeArray(buffer, start, );
+	if (type === DATA_TYPE.ARRAY_BUFFER) {
+		return __deserializeArrayBuffer(buffer, start);
 	}
-	else if (type === DATA_TYPE.ARRAY_START) {
-		result = __deserializeArrayStreaming(buffer, start, );
-	}
-	else if (type === DATA_TYPE.OBJECT) {
-		result = __deserializeObject(buffer, start, );
-	}
-	else if (type === DATA_TYPE.OBJECT_START) {
-		result = __deserializeObjectStreaming(buffer, start, );
-	}
-	else if (type === DATA_TYPE.DATE) {
-		result = __deserializeDate(buffer, start, );
-	}
-	else if (type === DATA_TYPE.BINARY) {
-		result = __deserializeArrayBuffer(buffer, start, );
-		result.value = Binary.from(result.value);
-	}
-	else if (type === DATA_TYPE.ARRAY_BUFFER) {
-		result = __deserializeArrayBuffer(buffer, start, );
-	}
-	else if (type === DATA_TYPE.DATA_VIEW) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.DATA_VIEW) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new DataView(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.UINT8_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.UINT8_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Uint8Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.INT8_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.INT8_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Int8Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.UINT16_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.UINT16_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Uint16Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.INT16_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.INT16_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Int16Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.UINT32_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.UINT32_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Uint32Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.INT32_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.INT32_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Int32Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.FLOAT32_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.FLOAT32_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Float32Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.FLOAT64_ARRAY) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.FLOAT64_ARRAY) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = new Float64Array(result.value);
+		return result;
 	}
-	else if (type === DATA_TYPE.SPECIAL_BUFFER) {
-		result = __deserializeArrayBuffer(buffer, start, );
+	if (type === DATA_TYPE.SPECIAL_BUFFER) {
+		const result = __deserializeArrayBuffer(buffer, start);
+		if ( !result ) return null;
+		
 		result.value = HAS_NODE_BUFFER ? Buffer.from(result.value) : new Uint8Array(result.value);
+		return result;
+	}
+	if (type === DATA_TYPE.ARRAY) {
+		return __deserializeArray(buffer, start);
+	}
+	if (type === DATA_TYPE.OBJECT) {
+		return __deserializeObject(buffer, start);
+	}
+	if (type === DATA_TYPE.SET) {
+		return __deserializeSet(buffer, start);
+	}
+	if (type === DATA_TYPE.MAP) {
+		return __deserializeMap(buffer, start);
+	}
+	if (type === DATA_TYPE.REGEX) {
+		return __deserializeRegExp(buffer, start);
 	}
 	
-	return result;
+	
+	
+	const error = new TypeError('Unexpected parsed type');
+	error.detail = type;
+	
+	throw error;
 }
-function __deserializeNull(start) {
-	return { anchor: start, value: null };
-}
-function __deserializeBoolean(type, start) {
-	let end = start;
-	let data = type === DATA_TYPE.TRUE;
-	return { anchor: end, value: data };
-}
+
 function __deserializeInt8(buffer, start) {
-	let end = start + 1;
-	let dataView = new DataView(buffer);
-	let data = dataView.getInt8(start);
-	return { anchor: end, value:Int8.from(data) };
-}
-function __deserializeInt16(buffer, start) {
-	let end = start + 2;
-	let dataView = new DataView(buffer);
-	let data = dataView.getInt16(start, true);
-	return { anchor: end, value:Int16.from(data) };
-}
-function __deserializeInt32(buffer, start) {
-	let end = start + 4;
-	let dataView = new DataView(buffer);
-	let data = dataView.getInt32(start, true);
-	return { anchor: end, value:Int32.from(data) };
-}
-function __deserializeInt64(buffer, start) {
-	let step = 4;
-	let length = 2;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
-	}
-	let data = new Int64(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
-}
-function __deserializeInt128(buffer, start) {
-	let step = 4;
-	let length = 4;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
-	}
-	let data = new Int128(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
-}
-function __deserializeInt256(buffer, start) {
-	let step = 4;
-	let length = 8;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
-	}
-	let data = new Int256(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
-}
-function __deserializeInt512(buffer, start) {
-	let step = 4;
-	let length = 16;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
-	}
-	let data = new Int512(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
-}
-function __deserializeIntVar(buffer, start) {
-	const dataBuff = new Uint8Array(buffer);
-	if ( dataBuff[start] > 127 ) {
-		throw new Error( "Cannot support IntVar whose size is greater than 127 bytes" );
-	}
-	
-	
-	
-	let index = 0, data_size = dataBuff[start], end = start + 1;
-	const result_buffer = new Uint8Array(data_size);
-	while( data_size-- > 0 ) {
-		result_buffer[index] = dataBuff[end];
-		index++; end++;
+	const len = 1;
+	if ( buffer.length < start + len ) {
+		return null;
 	}
 
-
-	let data = new IntVar(result_buffer);
-	return { anchor: end, value: data };
+	
+	const val = Int8.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt8(buffer, start) {
-	let end = start + 1;
-	let dataView = new DataView(buffer);
-	let data = dataView.getUint8(start);
-	return { anchor: end, value:UInt8.from(data) };
+	const len = 1;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = UInt8.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
+}
+function __deserializeInt16(buffer, start) {
+	const len = 2;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Int16.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt16(buffer, start) {
-	let end = start + 2;
-	let dataView = new DataView(buffer);
-	let data = dataView.getUint16(start, true);
-	return { anchor: end, value:UInt16.from(data) };
+	const len = 2;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = UInt16.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
+}
+function __deserializeInt32(buffer, start) {
+	const len = 4;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Int32.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt32(buffer, start) {
-	let end = start + 4;
-	let dataView = new DataView(buffer);
-	let data = dataView.getUint32(start, true);
-	return { anchor: end, value:UInt32.from(data) };
+	const len = 4;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = UInt32.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
+}
+function __deserializeInt64(buffer, start) {
+	const len = 8;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Int64.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt64(buffer, start) {
-	let step = 4;
-	let length = 2;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
+	const len = 8;
+	if ( buffer.length < start + len ) {
+		return null;
 	}
-	let data = new UInt64(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
+
+	
+	const val = UInt64.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
+}
+function __deserializeInt128(buffer, start) {
+	const len = 16;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Int128.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt128(buffer, start) {
-	let step = 4;
-	let length = 4;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
+	const len = 16;
+	if ( buffer.length < start + len ) {
+		return null;
 	}
-	let data = new UInt128(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
+
+	
+	const val = UInt128.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
+}
+function __deserializeInt256(buffer, start) {
+	const len = 32;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Int256.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt256(buffer, start) {
-	let step = 4;
-	let length = 8;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
+	const len = 32;
+	if ( buffer.length < start + len ) {
+		return null;
 	}
-	let data = new UInt256(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
+
+	
+	const val = UInt256.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
+}
+function __deserializeInt512(buffer, start) {
+	const len = 64;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Int512.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeUInt512(buffer, start) {
-	let step = 4;
-	let length = 16;
-	let end = start + (step * length);
-	let dataView = new DataView(buffer);
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint32(i, true));
-	}
-	let data = new UInt512(new Uint32Array(dataArray));
-	return { anchor: end, value: data };
-}
-function __deserializeUIntVar(buffer, start) {
-	const dataBuff = new Uint8Array(buffer);
-	if ( dataBuff[start] > 127 ) {
-		throw new Error( "Cannot support UIntVar whose size is greater than 127 bytes" );
-	}
-	
-	
-	
-	let index = 0, data_size = dataBuff[start], end = start + 1;
-	const result_buffer = new Uint8Array(data_size);
-	while( data_size-- > 0 ) {
-		result_buffer[index] = dataBuff[end];
-		index++; end++;
+	const len = 64;
+	if ( buffer.length < start + len ) {
+		return null;
 	}
 
-
-	let data = new UIntVar(result_buffer);
-	return { anchor: end, value: data };
+	
+	const val = UInt512.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeFloat32(buffer, start) {
-	let end = start + 4;
-	let dataView = new DataView(buffer);
-	let data = dataView.getFloat32(start, true);
-	return { anchor: end, value:Float32.from(data) };
+	const len = 4;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = Float32.ZERO;
+	__COPY_BYTES(val._ba, buffer, len, start);
+	return { anchor:start+len, value:val };
 }
 function __deserializeFloat64(buffer, start) {
-	let end = start + 8;
-	let dataView = new DataView(buffer);
-	let data = dataView.getFloat64(start, true);
-	return { anchor: end, value: data };
+	const len = 8;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = new Float64Array(buffer.slice(start, start+len).buffer);
+	return { anchor:start+len, value:val[0] };
 }
 function __deserializeString(buffer, start) {
-	let step = 1;
-	let dataView = new DataView(buffer);
-	let length = dataView.getUint32(start, true);
-	start += 4;
-	let end = start + length;
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint8(i));
+	let len = 4;
+	if ( buffer.length < start + len ) {
+		return null;
 	}
-	let data = UTF8Decode(Uint8Array.from(dataArray).buffer);
-	return { anchor: end, value: data };
-}
-function __deserializeShortString(buffer, start) {
-	let step = 1;
-	let dataView = new DataView(buffer);
-	let length = dataView.getUint16(start, true);
-	start += 2;
-	let end = start + length;
-	let dataArray = [];
-	for (let i = start; i < end; i += step) {
-		dataArray.push(dataView.getUint8(i));
+	const len_buff = new Uint32Array(buffer.slice(start, start+len).buffer);
+	start += len;
+	
+	
+	
+	len = len_buff[0];
+	if ( buffer.length < start + len ) {
+		return null;
 	}
-	let data = UTF8Decode(Uint8Array.from(dataArray).buffer);
-	return { anchor: end, value: data };
-}
-function __deserializeArray(buffer, start) {
-	let dataView = new DataView(buffer);
-	let length = dataView.getUint32(start, true);
-	start += 4;
-	let end = start + length;
-	let data = [];
-	while (start < end) {
-		let subType, subData;
-		({ anchor: start, value: subType } = __deserializeType(buffer, start));
-		({ anchor: start, value: subData } = __deserializeData(subType, buffer, start));
-		data.push(subData);
-	}
-	return { anchor: end, value: data };
-}
-function __deserializeArrayStreaming(buffer, start) {
-	let end = start;
-	let dataView = new DataView(buffer);
-	let endData = new Uint16Array(TYPE_HEADER.ARRAY_END);
-	let data = [];
-	while (start < buffer.byteLength) {
-		let tmpType = dataView.getUint16(start, true);
-		if (tmpType === endData[0]) {
-			end += 2;
-			break;
-		}
-		
-		let subType, subData;
-		({ anchor: start, value: subType } = __deserializeType(buffer, start));
-		({ anchor: start, value: subData } = __deserializeData(subType, buffer, start));
-		data.push(subData);
-		end = start;
-	}
-	return { anchor: end, value: data };
-}
-function __deserializeObject(buffer, start) {
-	let dataView = new DataView(buffer);
-	let length = dataView.getUint32(start, true);
-	start += 4;
-	let end = start + length;
-	let data = {};
-	while (start < end) {
-		let subType, subKey, subData;
-		({ anchor: start, value: subType } = __deserializeType(buffer, start));
-		({ anchor: start, value: subKey } = __deserializeShortString(buffer, start));
-		({ anchor: start, value: subData } = __deserializeData(subType, buffer, start));
-		data[subKey] = subData;
-	}
-	return { anchor: end, value: data };
-}
-function __deserializeObjectStreaming(buffer, start) {
-	let end = start;
-	let dataView = new DataView(buffer);
-	let endData = new Uint16Array(TYPE_HEADER.OBJECT_END);
-	let data = {};
-	while (start < buffer.byteLength) {
-		let tmpType = dataView.getUint16(start, true);
-		if (tmpType === endData[0]) {
-			end += 2;
-			break;
-		}
-
-		let subType, subKey, subData;
-		({ anchor: start, value: subType } = __deserializeType(buffer, start));
-		({ anchor: start, value: subKey } = __deserializeShortString(buffer, start));
-		({ anchor: start, value: subData } = __deserializeData(subType, buffer, start));
-		data[subKey] = subData;
-		end = start;
-	}
-	return { anchor: end, value: data };
+	const bytes = new Uint8Array(buffer.slice(start, start+len).buffer);
+	start += len;
+	
+	return {anchor:start, value:UTF8Decode(bytes.buffer)};
 }
 function __deserializeDate(buffer, start) {
-	let end = start + 8;
-	let dataView = new DataView(buffer);
-	let data = new Date(dataView.getFloat64(start, true));
-	return { anchor: end, value: data };
+	const len = 8;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+
+	
+	const val = new Float64Array(buffer.slice(start, start+len).buffer);
+	return { anchor:start+len, value:new Date(val[0]) };
+}
+function __deserializeShortString(buffer, start) {
+	let len = 2;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const len_buff = new Uint16Array(buffer.slice(start, start+len).buffer);
+	start += len;
+	
+	
+	
+	len = len_buff[0];
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const bytes = new Uint8Array(buffer.slice(start, start+len).buffer);
+	start += len;
+	
+	return {anchor:start, value:UTF8Decode(bytes.buffer)};
 }
 function __deserializeArrayBuffer(buffer, start) {
-	let end = start + 4;
-	let [length] = new Uint32Array(buffer.slice(start, end));
+	let len = 4;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const len_buff = new Uint32Array(buffer.slice(start, start+len).buffer);
+	start += len;
 	
-	end = end + length;
-	return {anchor:end, value:buffer.slice(start+4, end)};
+	
+	
+	len = len_buff[0];
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const value = buffer.slice(start, start+len).buffer;
+	start += len;
+	
+	return {anchor:start, value:value};
+}
+function __deserializeRegExp(buffer, start) {
+	let len = 2;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const source_len_buff = new Uint16Array(buffer.slice(start, start+len).buffer);
+	start += len;
+	
+	
+	len = source_len_buff[0];
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const source_buff = buffer.slice(start, start+len).buffer;
+	start += len;
+	
+	
+	
+	
+	
+	
+	len = 1;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const flags_len_buff = buffer[start];
+	start += len;
+	
+	
+	len = flags_len_buff;
+	if ( buffer.length < start + len ) {
+		return null;
+	}
+	const flag_buff = buffer.slice(start, start+len).buffer;
+	start += len;
+	
+	
+	
+	return {anchor:start, value:new RegExp(UTF8Decode(source_buff), UTF8Decode(flag_buff))};
+}
+
+
+
+function __deserializeArray(buffer, start) {
+	const array_data = [];
+	while(start < buffer.byteLength) {
+		let result = DeserializeType(buffer, start);
+		if ( !result ) return null;
+		
+		
+		start = result.anchor;
+		const type = result.value;
+		if ( type === DATA_TYPE.END ) { break; }
+		
+		result = DeserializeDataBaseOnType(type, buffer, start);
+		if ( !result ) return null;
+		
+		start = result.anchor;
+		array_data.push(result.value);
+	}
+	return { anchor:start, value:array_data };
+}
+function __deserializeSet(buffer, start) {
+	const set_data = new Set();
+	while(start < buffer.byteLength) {
+		let result = DeserializeType(buffer, start);
+		if ( !result ) return null;
+		start = result.anchor;
+		const type = result.value;
+		if ( type === DATA_TYPE.END ) { break; }
+		
+		
+		result = DeserializeDataBaseOnType(type, buffer, start);
+		if ( !result ) return null;
+		start = result.anchor;
+		set_data.add(result.value);
+	}
+	return { anchor:start, value:set_data };
+}
+function __deserializeObject(buffer, start) {
+	const object_data = {};
+	while(start < buffer.byteLength) {
+		let result = DeserializeType(buffer, start);
+		if ( !result ) return null;
+		
+		
+		
+		start = result.anchor;
+		const type = result.value;
+		if ( type === DATA_TYPE.END ) { break; }
+		
+		
+		
+		result = __deserializeShortString(buffer, start);
+		if ( !result ) return null;
+		
+		
+		
+		start = result.anchor;
+		const key = result.value;
+		result = DeserializeDataBaseOnType(type, buffer, start);
+		if ( !result ) return null;
+		
+		
+		
+		start = result.anchor;
+		object_data[key] = result.value;
+	}
+	return { anchor:start, value:object_data };
+}
+function __deserializeMap(buffer, start) {
+	const map_data = new Map();
+	while(start < buffer.byteLength) {
+		let result = DeserializeType(buffer, start);
+		if ( !result ) return null;
+		start = result.anchor;
+		const key_type = result.value;
+		if ( key_type === DATA_TYPE.END ) { break; }
+		
+		
+		result = DeserializeDataBaseOnType(key_type, buffer, start);
+		if ( !result ) return null;
+		start = result.anchor;
+		const key = result.value;
+		
+		
+		
+		result = DeserializeType(buffer, start);
+		if ( !result ) return null;
+		start = result.anchor;
+		const data_type = result.value;
+		if ( data_type === DATA_TYPE.END ) { break; }
+		
+		
+		result = DeserializeDataBaseOnType(data_type, buffer, start);
+		if ( !result ) return null;
+		start = result.anchor;
+		map_data.set(key, result.value);
+	}
+	return { anchor:start, value:map_data };
 }
