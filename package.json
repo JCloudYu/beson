@@ -1,10 +1,10 @@
 {
 	"name": "beson",
-	"version": "2.1.0",
+	"version": "2.1.2",
 	"description": "Yet an another binary representation of json format",
 	"main": "beson",
 	"scripts": {
-		"test": "node --experimental-modules --loader ./_supportive/loader.mjs ./unit-test.mjs"
+		"test": "node unit-test.js"
 	},
 	"repository": {
 		"type": "git",

@@ -54,7 +54,8 @@ export const DATA_TYPE = Object.freeze({
 	DATE:			38,
 	REGEX:			39,
 	
-	END:			99
+	END:			99,
+	BINARIZABLE:   100,
 });
 export const TYPE_HEADER = Object.freeze({
 	END:			0x00,

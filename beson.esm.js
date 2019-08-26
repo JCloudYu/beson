@@ -4,7 +4,7 @@
 **/
 export const ___IS_LITTLE_ENDIAN = (new Uint8Array(Uint16Array.from([0x1234])))[0] === 0x34;
 if ( !___IS_LITTLE_ENDIAN ) {
-	console.error("Beson is designed to run under little endian environment!");
+	throw new Error( "Beson only supports little endian environment!" )
 }
 
 
@@ -17,7 +17,7 @@ import {
 	IntVar, UIntVar
 } from "./beson-types.esm.js";
 
-export const Beson = !___IS_LITTLE_ENDIAN ? null : Object.freeze({
+export const Beson = Object.freeze({
 	Serialize, Deserialize,
 	
 	Int8, Int16, Int32, Int64, Int128, Float32,

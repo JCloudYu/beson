@@ -10,11 +10,7 @@ export function Deserialize(buffer) {
 	buffer = new Uint8Array(buffer);
 
 	const result = _deserialize(buffer, 0);
-	if ( !result ) {
-		throw new TypeError('Wrong data format');
-	}
-	
-	return result.value;
+	return result ? result.value : undefined;
 }
 export function _deserialize(buffer, anchor=0) {
 	if ( HAS_NODE_BUFFER ) {

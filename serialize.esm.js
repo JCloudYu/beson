@@ -173,6 +173,11 @@ function SerializeType(data, data_cb) {
 	}
 	
 	if (data_type === 'object') {
+		if ( typeof data.toBytes === "function" ) {
+			data_cb(Uint8Array.from([ TYPE_HEADER.UINT8_ARRAY ]).buffer);
+			return DATA_TYPE.BINARIZABLE;
+		}
+	
 		data_cb(Uint8Array.from([ TYPE_HEADER.OBJECT ]).buffer);
 		return DATA_TYPE.OBJECT;
 	}
@@ -222,6 +227,18 @@ function SerializeDataBaseOnType(type, data, data_cb) {
 		const lengthData = new Uint32Array([buff.length]);
 		data_cb(lengthData);
 		data_cb(buff.buffer);
+		return;
+	}
+	
+	if ( type === DATA_TYPE.BINARIZABLE ) {
+		const raw_data = data.toBytes();
+		if ( !(raw_data instanceof Uint8Array) ) {
+			throw new TypeError( "Beson binary interface `toBytes` must return Uint8Array instance!" )
+		}
+		
+		const lengthData = new Uint32Array([raw_data.length]);
+		data_cb(lengthData);
+		data_cb(raw_data.buffer);
 		return;
 	}
 	
