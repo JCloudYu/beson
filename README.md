@@ -109,7 +109,7 @@ console.log(data); // Hello World
 
 
 ## Some Extended Usage ##
-Beson also provides other types that for developers who want to specifically controls the data they want to encode, such as uint32 or uint64. Following list are types that are provided by beson. ( These types can be found in BesonType exports )
+Beson also provides other types that for developers who want to specifically controls the data they want to encode, such as uint32 or uint64. Following list are types that are provided by beson. ( These types can be found in Beson exports )
 
 ```javascript
 Int32 / UInt32

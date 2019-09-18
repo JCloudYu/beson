@@ -147,28 +147,23 @@ export function ReadBuffer(input){
 	}
 	return null;
 }
-export function ConcatBuffers(segments){
-	const buffers = [];
+export function MergeArrayBuffers(...array_buffers) {
+	if ( Array.isArray(array_buffers[0]) ) {
+		array_buffers = array_buffers[0];
+	}
 	
 	let totalLength = 0;
-	for( let seg of segments ){
-		const buff = ReadBuffer(seg);
-		if( buff === null ){
-			throw new TypeError("Some of the given segments cannot be converted into ArrayBuffer!");
-		}
-		else{
-			buffers.push(buff);
-			totalLength += buff.byteLength;
-		}
+	for( let ab of array_buffers ) {
+		totalLength += ab.byteLength;
 	}
 	
 	
 	// NOTE: Copy all data
 	const newInst = new Uint8Array(totalLength);
 	let offset = 0;
-	for( let seg of buffers ){
-		newInst.set(new Uint8Array(seg), offset);
-		offset += seg.byteLength;
+	for( let ab of array_buffers ){
+		newInst.set(new Uint8Array(ab), offset);
+		offset += ab.byteLength;
 	}
 	
 	return newInst.buffer;

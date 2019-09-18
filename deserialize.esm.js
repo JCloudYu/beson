@@ -6,13 +6,22 @@ import {
 } from "./beson-types.esm.js";
 
 
-export function Deserialize(buffer) {
+export function Deserialize(buffer, throw_if_error=false) {
 	buffer = new Uint8Array(buffer);
 
-	const result = _deserialize(buffer, 0);
-	return result ? result.value : undefined;
+	const result = DeserializeBuffer(buffer, 0);
+	if ( result ) {
+		return result.value;
+	}
+	else {
+		if ( throw_if_error ) {
+			throw new TypeError( "Input data is not encoded in beson format!" );
+		}
+		
+		return undefined;
+	}
 }
-export function _deserialize(buffer, anchor=0) {
+export function DeserializeBuffer(buffer, anchor=0) {
 	if ( HAS_NODE_BUFFER ) {
 		if ( buffer instanceof Buffer ) {
 			let buff = Buffer.alloc(buffer.length);
@@ -27,16 +36,14 @@ export function _deserialize(buffer, anchor=0) {
 
 
 function __deserializeContent(buffer, start) {
-	const result = DeserializeType(buffer, start);
-	if ( !result ) { return null; }
+	const result = __deserializeType(buffer, start);
+	if ( !result ) { return result; }
 	
-	return DeserializeDataBaseOnType(result.value, buffer, result.anchor);
+	return __deserializeTypeData(result.value, buffer, result.anchor);
 }
-
-
-function DeserializeType(buffer, start) {
+function __deserializeType(buffer, start) {
 	if ( buffer.length < start+1 ) {
-		return null;
+		return false;
 	}
 	
 	const type_val = buffer[start];
@@ -49,12 +56,12 @@ function DeserializeType(buffer, start) {
 	}
 	
 	if ( !type ) {
-		throw new TypeError( "Invalid beson type header!" );
+		return undefined;
 	}
 	
 	return {anchor:start+1, value:type};
 }
-function DeserializeDataBaseOnType(type, buffer, start) {
+function __deserializeTypeData(type, buffer, start) {
 	if (type === DATA_TYPE.NULL) {
 		return {anchor:start, value:null};
 	}
@@ -123,70 +130,70 @@ function DeserializeDataBaseOnType(type, buffer, start) {
 	}
 	if (type === DATA_TYPE.DATA_VIEW) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new DataView(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.UINT8_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Uint8Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.INT8_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Int8Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.UINT16_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Uint16Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.INT16_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Int16Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.UINT32_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Uint32Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.INT32_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Int32Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.FLOAT32_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Float32Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.FLOAT64_ARRAY) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = new Float64Array(result.value);
 		return result;
 	}
 	if (type === DATA_TYPE.SPECIAL_BUFFER) {
 		const result = __deserializeArrayBuffer(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		result.value = HAS_NODE_BUFFER ? Buffer.from(result.value) : new Uint8Array(result.value);
 		return result;
@@ -209,16 +216,13 @@ function DeserializeDataBaseOnType(type, buffer, start) {
 	
 	
 	
-	const error = new TypeError('Unexpected parsed type');
-	error.detail = type;
-	
-	throw error;
+	return undefined;
 }
 
 function __deserializeInt8(buffer, start) {
 	const len = 1;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -229,7 +233,7 @@ function __deserializeInt8(buffer, start) {
 function __deserializeUInt8(buffer, start) {
 	const len = 1;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -240,7 +244,7 @@ function __deserializeUInt8(buffer, start) {
 function __deserializeInt16(buffer, start) {
 	const len = 2;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -251,7 +255,7 @@ function __deserializeInt16(buffer, start) {
 function __deserializeUInt16(buffer, start) {
 	const len = 2;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -262,7 +266,7 @@ function __deserializeUInt16(buffer, start) {
 function __deserializeInt32(buffer, start) {
 	const len = 4;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -273,7 +277,7 @@ function __deserializeInt32(buffer, start) {
 function __deserializeUInt32(buffer, start) {
 	const len = 4;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -284,7 +288,7 @@ function __deserializeUInt32(buffer, start) {
 function __deserializeInt64(buffer, start) {
 	const len = 8;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -295,7 +299,7 @@ function __deserializeInt64(buffer, start) {
 function __deserializeUInt64(buffer, start) {
 	const len = 8;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -306,7 +310,7 @@ function __deserializeUInt64(buffer, start) {
 function __deserializeInt128(buffer, start) {
 	const len = 16;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -317,7 +321,7 @@ function __deserializeInt128(buffer, start) {
 function __deserializeUInt128(buffer, start) {
 	const len = 16;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -328,7 +332,7 @@ function __deserializeUInt128(buffer, start) {
 function __deserializeInt256(buffer, start) {
 	const len = 32;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -339,7 +343,7 @@ function __deserializeInt256(buffer, start) {
 function __deserializeUInt256(buffer, start) {
 	const len = 32;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -350,7 +354,7 @@ function __deserializeUInt256(buffer, start) {
 function __deserializeInt512(buffer, start) {
 	const len = 64;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -361,7 +365,7 @@ function __deserializeInt512(buffer, start) {
 function __deserializeUInt512(buffer, start) {
 	const len = 64;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -372,7 +376,7 @@ function __deserializeUInt512(buffer, start) {
 function __deserializeFloat32(buffer, start) {
 	const len = 4;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -383,7 +387,7 @@ function __deserializeFloat32(buffer, start) {
 function __deserializeFloat64(buffer, start) {
 	const len = 8;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -393,7 +397,7 @@ function __deserializeFloat64(buffer, start) {
 function __deserializeString(buffer, start) {
 	let len = 4;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const len_buff = new Uint32Array(buffer.slice(start, start+len).buffer);
 	start += len;
@@ -402,7 +406,7 @@ function __deserializeString(buffer, start) {
 	
 	len = len_buff[0];
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const bytes = new Uint8Array(buffer.slice(start, start+len).buffer);
 	start += len;
@@ -412,7 +416,7 @@ function __deserializeString(buffer, start) {
 function __deserializeDate(buffer, start) {
 	const len = 8;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 
 	
@@ -422,7 +426,7 @@ function __deserializeDate(buffer, start) {
 function __deserializeShortString(buffer, start) {
 	let len = 2;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const len_buff = new Uint16Array(buffer.slice(start, start+len).buffer);
 	start += len;
@@ -431,7 +435,7 @@ function __deserializeShortString(buffer, start) {
 	
 	len = len_buff[0];
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const bytes = new Uint8Array(buffer.slice(start, start+len).buffer);
 	start += len;
@@ -441,7 +445,7 @@ function __deserializeShortString(buffer, start) {
 function __deserializeArrayBuffer(buffer, start) {
 	let len = 4;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const len_buff = new Uint32Array(buffer.slice(start, start+len).buffer);
 	start += len;
@@ -450,7 +454,7 @@ function __deserializeArrayBuffer(buffer, start) {
 	
 	len = len_buff[0];
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const value = buffer.slice(start, start+len).buffer;
 	start += len;
@@ -460,7 +464,7 @@ function __deserializeArrayBuffer(buffer, start) {
 function __deserializeRegExp(buffer, start) {
 	let len = 2;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const source_len_buff = new Uint16Array(buffer.slice(start, start+len).buffer);
 	start += len;
@@ -468,7 +472,7 @@ function __deserializeRegExp(buffer, start) {
 	
 	len = source_len_buff[0];
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const source_buff = buffer.slice(start, start+len).buffer;
 	start += len;
@@ -480,7 +484,7 @@ function __deserializeRegExp(buffer, start) {
 	
 	len = 1;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const flags_len_buff = buffer[start];
 	start += len;
@@ -488,7 +492,7 @@ function __deserializeRegExp(buffer, start) {
 	
 	len = flags_len_buff;
 	if ( buffer.length < start + len ) {
-		return null;
+		return false;
 	}
 	const flag_buff = buffer.slice(start, start+len).buffer;
 	start += len;
@@ -503,16 +507,16 @@ function __deserializeRegExp(buffer, start) {
 function __deserializeArray(buffer, start) {
 	const array_data = [];
 	while(start < buffer.byteLength) {
-		let result = DeserializeType(buffer, start);
-		if ( !result ) return null;
+		let result = __deserializeType(buffer, start);
+		if ( !result ) return result;
 		
 		
 		start = result.anchor;
 		const type = result.value;
 		if ( type === DATA_TYPE.END ) { break; }
 		
-		result = DeserializeDataBaseOnType(type, buffer, start);
-		if ( !result ) return null;
+		result = __deserializeTypeData(type, buffer, start);
+		if ( !result ) return result;
 		
 		start = result.anchor;
 		array_data.push(result.value);
@@ -522,15 +526,15 @@ function __deserializeArray(buffer, start) {
 function __deserializeSet(buffer, start) {
 	const set_data = new Set();
 	while(start < buffer.byteLength) {
-		let result = DeserializeType(buffer, start);
-		if ( !result ) return null;
+		let result = __deserializeType(buffer, start);
+		if ( !result ) return result;
 		start = result.anchor;
 		const type = result.value;
 		if ( type === DATA_TYPE.END ) { break; }
 		
 		
-		result = DeserializeDataBaseOnType(type, buffer, start);
-		if ( !result ) return null;
+		result = __deserializeTypeData(type, buffer, start);
+		if ( !result ) return result;
 		start = result.anchor;
 		set_data.add(result.value);
 	}
@@ -539,8 +543,8 @@ function __deserializeSet(buffer, start) {
 function __deserializeObject(buffer, start) {
 	const object_data = {};
 	while(start < buffer.byteLength) {
-		let result = DeserializeType(buffer, start);
-		if ( !result ) return null;
+		let result = __deserializeType(buffer, start);
+		if ( !result ) return result;
 		
 		
 		
@@ -551,14 +555,14 @@ function __deserializeObject(buffer, start) {
 		
 		
 		result = __deserializeShortString(buffer, start);
-		if ( !result ) return null;
+		if ( !result ) return result;
 		
 		
 		
 		start = result.anchor;
 		const key = result.value;
-		result = DeserializeDataBaseOnType(type, buffer, start);
-		if ( !result ) return null;
+		result = __deserializeTypeData(type, buffer, start);
+		if ( !result ) return result;
 		
 		
 		
@@ -570,29 +574,29 @@ function __deserializeObject(buffer, start) {
 function __deserializeMap(buffer, start) {
 	const map_data = new Map();
 	while(start < buffer.byteLength) {
-		let result = DeserializeType(buffer, start);
-		if ( !result ) return null;
+		let result = __deserializeType(buffer, start);
+		if ( !result ) return result;
 		start = result.anchor;
 		const key_type = result.value;
 		if ( key_type === DATA_TYPE.END ) { break; }
 		
 		
-		result = DeserializeDataBaseOnType(key_type, buffer, start);
-		if ( !result ) return null;
+		result = __deserializeTypeData(key_type, buffer, start);
+		if ( !result ) return result;
 		start = result.anchor;
 		const key = result.value;
 		
 		
 		
-		result = DeserializeType(buffer, start);
-		if ( !result ) return null;
+		result = __deserializeType(buffer, start);
+		if ( !result ) return result;
 		start = result.anchor;
 		const data_type = result.value;
 		if ( data_type === DATA_TYPE.END ) { break; }
 		
 		
-		result = DeserializeDataBaseOnType(data_type, buffer, start);
-		if ( !result ) return null;
+		result = __deserializeTypeData(data_type, buffer, start);
+		if ( !result ) return result;
 		start = result.anchor;
 		map_data.set(key, result.value);
 	}

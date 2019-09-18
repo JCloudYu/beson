@@ -1,4 +1,4 @@
-import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Encode, ConcatBuffers} from "./helper.esm.js";
+import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Encode, MergeArrayBuffers} from "./helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
@@ -14,16 +14,16 @@ export function Serialize(data) {
 	SerializeData(data, (chunk)=>{
 		chunks.push(chunk);
 	});
-	return ConcatBuffers(chunks);
+	return MergeArrayBuffers(chunks);
+}
+export function SerializeData(data, data_cb) {
+	const type = __serializeType(data, data_cb);
+	__serializeTypeData(type, data, data_cb);
 }
 
 
 
-function SerializeData(data, data_cb) {
-	const type = SerializeType(data, data_cb);
-	SerializeDataBaseOnType(type, data, data_cb);
-}
-function SerializeType(data, data_cb) {
+function __serializeType(data, data_cb) {
 	if ( data === null ) {
 		data_cb(Uint8Array.from([TYPE_HEADER.NULL]).buffer);
 		return DATA_TYPE.NULL;
@@ -189,7 +189,7 @@ function SerializeType(data, data_cb) {
 	
 	throw error;
 }
-function SerializeDataBaseOnType(type, data, data_cb) {
+function __serializeTypeData(type, data, data_cb) {
 	if (type === DATA_TYPE.NULL || type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
 		// null and boolean has no data payload
 		return;
@@ -278,30 +278,27 @@ function SerializeDataBaseOnType(type, data, data_cb) {
 	}
 	
 	if (type === DATA_TYPE.ARRAY || type === DATA_TYPE.SET) {
-		return SerializeArrayAndSet(data, data_cb);
+		return __serializeArrayAndSet(data, data_cb);
 	}
 	
 	if (type === DATA_TYPE.OBJECT) {
-		return SerializeObject(data, data_cb);
+		return __serializeObject(data, data_cb);
 	}
 	
 	if (type === DATA_TYPE.MAP) {
-		return SerializeMap(data, data_cb);
+		return __serializeMap(data, data_cb);
 	}
 }
 
-
-
-
-function SerializeArrayAndSet(array, data_cb) {
+function __serializeArrayAndSet(array, data_cb) {
 	for ( let data of array ) {
 		if ( data === undefined ) { data = null; }
-		const type = SerializeType(data, data_cb);
-		SerializeDataBaseOnType(type, data, data_cb);
+		const type = __serializeType(data, data_cb);
+		__serializeTypeData(type, data, data_cb);
 	}
 	data_cb(SEQUENCE_END);
 }
-function SerializeShortString(data, data_cb) {
+function __serializeShortString(data, data_cb) {
 	const buffer = UTF8Encode(data);
 	if ( buffer.byteLength > 65535 ) {
 		throw new RangeError("Given key cannot be larger than 65565 bytes!");
@@ -311,29 +308,29 @@ function SerializeShortString(data, data_cb) {
 	data_cb(length_data);
 	data_cb(buffer);
 }
-function SerializeObject(object, data_cb) {
+function __serializeObject(object, data_cb) {
 	for ( let key in object ) {
 		const data = object[key];
 		if ( data === undefined ) continue;
 		
-		const type = SerializeType(data, data_cb);
-		SerializeShortString(`${key}`, data_cb);
-		SerializeDataBaseOnType(type, data, data_cb);
+		const type = __serializeType(data, data_cb);
+		__serializeShortString(`${key}`, data_cb);
+		__serializeTypeData(type, data, data_cb);
 	}
 	data_cb(SEQUENCE_END);
 }
-function SerializeMap(map, data_cb) {
+function __serializeMap(map, data_cb) {
 	for ( let [key, data] of map ) {
 		if ( data === undefined ) continue;
 		
 		if ( Object(key) === key ) {
 			console.error( "You're serializing a Map that contains object key!" );
 		}
-		const key_type = SerializeType(key, data_cb);
-		SerializeDataBaseOnType(key_type, key, data_cb);
+		const key_type = __serializeType(key, data_cb);
+		__serializeTypeData(key_type, key, data_cb);
 		
-		const data_type = SerializeType(data, data_cb);
-		SerializeDataBaseOnType(data_type, data, data_cb);
+		const data_type = __serializeType(data, data_cb);
+		__serializeTypeData(data_type, data, data_cb);
 	}
 	data_cb(SEQUENCE_END);
 }

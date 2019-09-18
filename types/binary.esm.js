@@ -4,9 +4,9 @@
 **/
 import {BinaryData} from "./_core-types.esm.js";
 import {
-	ConcatBuffers, HexToBuffer,
+	HexToBuffer,
 	BitwiseNot, BitwiseCompareBE, BitwiseLeftShiftBE, BitwiseRightShiftBE,
-	___SET_BINARY_BUFFER
+	___SET_BINARY_BUFFER, ReadBuffer, MergeArrayBuffers
 } from "../helper.esm.js";
 
 
@@ -24,8 +24,17 @@ export class Binary extends BinaryData {
 		return ___SET_BINARY_BUFFER.call(this, this._ab.slice(...args));
 	}
 	append(...segments) {
-		segments.unshift(this._ab);
-		return ___SET_BINARY_BUFFER.call(this, ConcatBuffers(segments));
+		const buffers = [this._ab];
+		for ( let seg of segments ) {
+			const buff = ReadBuffer(seg);
+			if ( buff === null ){
+				throw new TypeError("Some of the given segments cannot be converted into ArrayBuffer!");
+			}
+			
+			buffers.push(buff);
+		}
+		
+		return ___SET_BINARY_BUFFER.call(this, MergeArrayBuffers(buffers));
 	}
 	set(array, offset) {
 		const args = Array.prototype.slice.call(arguments, 0);
@@ -87,7 +96,7 @@ export class Binary extends BinaryData {
 		
 		
 		
-		let array_buffer;
+		let array_buffers;
 		if ( args.length === 1 ) {
 			if ( typeof args[0] === "string" ) {
 				let hexString = args[0];
@@ -95,19 +104,16 @@ export class Binary extends BinaryData {
 					hexString = "0x" + hexString;
 				}
 				
-				array_buffer = HexToBuffer(hexString);
+				array_buffers = [ HexToBuffer(hexString) ];
 			}
 			else {
-				array_buffer = args[0];
+				array_buffers = [ args[0] ];
 			}
 		}
 		else {
-			array_buffer = ConcatBuffers(args);
+			array_buffers = args
 		}
 		
-		
-		
-		if ( !(array_buffer instanceof ArrayBuffer) ) { return inst; }
-		return ___SET_BINARY_BUFFER.call(inst, array_buffer);
+		return inst.append(array_buffers);
 	}
 }
