@@ -121,6 +121,7 @@ const HEX_MAP_INVERSE = {
 	a: 10, b: 11, c: 12, d: 13, e: 14, f: 15,
 	A: 10, B: 11, C: 12, D: 13, E: 14, F: 15
 };
+const UTF8_DECODE_CHUNK_SIZE = 100;
 
 
 
@@ -256,7 +257,15 @@ export function UTF8Decode(buffer){
 			i += 3;
 		}
 	}
-	return String.fromCodePoint(...codePoints);
+	
+	
+	
+	let result_string = "";
+	while(codePoints.length > 0) {
+		const chunk = codePoints.splice(0, UTF8_DECODE_CHUNK_SIZE);
+		result_string += String.fromCharCode(...chunk);
+	}
+	return result_string;
 }
 
 export function BitwiseNot(input){
