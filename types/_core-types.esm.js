@@ -4,7 +4,7 @@
 **/
 import {
 	BitwiseAdditionLE,
-	BitwiseAnd,
+	BitwiseAnd, BitwiseCompareBE,
 	BitwiseCompareLE,
 	BitwiseDivisionLE,
 	BitwiseIsZero,
@@ -76,6 +76,15 @@ export class BinaryData {
 			default:
 				throw new RangeError( "BinaryData.toString only supports binary & hex representation!" );
 		}
+	}
+	compare(inst) {
+		return this.compareBE(inst);
+	}
+	compareLE(inst) {
+		return BitwiseCompareLE(this._ab, inst);
+	}
+	compareBE(inst) {
+		return BitwiseCompareBE(this._ab, inst);
 	}
 	
 	get size() {
@@ -185,7 +194,7 @@ export class BinaryInt extends BinaryData {
 	
 	compare(value) {
 		const val = this.constructor.from(value);
-		return BitwiseCompareLE(this._ab, val._ab);
+		return this.compareLE(this._ab, val._ab);
 	}
 	isZero() {
 		return BitwiseIsZero(this._ab);

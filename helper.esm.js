@@ -186,8 +186,10 @@ export function HexToBuffer(inputStr, length = null){
 
 export function UTF8Encode(str){
 	let codePoints = [];
+	
 	for( let i = 0; i < str.length; i++ ){
 		let codePoint = str.codePointAt(i);
+		
 		// 1-byte sequence
 		if( (codePoint & 0xffffff80) === 0 ){
 			codePoints.push(codePoint);
@@ -216,11 +218,11 @@ export function UTF8Encode(str){
 				0x80 | (0x3f & codePoint)
 			);
 		}
-		
-		if( codePoint > 0xffff ){
-			i++;
+		else {
+			throw new RangeError( `Invalid codepoint \`${codePoint}\` at index \`${i}\`!` );
 		}
 	}
+	
 	return new Uint8Array(codePoints).buffer;
 }
 export function UTF8Decode(buffer){
@@ -255,6 +257,9 @@ export function UTF8Decode(buffer){
 				| (0x3f & uint8[i + 3]);
 			codePoints.push(codePoint);
 			i += 3;
+		}
+		else {
+			throw new RangeError( `Invalid codepoint \`${codePoint}\` at index \`${i}\`!` );
 		}
 	}
 	
