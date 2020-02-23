@@ -74,5 +74,5 @@ class __Int256 extends BinaryInt  {
 //@endexport
 
 
-export cosnt UInt256 = __UInt256;
+export const UInt256 = __UInt256;
 export const Int256 = __Int256;
