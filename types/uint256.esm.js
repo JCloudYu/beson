@@ -33,9 +33,8 @@ class UInt256 extends BinaryInt {
 		]);
 	}
 }
-//@endexport
-//@export=Int256
-class __Int256 extends BinaryInt  {
+
+class Int256 extends BinaryInt  {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(32));
@@ -74,5 +73,5 @@ class __Int256 extends BinaryInt  {
 //@endexport
 
 
-export const UInt256 = __UInt256;
-export const Int256 = __Int256;
+export {UInt256};
+export {Int256};
