@@ -6,24 +6,24 @@ import {
 } from "./beson-types.esm.js";
 
 
-//@export
+//@export=serialize
 const SEQUENCE_END = (new Uint8Array([0x00]).buffer);
 
-function __Serialize(data) {
+function Serialize(data) {
 	const chunks = [];
 	SerializeData(data, (chunk)=>{
 		chunks.push(chunk);
 	});
 	return MergeArrayBuffers(chunks);
 }
-function __SerializeData(data, data_cb) {
+function SerializeData(data, data_cb) {
 	const type = __serializeType(data, data_cb);
 	__serializeTypeData(type, data, data_cb);
 }
 
 
 
-function __serializeType(data, data_cb) {
+function serializeType(data, data_cb) {
 	if ( data === null ) {
 		data_cb(Uint8Array.from([TYPE_HEADER.NULL]).buffer);
 		return DATA_TYPE.NULL;
@@ -189,7 +189,7 @@ function __serializeType(data, data_cb) {
 	
 	throw error;
 }
-function __serializeTypeData(type, data, data_cb) {
+function serializeTypeData(type, data, data_cb) {
 	if (type === DATA_TYPE.NULL || type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
 		// null and boolean has no data payload
 		return;
@@ -290,7 +290,7 @@ function __serializeTypeData(type, data, data_cb) {
 	}
 }
 
-function __serializeArrayAndSet(array, data_cb) {
+function serializeArrayAndSet(array, data_cb) {
 	for ( let data of array ) {
 		if ( data === undefined ) { data = null; }
 		const type = __serializeType(data, data_cb);
@@ -298,7 +298,7 @@ function __serializeArrayAndSet(array, data_cb) {
 	}
 	data_cb(SEQUENCE_END);
 }
-function __serializeShortString(data, data_cb) {
+function serializeShortString(data, data_cb) {
 	const buffer = UTF8Encode(data);
 	if ( buffer.byteLength > 65535 ) {
 		throw new RangeError("Given key cannot be larger than 65565 bytes!");
@@ -308,7 +308,7 @@ function __serializeShortString(data, data_cb) {
 	data_cb(length_data);
 	data_cb(buffer);
 }
-function __serializeObject(object, data_cb) {
+function serializeObject(object, data_cb) {
 	for ( let key in object ) {
 		const data = object[key];
 		if ( data === undefined ) continue;
@@ -319,7 +319,7 @@ function __serializeObject(object, data_cb) {
 	}
 	data_cb(SEQUENCE_END);
 }
-function __serializeMap(map, data_cb) {
+function serializeMap(map, data_cb) {
 	for ( let [key, data] of map ) {
 		if ( data === undefined ) continue;
 		
@@ -337,5 +337,5 @@ function __serializeMap(map, data_cb) {
 //@endexport
 
 
-export cosnt Serialize = __Serialize;
-export cosnt SerializeData = __SerializeData;
+export {Serialize};
+export {SerializeData};
