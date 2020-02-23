@@ -11,7 +11,7 @@ import {
 
 
 //@export=Binary
-class __Binary extends BinaryData {
+class Binary extends BinaryData {
 	clone() {
 		return Binary.FromArrayBuffer(this._ab.slice(0));
 	}
@@ -119,4 +119,4 @@ class __Binary extends BinaryData {
 }
 //@endexport
 
-export cont Binary = __Binary;
+export {Binary};
