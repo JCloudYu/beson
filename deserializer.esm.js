@@ -6,10 +6,10 @@ import {DeserializeBuffer} from "./deserialize.esm.js";
 import {MergeArrayBuffers} from "./helper.esm.js";
 
 
-
+//@export
 const _PRIVATES = new WeakMap();
 const EMPTY_BUFFER = new Uint8Array(new ArrayBuffer(0));
-export class Deserializer {
+class __Deserializer {
 	constructor() {
 		_PRIVATES.set(this, { buffer:EMPTY_BUFFER });
 		
@@ -72,3 +72,6 @@ export class Deserializer {
 		return deserializer;
 	}
 }
+//endexport
+
+export const Deserializer = __Deserializer;
