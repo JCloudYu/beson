@@ -30,7 +30,7 @@ const DEFAULT_BA  = new Uint8Array(DEFAULT_AB);
 
 
 
-class __BinaryData {
+class BinaryData {
 	constructor(length=0) {
 		if ( arguments.length === 0 ) {
 			this._ab = DEFAULT_AB;
@@ -103,7 +103,7 @@ class __BinaryData {
 }
 //@endexport
 //@export=BinaryInt
-class __BinaryInt extends BinaryData {
+class BinaryInt extends BinaryData {
 	constructor() {
 		super();
 		this._ta = this._ba;
@@ -344,5 +344,5 @@ class __BinaryInt extends BinaryData {
 }
 //@endexport
 
-export const BinaryData = __BinaryData;
-export const BinaryInt = __BinaryInt;
+export {BinaryData};
+export {BinaryInt};
