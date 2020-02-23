@@ -7,7 +7,7 @@ import {___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 
 //@export=UInt64
-class __UInt64 extends BinaryInt {
+class UInt64 extends BinaryInt {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(8));
@@ -32,9 +32,8 @@ class __UInt64 extends BinaryInt {
 		return val;
 	}
 }
-//@endexport
-//@export=Int64
-class __Int64 extends BinaryInt {
+
+class Int64 extends BinaryInt {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(8));
@@ -68,5 +67,5 @@ class __Int64 extends BinaryInt {
 }
 //@endexport
 
-export const UInt64 = __UInt64;
-export const Int64 = __Int64;
+export {UInt64};
+export {Int64};
