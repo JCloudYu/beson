@@ -2,8 +2,10 @@
  * Author: JCloudYu
  * Create: 2018/10/30
  **/
-export const HAS_NODE_BUFFER = (typeof Buffer !== "undefined");
-export const DATA_TYPE = Object.freeze({
+
+//@export=helper
+const __HAS_NODE_BUFFER = (typeof Buffer !== "undefined");
+const __DATA_TYPE = Object.freeze({
 	NULL:			1,
 	
 	FALSE:			2,
@@ -57,7 +59,7 @@ export const DATA_TYPE = Object.freeze({
 	END:			99,
 	BINARIZABLE:   100,
 });
-export const TYPE_HEADER = Object.freeze({
+const __TYPE_HEADER = Object.freeze({
 	END:			0x00,
 
 	NULL:			0x10,
@@ -131,7 +133,7 @@ const HEX_MAP_INVERSE = {
 
 
 
-export function ReadBuffer(input){
+function __ReadBuffer(input){
 	if( HAS_NODE_BUFFER ){
 		if( input instanceof Buffer ){
 			let buff = Buffer.alloc(input.length);
@@ -147,7 +149,7 @@ export function ReadBuffer(input){
 	}
 	return null;
 }
-export function MergeArrayBuffers(...array_buffers) {
+function __MergeArrayBuffers(...array_buffers) {
 	if ( Array.isArray(array_buffers[0]) ) {
 		array_buffers = array_buffers[0];
 	}
@@ -168,7 +170,7 @@ export function MergeArrayBuffers(...array_buffers) {
 	
 	return newInst.buffer;
 }
-export function HexToBuffer(inputStr, length = null){
+function __HexToBuffer(inputStr, length = null){
 	if( !HEX_FORMAT_CHECKER.test(inputStr) ){
 		throw new SyntaxError("Given hex string is not a valid hex string!");
 	}
@@ -183,7 +185,7 @@ export function HexToBuffer(inputStr, length = null){
 	return buffer.buffer;
 }
 
-export function UTF8Encode(str){
+function __UTF8Encode(str){
 	let codePoints = [];
 	for( let i = 0; i < str.length; i++ ){
 		let codePoint = str.codePointAt(i);
@@ -222,7 +224,7 @@ export function UTF8Encode(str){
 	}
 	return new Uint8Array(codePoints).buffer;
 }
-export function UTF8Decode(buffer){
+function __UTF8Decode(buffer){
 	let uint8 = new Uint8Array(buffer);
 	let codePoints = [];
 	for( let i = 0; i < uint8.length; i++ ){
@@ -259,7 +261,7 @@ export function UTF8Decode(buffer){
 	return String.fromCodePoint(...codePoints);
 }
 
-export function BitwiseNot(input){
+function __BitwiseNot(input){
 	input = ReadBuffer(input);
 	if( input === null ){
 		throw new TypeError("Given input must be an ArrayBuffer!");
@@ -270,7 +272,7 @@ export function BitwiseNot(input){
 		buffer[off] = ~buffer[off];
 	}
 }
-export function BitwiseAnd(a, b){
+function __BitwiseAnd(a, b){
 	a = ReadBuffer(a);
 	b = ReadBuffer(b);
 	
@@ -284,7 +286,7 @@ export function BitwiseAnd(a, b){
 		bufferA[off] = bufferA[off] & (bufferB[off] || 0);
 	}
 }
-export function BitwiseOr(a, b){
+function __BitwiseOr(a, b){
 	a = ReadBuffer(a);
 	b = ReadBuffer(b);
 	
@@ -298,7 +300,7 @@ export function BitwiseOr(a, b){
 		bufferA[off] = bufferA[off] | (bufferB[off] || 0);
 	}
 }
-export function BitwiseXor(a, b){
+function __BitwiseXor(a, b){
 	a = ReadBuffer(a);
 	b = ReadBuffer(b);
 	
@@ -312,7 +314,7 @@ export function BitwiseXor(a, b){
 		bufferA[off] = bufferA[off] ^ (bufferB[off] || 0);
 	}
 }
-export function BitwiseIsZero(input){
+function __BitwiseIsZero(input){
 	const buff = new Uint8Array(ReadBuffer(input));
 	let isZero = true;
 	for( let i = 0; i < buff.length; i++ ){
@@ -321,12 +323,12 @@ export function BitwiseIsZero(input){
 	return isZero;
 }
 
-export function __COPY_BYTES(target, source, length, source_start=0, target_start=0) {
+function ____COPY_BYTES(target, source, length, source_start=0, target_start=0) {
 	for(let i=0; i<length; i++) {
 		target[target_start+i] = source[source_start+i];
 	}
 }
-export function ___SET_BINARY_BUFFER(array_buffer){
+function _____SET_BINARY_BUFFER(array_buffer){
 	if( !(array_buffer instanceof ArrayBuffer) ){
 		throw new TypeError("Given input must be an ArrayBuffer!");
 	}
@@ -340,7 +342,7 @@ export function ___SET_BINARY_BUFFER(array_buffer){
 
 
 // region [ Little Endian Operations ]
-export function BufferFromHexStrLE(inputStr, size = null){
+function __BufferFromHexStrLE(inputStr, size = null){
 	if( !HEX_FORMAT_CHECKER.test(inputStr) ){
 		throw new SyntaxError("Given hex string is not a valid hex string!");
 	}
@@ -366,7 +368,7 @@ export function BufferFromHexStrLE(inputStr, size = null){
 	}
 	return buffer;
 }
-export function BufferFromBinStrLE(inputStr, size = null){
+function __BufferFromBinStrLE(inputStr, size = null){
 	if( !BIN_FORMAT_CHECKER.test(inputStr) ){
 		throw new SyntaxError("Given hex string is not a valid hex string!");
 	}
@@ -391,7 +393,7 @@ export function BufferFromBinStrLE(inputStr, size = null){
 	}
 	return buffer;
 }
-export function DumpHexStringLE(input){
+function __DumpHexStringLE(input){
 	let val = new Uint8Array(ReadBuffer(input));
 	
 	let str = '';
@@ -401,7 +403,7 @@ export function DumpHexStringLE(input){
 	}
 	return str;
 }
-export function DumpBinaryStringLE(input){
+function __DumpBinaryStringLE(input){
 	let val = new Uint8Array(ReadBuffer(input));
 	
 	let str = '';
@@ -413,7 +415,7 @@ export function DumpBinaryStringLE(input){
 	}
 	return str;
 }
-export function BitwiseCompareLE(a, b){
+function __BitwiseCompareLE(a, b){
 	a = ReadBuffer(a);
 	b = ReadBuffer(b);
 	if( a === null || b === null ){
@@ -441,7 +443,7 @@ export function BitwiseCompareLE(a, b){
 	
 	return 0;
 }
-export function BitwiseRightShiftLE(value, shift, padding = 0){
+function __BitwiseRightShiftLE(value, shift, padding = 0){
 	if( typeof shift !== "number" ){
 		throw new TypeError("Shift bits number must be a number");
 	}
@@ -485,7 +487,7 @@ export function BitwiseRightShiftLE(value, shift, padding = 0){
 		}
 	}
 }
-export function BitwiseLeftShiftLE(value, shift, padding = 0){
+function __BitwiseLeftShiftLE(value, shift, padding = 0){
 	if( typeof shift !== "number" ){
 		throw new TypeError("Shift bits must be a number!");
 	}
@@ -527,7 +529,7 @@ export function BitwiseLeftShiftLE(value, shift, padding = 0){
 		}
 	}
 }
-export function BitwiseIsNegativeLE(input){
+function __BitwiseIsNegativeLE(input){
 	const buff = new Uint8Array(ReadBuffer(input));
 	return ((buff[buff.length - 1] & 0x80) !== 0)
 }
@@ -535,7 +537,7 @@ export function BitwiseIsNegativeLE(input){
 
 
 // region [ Little Endian exclusive functions ]
-export function BufferFromIntStrLE(inputStr, size = null){
+function __BufferFromIntStrLE(inputStr, size = null){
 	if( !INT_FORMAT_CHECKER.test(inputStr) ){
 		throw new SyntaxError("Given hex string is not a valid hex string!");
 	}
@@ -599,7 +601,7 @@ export function BufferFromIntStrLE(inputStr, size = null){
 	
 	return _result;
 }
-export function DumpIntStringLE(input, unsigned = false){
+function __DumpIntStringLE(input, unsigned = false){
 	let is_negative = false;
 	
 	const value = new Uint8Array(ReadBuffer(input).slice(0));
@@ -624,7 +626,7 @@ export function DumpIntStringLE(input, unsigned = false){
 	
 	return (is_negative ? '-' : '') + remainder[0].toString(10) + result;
 }
-export function BitwiseMultiplicationLE(multiplier, multiplicand){
+function __BitwiseMultiplicationLE(multiplier, multiplicand){
 	const a = new Uint8Array(ReadBuffer(multiplier));
 	const b = new Uint8Array(ReadBuffer(multiplicand));
 	const res = new Uint8Array(a.length);
@@ -640,7 +642,7 @@ export function BitwiseMultiplicationLE(multiplier, multiplicand){
 	
 	a.set(res);
 }
-export function BitwiseAdditionLE(addend_a, addend_b){
+function __BitwiseAdditionLE(addend_a, addend_b){
 	let a = new Uint8Array(ReadBuffer(addend_a));
 	let b = new Uint8Array(ReadBuffer(addend_b));
 	
@@ -651,14 +653,14 @@ export function BitwiseAdditionLE(addend_a, addend_b){
 		carriage = (carriage / 256) | 0;
 	}
 }
-export function BitwiseSubtractionLE(minuend, subtrahend){
+function __BitwiseSubtractionLE(minuend, subtrahend){
 	const a = new Uint8Array(ReadBuffer(minuend));
 	const b = new Uint8Array(ReadBuffer(subtrahend));
 	const negB = new Uint8Array(b);
 	BitwiseTwoComplimentLE(negB);
 	BitwiseAdditionLE(a, negB);
 }
-export function BitwiseDivisionLE(dividend, divisor, unsigned = false, remainder_buff = null){
+function __BitwiseDivisionLE(dividend, divisor, unsigned = false, remainder_buff = null){
 	const raw_a = new Uint8Array(ReadBuffer(dividend));
 	const raw_b = new Uint8Array(ReadBuffer(divisor));
 	
@@ -748,7 +750,7 @@ export function BitwiseDivisionLE(dividend, divisor, unsigned = false, remainder
 	
 	return remainder;
 }
-export function BitwiseTwoComplimentLE(input){
+function __BitwiseTwoComplimentLE(input){
 	input = ReadBuffer(input);
 	if( input === null ){
 		throw new TypeError("Given input must be an ArrayBuffer!");
@@ -766,7 +768,7 @@ export function BitwiseTwoComplimentLE(input){
 // endregion
 
 // region [ Big Endian Operations ]
-export function BufferFromHexStrBE(inputStr, size = 0){
+function __BufferFromHexStrBE(inputStr, size = 0){
 	if( !HEX_FORMAT_CHECKER.test(inputStr) ){
 		throw new SyntaxError("Given hex string is not a valid hex string!");
 	}
@@ -791,7 +793,7 @@ export function BufferFromHexStrBE(inputStr, size = 0){
 	}
 	return buffer;
 }
-export function BufferFromBinStrBE(inputStr, size = null){
+function __BufferFromBinStrBE(inputStr, size = null){
 	if( !BIN_FORMAT_CHECKER.test(inputStr) ){
 		throw new SyntaxError("Given hex string is not a valid hex string!");
 	}
@@ -814,7 +816,7 @@ export function BufferFromBinStrBE(inputStr, size = null){
 	}
 	return buffer;
 }
-export function DumpHexStringBE(input){
+function __DumpHexStringBE(input){
 	let val = new Uint8Array(ReadBuffer(input));
 	
 	const length = val.length;
@@ -825,7 +827,7 @@ export function DumpHexStringBE(input){
 	}
 	return str;
 }
-export function DumpBinaryStringBE(input){
+function __DumpBinaryStringBE(input){
 	let val = new Uint8Array(ReadBuffer(input));
 	
 	const length = val.length;
@@ -838,11 +840,11 @@ export function DumpBinaryStringBE(input){
 	}
 	return str;
 }
-export function BitwiseIsNegativeBE(input){
+function __BitwiseIsNegativeBE(input){
 	const buff = new Uint8Array(ReadBuffer(input));
 	return ((buff[0] & 0x80) !== 0)
 }
-export function BitwiseCompareBE(a, b){
+function __BitwiseCompareBE(a, b){
 	a = ReadBuffer(a);
 	b = ReadBuffer(b);
 	if( a === null || b === null ){
@@ -869,7 +871,7 @@ export function BitwiseCompareBE(a, b){
 	}
 	return 0;
 }
-export function BitwiseRightShiftBE(value, shift, padding = 0){
+function __BitwiseRightShiftBE(value, shift, padding = 0){
 	if( typeof shift !== "number" ){
 		throw new TypeError("Shift bits number must be a number");
 	}
@@ -914,7 +916,7 @@ export function BitwiseRightShiftBE(value, shift, padding = 0){
 		}
 	}
 }
-export function BitwiseLeftShiftBE(value, shift, padding = 0){
+function __BitwiseLeftShiftBE(value, shift, padding = 0){
 	if( typeof shift !== "number" ){
 		throw new TypeError("Shift bits must be a number!");
 	}
@@ -983,3 +985,43 @@ function ___GEN_8BITS_MASK(BITS){
 	}
 	return val;
 }
+//@endexport
+
+export const HAS_NODE_BUFFER ＝ __HAS_NODE_BUFFER;
+export const DATA_TYPE = __DATA_TYPE;
+export const TYPE_HEADER = __TYPE_HEADER;
+export const ReadBuffer = __ReadBuffer;
+export const MergeArrayBuffers = __MergeArrayBuffers;
+export const HexToBuffer = __HexToBuffer;
+export const UTF8Encode = __UTF8Encode;
+export const UTF8Decode = __UTF8Decode
+export const BitwiseNot = __BitwiseNot;
+export const BitwiseAnd = __BitwiseAnd;
+export const BitwiseOr = __BitwiseOr;
+export const BitwiseXor = __BitwiseXor;
+export const BitwiseIsZero = __BitwiseIsZero;
+export const __COPY_BYTES = ____COPY_BYTES;
+export const ___SET_BINARY_BUFFER = _____SET_BINARY_BUFFER;
+export const BufferFromHexStrLE = __BufferFromHexStrLE;
+export const BufferFromBinStrLE = __BufferFromBinStrLE;
+export const DumpHexStringLE = __DumpHexStringLE;
+export const DumpBinaryStringLE = __DumpBinaryStringLE;
+export const BitwiseCompareLE = __BitwiseCompareLE;
+export const BitwiseRightShiftLE = __BitwiseRightShiftLE;
+export const BitwiseLeftShiftLE = __BitwiseLeftShiftLE;
+export const BitwiseIsNegativeLE = __BitwiseIsNegativeLE;
+export const BufferFromIntStrLE = __BufferFromIntStrLE;
+export const DumpIntStringLE = __DumpIntStringLE;
+export const BitwiseMultiplicationLE = __BitwiseMultiplicationLE;
+export const BitwiseAdditionLE = __BitwiseAdditionLE;
+export const BitwiseSubtractionLE = __BitwiseSubtractionLE;
+export const BitwiseDivisionLE = __BitwiseDivisionLE;
+export const BitwiseTwoComplimentLE = __BitwiseTwoComplimentLE;
+export const BufferFromHexStrBE = __BufferFromHexStrBE;
+export const BufferFromBinStrBE = __BufferFromBinStrBE;
+export const DumpHexStringBE = __DumpHexStringBE;
+export const DumpBinaryStringBE = __DumpBinaryStringBE;
+export const BitwiseIsNegativeBE = __BitwiseIsNegativeBE;
+export const BitwiseCompareBE = __BitwiseCompareBE;
+export const BitwiseRightShiftBE = __BitwiseRightShiftBE;
+export const BitwiseLeftShiftBE = __BitwiseLeftShiftBE;
