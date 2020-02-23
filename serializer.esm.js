@@ -8,7 +8,7 @@ import {MergeArrayBuffers} from "./helper.esm.js";
 
 //@export=Serializer
 const _PRIVATES = new WeakMap();
-class __Serializer {
+class Serializer {
 	constructor() {
 		const parts = [];
 		_PRIVATES.set(this, {
@@ -43,4 +43,4 @@ class __Serializer {
 }
 //@endexport
 
-export const Serializer = __Serializer;
+export {Serializer};
