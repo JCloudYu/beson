@@ -6,7 +6,7 @@ import {ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
 import {BinaryData, BinaryInt} from "./_core-types.esm.js";
 
 
-
+//@export=BinarySmallNumber
 const MIN_INT8	 = -128;
 const MAX_INT8	 =  127;
 const MAX_UINT8  =  0xFF;
@@ -25,7 +25,7 @@ const POS_INF_FLT32 = new Uint8Array([0x00, 0x00, 0x80, 0x7F]); // 0x7F800000
 const NEG_INF_FLT32 = new Uint8Array([0x00, 0x00, 0x80, 0xFF]); // 0xFF800000
 
 
-//@export=BinarySmallNumber
+
 class BinarySmallNumber extends BinaryInt {
 	[Symbol.toPrimitive](hint) {
 		return (hint === 'string') ? `${this._ta[0]}` : this._ta[0];
@@ -297,7 +297,7 @@ class __UInt8 extends BinarySmallNumber {
 }
 //@endexport
 //@export=Int8
-class __Int8 extends BinarySmallNumber {
+class Int8 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(1));
@@ -350,7 +350,7 @@ class __Int8 extends BinarySmallNumber {
 }
 //＠endexport
 //@export=Float32
-export class __Float32 extends BinarySmallNumber {
+class Float32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(4));
@@ -418,9 +418,9 @@ export class __Float32 extends BinarySmallNumber {
 //@endexport
 
 
-export const UInt32 = __UInt32;
-export const Int32 = __Int32;
-export const Int16 = __Int16;
-export const UInt8 = __UInt8;
-export const Int8 = __Int8;
-export const Float32 = __Float32;
+export {UInt32};
+export {Int32};
+export {Int16};
+export {UInt8};
+export {Int8};
+export {Float32};
