@@ -39,9 +39,9 @@ class BinarySmallNumber extends BinaryInt {
 		return super.toString(bits);
 	}
 }
-//endexport
+//@endexport
 
-//export=__UInt32
+//@export=__UInt32
 class __UInt32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
