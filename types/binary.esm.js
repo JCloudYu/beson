@@ -10,8 +10,8 @@ import {
 } from "../helper.esm.js";
 
 
-
-export class Binary extends BinaryData {
+//@export=Binary
+class __Binary extends BinaryData {
 	clone() {
 		return Binary.FromArrayBuffer(this._ab.slice(0));
 	}
@@ -117,3 +117,6 @@ export class Binary extends BinaryData {
 		return inst.append(array_buffers);
 	}
 }
+//@endexport
+
+export cont Binary = __Binary;
