@@ -5,8 +5,8 @@ import {
 	Int256, Int512, UInt256, UInt512, Float32
 } from "./beson-types.esm.js";
 
-//@export
-function __Deserialize(buffer, throw_if_error=false) {
+//@export=deserialize
+function Deserialize(buffer, throw_if_error=false) {
 	buffer = new Uint8Array(buffer);
 
 	const result = DeserializeBuffer(buffer, 0);
@@ -22,7 +22,7 @@ function __Deserialize(buffer, throw_if_error=false) {
 	}
 }
 
-function __DeserializeBuffer(buffer, anchor=0) {
+function DeserializeBuffer(buffer, anchor=0) {
 	if ( HAS_NODE_BUFFER ) {
 		if ( buffer instanceof Buffer ) {
 			let buff = Buffer.alloc(buffer.length);
@@ -605,5 +605,5 @@ function __deserializeMap(buffer, start) {
 }
 //@endexport
 
-export const Deserialize = __Deserialize;
-export const DeserializeBuffer = __DeserializeBuffer;
+export {Deserialize};
+export {DeserializeBuffer};
