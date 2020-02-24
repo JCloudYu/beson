@@ -6,7 +6,7 @@ import {BinaryData, BinaryInt} from "./_core-types.esm.js";
 import {BufferFromBinStrLE, BufferFromHexStrLE, BufferFromIntStrLE, ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 
-//@export=uint_var
+//@export=BinaryVariableLengthInt
 class BinaryVariableLengthInt extends BinaryInt {
 	constructor(value=0, size=null) {
 		super();

@@ -101,8 +101,7 @@ class BinaryData {
 		return check;
 	}
 }
-//@endexport
-//@export=BinaryInt
+
 class BinaryInt extends BinaryData {
 	constructor() {
 		super();

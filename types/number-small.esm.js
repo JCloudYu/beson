@@ -39,9 +39,7 @@ class BinarySmallNumber extends BinaryInt {
 		return super.toString(bits);
 	}
 }
-//@endexport
 
-//@export=__UInt32
 class __UInt32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
@@ -89,8 +87,7 @@ class __UInt32 extends BinarySmallNumber {
 		return new UInt32(MAX_UINT32);
 	}
 }
-//@endexport
-//@export=Int32
+
 class Int32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
@@ -142,8 +139,7 @@ class Int32 extends BinarySmallNumber {
 		return new Int32(MIN_INT32);
 	}
 }
-//@endexport
-//@export=UInt16
+
 class UInt16 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
@@ -192,8 +188,7 @@ class UInt16 extends BinarySmallNumber {
 		return new UInt16(MAX_UINT16);
 	}
 }
-//@endexport
-//@export=Int16
+
 class Int16 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
@@ -245,9 +240,8 @@ class Int16 extends BinarySmallNumber {
 		return new Int16(MIN_INT16);
 	}
 }
-//@endexport
-//@export=UInt8
-class __UInt8 extends BinarySmallNumber {
+
+class UInt8 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(1));
@@ -295,8 +289,7 @@ class __UInt8 extends BinarySmallNumber {
 		return new UInt8(MAX_UINT8);
 	}
 }
-//@endexport
-//@export=Int8
+
 class Int8 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
@@ -348,8 +341,7 @@ class Int8 extends BinarySmallNumber {
 		return new Int8(MIN_INT8);
 	}
 }
-//＠endexport
-//@export=Float32
+
 class Float32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();

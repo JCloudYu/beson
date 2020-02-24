@@ -2,7 +2,7 @@
 * Author: JCloudYu
 * Create: 2018/09/24
 **/
-import {BinaryInt} from "./_core-types.esm.js";
+import {BinaryInt} from "./_core-types.esm.js.js";
 import {___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 

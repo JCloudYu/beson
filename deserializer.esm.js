@@ -72,6 +72,6 @@ class Deserializer {
 		return deserializer;
 	}
 }
-//endexport
+//@endexport
 
 export {Deserializer};
