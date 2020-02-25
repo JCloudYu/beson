@@ -40,7 +40,7 @@ class BinarySmallNumber extends BinaryInt {
 	}
 }
 
-class __UInt32 extends BinarySmallNumber {
+class UInt32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(4));

@@ -328,7 +328,7 @@ function __COPY_BYTES(target, source, length, source_start=0, target_start=0) {
 		target[target_start+i] = source[source_start+i];
 	}
 }
-function __SET_BINARY_BUFFER(array_buffer){
+function ___SET_BINARY_BUFFER(array_buffer){
 	if( !(array_buffer instanceof ArrayBuffer) ){
 		throw new TypeError("Given input must be an ArrayBuffer!");
 	}
