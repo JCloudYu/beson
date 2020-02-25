@@ -24,9 +24,9 @@ ${'!deserializer'}
 window.beson = {
     Int8,  Int16,  Int32,  Int64,  Int128,  Int256,  Int512,  IntVar,
 	UInt8, UInt16, UInt32, UInt64, UInt128, UInt256, UInt512, UIntVar,
-    Float32,
-    
+    Float32,    
     Deserialize, DeserializeBuffer,Deserializer,
-    Serialize, Serializer
+    Serialize, Serializer,
+    UTF8Encode, UTF8Decode, BitwiseCompareLE
 };
 })(window);`;
