@@ -410,9 +410,4 @@ class Float32 extends BinarySmallNumber {
 //@endexport
 
 
-export {UInt32};
-export {Int32};
-export {Int16};
-export {UInt8};
-export {Int8};
-export {Float32};
+export {Int8, UInt8, Int16, UInt16, Int32, UInt32, Float32};

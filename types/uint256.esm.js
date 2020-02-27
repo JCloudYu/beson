@@ -73,5 +73,4 @@ class Int256 extends BinaryInt  {
 //@endexport
 
 
-export {UInt256};
-export {Int256};
+export {UInt256, Int256};

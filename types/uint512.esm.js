@@ -84,5 +84,4 @@ class Int512 extends BinaryInt  {
 }
 //@endexport
 
-export {UInt512};
-export {Int512};
+export {UInt512, Int512};

@@ -173,5 +173,4 @@ class IntVar extends BinaryVariableLengthInt {
 }
 //@endexport
 
-export {UIntVar};
-export {IntVar};
+export {UIntVar, IntVar};

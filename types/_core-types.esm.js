@@ -343,5 +343,4 @@ class BinaryInt extends BinaryData {
 }
 //@endexport
 
-export {BinaryData};
-export {BinaryInt};
+export {BinaryData, BinaryInt};

@@ -66,5 +66,4 @@ class Int128 extends BinaryInt  {
 }
 //@endexport
 
-export {UInt128};
-export {Int128}; 
+export {UInt128, Int128}; 
