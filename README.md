@@ -21,7 +21,10 @@ You can simply use the following statement in NodesJS to use beson.
 const { Deserialize, Serialize } = require('beson');
 ...
 ```
-
+#### Run Unit Test ####
+```
+node --experimental-modules --loader ./.loader.mjs unit-test.mjs
+```
 #### ES Module ( beson@1.x ) ####
 Since that the module is completely written in es module, NodeJS requires more steps to make beson work! NodeJS requires [ESM Resolve Hook](https://nodejs.org/api/esm.html#esm_resolve_hook) to load modules ended with .esm.js. This repo contains the predefined [loader script](https://github.com/JCloudYu/beson/blob/master/_supportive/loader.mjs) for NodeJS developers who doesn't want to write one...
 

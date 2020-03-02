@@ -6,7 +6,7 @@ import {BinaryData, BinaryInt} from "./_core-types.esm.js";
 import {BufferFromBinStrLE, BufferFromHexStrLE, BufferFromIntStrLE, ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 
-
+//@export=BinaryVariableLengthInt
 class BinaryVariableLengthInt extends BinaryInt {
 	constructor(value=0, size=null) {
 		super();
@@ -94,9 +94,7 @@ class BinaryVariableLengthInt extends BinaryInt {
 	}
 }
 
-
-
-export class UIntVar extends BinaryVariableLengthInt {
+class UIntVar extends BinaryVariableLengthInt {
 	static from(value=0) {
 		return new UIntVar(value);
 	}
@@ -125,7 +123,8 @@ export class UIntVar extends BinaryVariableLengthInt {
 		return new UIntVar(input);
 	}
 }
-export class IntVar extends BinaryVariableLengthInt {
+
+class IntVar extends BinaryVariableLengthInt {
 	get isSignedInt() { return true; }
 	
 	
@@ -172,3 +171,6 @@ export class IntVar extends BinaryVariableLengthInt {
 		return new IntVar(input);
 	}
 }
+//@endexport
+
+export {UIntVar, IntVar};

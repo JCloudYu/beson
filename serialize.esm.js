@@ -6,17 +6,17 @@ import {
 } from "./beson-types.esm.js";
 
 
-
+//@export=serialize
 const SEQUENCE_END = (new Uint8Array([0x00]).buffer);
 
-export function Serialize(data) {
+function Serialize(data) {
 	const chunks = [];
 	SerializeData(data, (chunk)=>{
 		chunks.push(chunk);
 	});
 	return MergeArrayBuffers(chunks);
 }
-export function SerializeData(data, data_cb) {
+function SerializeData(data, data_cb) {
 	const type = __serializeType(data, data_cb);
 	__serializeTypeData(type, data, data_cb);
 }
@@ -334,3 +334,8 @@ function __serializeMap(map, data_cb) {
 	}
 	data_cb(SEQUENCE_END);
 }
+//@endexport
+
+
+export {Serialize};
+export {SerializeData};

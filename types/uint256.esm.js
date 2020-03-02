@@ -6,8 +6,8 @@ import {BinaryInt} from "./_core-types.esm.js";
 import {___SET_BINARY_BUFFER} from "../helper.esm.js";
 
 
-
-export class UInt256 extends BinaryInt {
+//@export=UInt256
+class UInt256 extends BinaryInt {
 	constructor(value=0) {
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(32));
@@ -33,7 +33,8 @@ export class UInt256 extends BinaryInt {
 		]);
 	}
 }
-export class Int256 extends BinaryInt  {
+
+class Int256 extends BinaryInt  {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(32));
@@ -69,3 +70,7 @@ export class Int256 extends BinaryInt  {
 		]);
 	}
 }
+//@endexport
+
+
+export {UInt256, Int256};

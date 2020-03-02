@@ -6,7 +6,7 @@ import {ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
 import {BinaryData, BinaryInt} from "./_core-types.esm.js";
 
 
-
+//@export=BinarySmallNumber
 const MIN_INT8	 = -128;
 const MAX_INT8	 =  127;
 const MAX_UINT8  =  0xFF;
@@ -39,7 +39,8 @@ class BinarySmallNumber extends BinaryInt {
 		return super.toString(bits);
 	}
 }
-export class UInt32 extends BinarySmallNumber {
+
+class UInt32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(4));
@@ -86,7 +87,8 @@ export class UInt32 extends BinarySmallNumber {
 		return new UInt32(MAX_UINT32);
 	}
 }
-export class Int32 extends BinarySmallNumber {
+
+class Int32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(4));
@@ -138,7 +140,7 @@ export class Int32 extends BinarySmallNumber {
 	}
 }
 
-export class UInt16 extends BinarySmallNumber {
+class UInt16 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(2));
@@ -186,7 +188,8 @@ export class UInt16 extends BinarySmallNumber {
 		return new UInt16(MAX_UINT16);
 	}
 }
-export class Int16 extends BinarySmallNumber {
+
+class Int16 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(2));
@@ -238,7 +241,7 @@ export class Int16 extends BinarySmallNumber {
 	}
 }
 
-export class UInt8 extends BinarySmallNumber {
+class UInt8 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(1));
@@ -286,7 +289,8 @@ export class UInt8 extends BinarySmallNumber {
 		return new UInt8(MAX_UINT8);
 	}
 }
-export class Int8 extends BinarySmallNumber {
+
+class Int8 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(1));
@@ -338,7 +342,7 @@ export class Int8 extends BinarySmallNumber {
 	}
 }
 
-export class Float32 extends BinarySmallNumber {
+class Float32 extends BinarySmallNumber {
 	constructor(value=0){
 		super();
 		___SET_BINARY_BUFFER.call(this, new ArrayBuffer(4));
@@ -403,3 +407,7 @@ export class Float32 extends BinarySmallNumber {
 		return new Float32(MIN_FLT32);
 	}
 }
+//@endexport
+
+
+export {Int8, UInt8, Int16, UInt16, Int32, UInt32, Float32};

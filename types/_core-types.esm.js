@@ -23,12 +23,14 @@ import {
 	DumpIntStringLE, ReadBuffer,
 } from "../helper.esm.js";
 
+
+//@export=BinaryData
 const DEFAULT_AB  = new ArrayBuffer(0);
 const DEFAULT_BA  = new Uint8Array(DEFAULT_AB);
 
 
 
-export class BinaryData {
+class BinaryData {
 	constructor(length=0) {
 		if ( arguments.length === 0 ) {
 			this._ab = DEFAULT_AB;
@@ -108,7 +110,8 @@ export class BinaryData {
 		return check;
 	}
 }
-export class BinaryInt extends BinaryData {
+
+class BinaryInt extends BinaryData {
 	constructor() {
 		super();
 		this._ta = this._ba;
@@ -347,3 +350,6 @@ export class BinaryInt extends BinaryData {
 		return present || inherit;
 	}
 }
+//@endexport
+
+export {BinaryData, BinaryInt};
