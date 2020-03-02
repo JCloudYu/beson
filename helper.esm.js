@@ -151,10 +151,14 @@ function ReadBuffer(input){
 	return null;
 }
 function MergeArrayBuffers(...array_buffers) {
+	if( !array_buffers[0] instanceof ArrayBuffer ) {
+		throw new TypeError("Given inputs must be ArrayBuffers!");
+	}	
+
 	if ( Array.isArray(array_buffers[0]) ) {
 		array_buffers = array_buffers[0];
 	}
-	
+
 	let totalLength = 0;
 	for( let ab of array_buffers ) {
 		totalLength += ab.byteLength;
