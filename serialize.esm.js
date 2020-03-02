@@ -225,7 +225,7 @@ function __serializeTypeData(type, data, data_cb) {
 		buff.set(data);
 		
 		const lengthData = new Uint32Array([buff.length]);
-		data_cb(lengthData);
+		data_cb(lengthData.buffer);
 		data_cb(buff.buffer);
 		return;
 	}
@@ -237,14 +237,14 @@ function __serializeTypeData(type, data, data_cb) {
 		}
 		
 		const lengthData = new Uint32Array([raw_data.length]);
-		data_cb(lengthData);
+		data_cb(lengthData.buffer);
 		data_cb(raw_data.buffer);
 		return;
 	}
 	
 	if ( data instanceof ArrayBuffer ) {
 		const lengthData = new Uint32Array([data.byteLength]);
-		data_cb(lengthData);
+		data_cb(lengthData.buffer);
 		data_cb(data);
 		return;
 	}
@@ -252,7 +252,7 @@ function __serializeTypeData(type, data, data_cb) {
 	if ( ArrayBuffer.isView(data) ) {
 		const buffer = data.buffer;
 		const lengthData = new Uint32Array([buffer.byteLength]);
-		data_cb(lengthData);
+		data_cb(lengthData.buffer);
 		data_cb(buffer);
 		return;
 	}
