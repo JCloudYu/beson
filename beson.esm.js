@@ -14,7 +14,7 @@ export {___IS_LITTLE_ENDIAN};
 import {Serialize} from "./serialize.esm.js";
 import {Deserialize} from "./deserialize.esm.js";
 import {
-	 Int8,  Int16,  Int32,  Int64,  Int128,  Int256,  Int512,  IntVar,
+	Int8,  Int16,  Int32,  Int64,  Int128,  Int256,  Int512,  IntVar,
 	UInt8, UInt16, UInt32, UInt64, UInt128, UInt256, UInt512, UIntVar,
 	Float32
 } from "./beson-types.esm.js";

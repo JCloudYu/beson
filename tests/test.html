@@ -312,9 +312,7 @@
 		index.unit_test43 = function() {
 			const buffer = new Float64Array(32);
 			const original = buffer.map(elm => Math.random());
-			console.log(original)
 			const test = beson.Deserialize(beson.Serialize(original));
-			console.log(test)
 			console.log(test instanceof Float64Array);
 			console.log(beson.BitwiseCompareLE(original, test) === 0);
 		};
