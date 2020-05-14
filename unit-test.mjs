@@ -8,6 +8,7 @@ import os from "os";
 
 (async()=>{
 	const __dirname = path.dirname((import.meta.url).substring(os.platform()==="win32"?8:7));
+	const __base_prefix = (import.meta.url).substring(0, os.platform()==="win32"?8:7);
 	
 	const TEST_SCRIPTS = process.argv.slice(2);
 	
@@ -29,7 +30,7 @@ import os from "os";
 				if ( !fInfo.isFile() ) continue;
 				if ( fPath.substr(-8) !== ".test.js" && fPath.substr(-9) !== ".test.mjs" ) continue;
 
-				await import( fPath );
+				await import( __base_prefix + fPath );
 			}
 		}
 		else {

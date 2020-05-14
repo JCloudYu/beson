@@ -294,8 +294,8 @@ function BitwiseAnd(a, b){
 		throw new TypeError("Given inputs must be ArrayBuffers!");
 	}
 	
-	const bufferA = new Uint8Array(input);
-	const bufferB = new Uint8Array(input);
+	const bufferA = new Uint8Array(a);
+	const bufferB = new Uint8Array(b);
 	for( let off = 0; off < bufferA.length; off++ ){
 		bufferA[off] = bufferA[off] & (bufferB[off] || 0);
 	}
@@ -308,8 +308,8 @@ function BitwiseOr(a, b){
 		throw new TypeError("Given inputs must be ArrayBuffers!");
 	}
 	
-	const bufferA = new Uint8Array(input);
-	const bufferB = new Uint8Array(input);
+	const bufferA = new Uint8Array(a);
+	const bufferB = new Uint8Array(b);
 	for( let off = 0; off < bufferA.length; off++ ){
 		bufferA[off] = bufferA[off] | (bufferB[off] || 0);
 	}
@@ -322,8 +322,8 @@ function BitwiseXor(a, b){
 		throw new TypeError("Given inputs must be ArrayBuffers!");
 	}
 	
-	const bufferA = new Uint8Array(input);
-	const bufferB = new Uint8Array(input);
+	const bufferA = new Uint8Array(a);
+	const bufferB = new Uint8Array(b);
 	for( let off = 0; off < bufferA.length; off++ ){
 		bufferA[off] = bufferA[off] ^ (bufferB[off] || 0);
 	}
@@ -445,9 +445,9 @@ function BitwiseCompareLE(a, b){
 	let B = new Uint8Array(b);
 	
 	let valA, valB;
-	for( let i = Math.max(A.length, B.length); i >= 0; i-- ){
-		valA = A[i] || 0;
-		valB = B[i] || 0;
+	for( let i = Math.max(A.length, B.length); i > 0; i-- ){
+		valA = A[i-1] || 0;
+		valB = B[i-1] || 0;
 		if( valA === valB ){
 			continue;
 		}

@@ -124,6 +124,7 @@ const HEX_MAP_INVERSE = {
 	a: 10, b: 11, c: 12, d: 13, e: 14, f: 15,
 	A: 10, B: 11, C: 12, D: 13, E: 14, F: 15
 };
+const UTF8_DECODE_CHUNK_SIZE = 100;
 
 
 
@@ -188,21 +189,23 @@ function HexToBuffer(inputStr, length = null){
 
 function UTF8Encode(str){
 	let codePoints = [];
-	for( let i = 0; i < str.length; i++ ){
+	let i=0;
+	while( i < str.length ) {
 		let codePoint = str.codePointAt(i);
+		
 		// 1-byte sequence
-		if( (codePoint & 0xffffff80) === 0 ){
+		if( (codePoint & 0xffffff80) === 0 ) {
 			codePoints.push(codePoint);
 		}
 		// 2-byte sequence
-		else if( (codePoint & 0xfffff800) === 0 ){
+		else if( (codePoint & 0xfffff800) === 0 ) {
 			codePoints.push(
 				0xc0 | (0x1f & (codePoint >> 6)),
 				0x80 | (0x3f & codePoint)
 			);
 		}
 		// 3-byte sequence
-		else if( (codePoint & 0xffff0000) === 0 ){
+		else if( (codePoint & 0xffff0000) === 0 ) {
 			codePoints.push(
 				0xe0 | (0x0f & (codePoint >> 12)),
 				0x80 | (0x3f & (codePoint >> 6)),
@@ -210,7 +213,7 @@ function UTF8Encode(str){
 			);
 		}
 		// 4-byte sequence
-		else if( (codePoint & 0xffe00000) === 0 ){
+		else if( (codePoint & 0xffe00000) === 0 ) {
 			codePoints.push(
 				0xf0 | (0x07 & (codePoint >> 18)),
 				0x80 | (0x3f & (codePoint >> 12)),
@@ -219,27 +222,27 @@ function UTF8Encode(str){
 			);
 		}
 		
-		if( codePoint > 0xffff ){
-			i++;
-		}
+		i += (codePoint>0xFFFF) ? 2 : 1;
 	}
-	return new Uint8Array(codePoints).buffer;
+	return new Uint8Array(codePoints);
 }
 function UTF8Decode(buffer){
 	let uint8 = new Uint8Array(buffer);
 	let codePoints = [];
-	for( let i = 0; i < uint8.length; i++ ){
+	let i = 0;
+	while( i < uint8.length ) {
 		let codePoint = uint8[i] & 0xff;
 		
 		// 1-byte sequence (0 ~ 127)
 		if( (codePoint & 0x80) === 0 ){
 			codePoints.push(codePoint);
+			i += 1;
 		}
 		// 2-byte sequence (192 ~ 223)
-		else if( (codePoint & 0xe0) === 0xc0 ){
+		else if( (codePoint & 0xE0) === 0xC0 ){
 			codePoint = ((0x1f & uint8[i]) << 6) | (0x3f & uint8[i + 1]);
 			codePoints.push(codePoint);
-			i += 1;
+			i += 2;
 		}
 		// 3-byte sequence (224 ~ 239)
 		else if( (codePoint & 0xf0) === 0xe0 ){
@@ -247,7 +250,7 @@ function UTF8Decode(buffer){
 				| ((0x3f & uint8[i + 1]) << 6)
 				| (0x3f & uint8[i + 2]);
 			codePoints.push(codePoint);
-			i += 2;
+			i += 3;
 		}
 		// 4-byte sequence (249 ~ )
 		else if( (codePoint & 0xF8) === 0xF0 ){
@@ -256,10 +259,21 @@ function UTF8Decode(buffer){
 				| ((0x3f & uint8[i + 2]) << 6)
 				| (0x3f & uint8[i + 3]);
 			codePoints.push(codePoint);
-			i += 3;
+			i += 4;
+		}
+		else {
+			i += 1;
 		}
 	}
-	return String.fromCodePoint(...codePoints);
+	
+	
+	
+	let result_string = "";
+	while(codePoints.length > 0) {
+		const chunk = codePoints.splice(0, UTF8_DECODE_CHUNK_SIZE);
+		result_string += String.fromCodePoint(...chunk);
+	}
+	return result_string;
 }
 
 function BitwiseNot(input){
@@ -281,8 +295,8 @@ function BitwiseAnd(a, b){
 		throw new TypeError("Given inputs must be ArrayBuffers!");
 	}
 	
-	const bufferA = new Uint8Array(input);
-	const bufferB = new Uint8Array(input);
+	const bufferA = new Uint8Array(a);
+	const bufferB = new Uint8Array(b);
 	for( let off = 0; off < bufferA.length; off++ ){
 		bufferA[off] = bufferA[off] & (bufferB[off] || 0);
 	}
@@ -295,8 +309,8 @@ function BitwiseOr(a, b){
 		throw new TypeError("Given inputs must be ArrayBuffers!");
 	}
 	
-	const bufferA = new Uint8Array(input);
-	const bufferB = new Uint8Array(input);
+	const bufferA = new Uint8Array(a);
+	const bufferB = new Uint8Array(b);
 	for( let off = 0; off < bufferA.length; off++ ){
 		bufferA[off] = bufferA[off] | (bufferB[off] || 0);
 	}
@@ -309,8 +323,8 @@ function BitwiseXor(a, b){
 		throw new TypeError("Given inputs must be ArrayBuffers!");
 	}
 	
-	const bufferA = new Uint8Array(input);
-	const bufferB = new Uint8Array(input);
+	const bufferA = new Uint8Array(a);
+	const bufferB = new Uint8Array(b);
 	for( let off = 0; off < bufferA.length; off++ ){
 		bufferA[off] = bufferA[off] ^ (bufferB[off] || 0);
 	}
@@ -432,9 +446,9 @@ function BitwiseCompareLE(a, b){
 	let B = new Uint8Array(b);
 	
 	let valA, valB;
-	for( let i = Math.max(A.length, B.length); i >= 0; i-- ){
-		valA = A[i] || 0;
-		valB = B[i] || 0;
+	for( let i = Math.max(A.length, B.length); i > 0; i-- ){
+		valA = A[i-1] || 0;
+		valB = B[i-1] || 0;
 		if( valA === valB ){
 			continue;
 		}
@@ -1041,6 +1055,15 @@ class BinaryData {
 				throw new RangeError( "BinaryData.toString only supports binary & hex representation!" );
 		}
 	}
+	compare(inst) {
+		return this.compareBE(inst);
+	}
+	compareLE(inst) {
+		return BitwiseCompareLE(this._ab, inst);
+	}
+	compareBE(inst) {
+		return BitwiseCompareBE(this._ab, inst);
+	}
 	
 	get size() {
 		return this._ab.byteLength;
@@ -1150,7 +1173,7 @@ class BinaryInt extends BinaryData {
 	
 	compare(value) {
 		const val = this.constructor.from(value);
-		return BitwiseCompareLE(this._ab, val._ab);
+		return this.compareLE(val._ab);
 	}
 	isZero() {
 		return BitwiseIsZero(this._ab);
@@ -3260,6 +3283,7 @@ class Deserializer {
 	}
 }
 
+
 window.beson = {
     Int8,  Int16,  Int32,  Int64,  Int128,  Int256,  Int512,  IntVar,
 	UInt8, UInt16, UInt32, UInt64, UInt128, UInt256, UInt512, UIntVar,
@@ -3268,5 +3292,4 @@ window.beson = {
     Serialize, Serializer,
     UTF8Encode, UTF8Decode, BitwiseCompareLE
 };
-
 })(window);

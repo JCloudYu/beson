@@ -380,13 +380,10 @@ test_group('beson testing', ()=>{
 			const serializer = Serializer.init().write(a).write(b).write(c.buffer);
 			const deserilzier = Deserializer.init(serializer.buffer);
 			
-			console.log(serializer, deserilzier);
 			
 			const _a = deserilzier.read();
 			const _b = deserilzier.read();
 			const _c = deserilzier.read();
-			
-			console.log(_a, _b);
 
 			assert(a === _a);
 			assert(_b instanceof Buffer);

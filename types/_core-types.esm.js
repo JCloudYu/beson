@@ -197,7 +197,7 @@ class BinaryInt extends BinaryData {
 	
 	compare(value) {
 		const val = this.constructor.from(value);
-		return this.compareLE(this._ab, val._ab);
+		return this.compareLE(val._ab);
 	}
 	isZero() {
 		return BitwiseIsZero(this._ab);
