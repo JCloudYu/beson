@@ -31,6 +31,15 @@ if ( typeof window !== "undefined" ) {
 }
 
 
+const Misc = {};
+Object.defineProperties(Misc, {
+	'DeserializeBuffer':{value:DeserializeBuffer, enumerable:true},
+	'Deserializer':{value:Deserializer, enumerable:true},
+	'Serializer':{value:Serializer, enumerable:true},
+	
+	'UTF8Encode':{value:UTF8Encode, enumerable:true},
+	'UTF8Decode':{value:UTF8Decode, enumerable:true}
+});
 
 Object.defineProperties(exports, {
 	'Int8':{value:Int8, enumerable:true},
@@ -54,13 +63,7 @@ Object.defineProperties(exports, {
 	'Float32':{value:Float32, enumerable:true},
 	
 	'Deserialize':{value:Deserialize, enumerable:true},
-	'DeserializeBuffer':{value:DeserializeBuffer, enumerable:true},
-	'Deserializer':{value:Deserializer, enumerable:true},
-	
 	'Serialize':{value:Serialize, enumerable:true},
-	'Serializer':{value:Serializer, enumerable:true},
-	
-	'UTF8Encode':{value:UTF8Encode, enumerable:true},
-	'UTF8Decode':{value:UTF8Decode, enumerable:true}
+	'Misc':{value:Misc, enumerable:true}
 });
 })();`;
