@@ -99,6 +99,10 @@ class BinaryData {
 	
 	
 	static isBinaryData(input){
+		if ( input instanceof BinaryData ) {
+			return true;
+		}
+	
 		if ( Object(input) !== input ) {
 			return false;
 		}
@@ -341,13 +345,15 @@ class BinaryInt extends BinaryData {
 	
 	
 	static isBinaryInt(input) {
+		if ( input instanceof BinaryInt ) {
+			return true;
+		}
+	
 		if ( !BinaryData.isBinaryData(input) ) {
 			return false;
 		}
 		
-		const present = !!Object.getOwnPropertyDescriptor(input, 'isSignedInt');
-		const inherit = !!Object.getOwnPropertyDescriptor(input.constructor.prototype, 'isSignedInt');
-		return present || inherit;
+		return typeof input.isSignedInt === 'boolean';
 	}
 }
 //@endexport
