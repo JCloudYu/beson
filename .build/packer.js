@@ -23,7 +23,8 @@
 	
 	// Read incoming arguments
 	{
-		const [, , basic_dir, tmpl_path, ...exec_args] = process.argv;
+		const exec_args = process.argv.slice(2);
+		const [tmpl_path, basic_dir] = exec_args.splice(exec_args.length-2);
 		exec_args.reverse();
 		
 		
@@ -253,11 +254,7 @@
 	}
 	function WriteToStream(stream, data){
 		return new Promise((resolve, reject)=>{
-			const should_wait = stream.write(data, ()=>resolve(true));
-			return;
-			if( !should_wait ){
-				reject(false);
-			}
+			stream.write(data, ()=>resolve(true));
 		});
 	}
 	function CloseStream(stream){

@@ -2,12 +2,12 @@
 *	Author: JCloudYu
 *	Create: 2018/10/23
 **/
-import {BinaryData} from "./_core-types.esm.js";
+import {BinaryData} from "src/types/_core-types.esm.js";
 import {
 	HexToBuffer,
 	BitwiseNot, BitwiseCompareBE, BitwiseLeftShiftBE, BitwiseRightShiftBE,
 	___SET_BINARY_BUFFER, ReadBuffer, MergeArrayBuffers
-} from "../helper.esm.js";
+} from "src/helper.esm.js";
 
 
 //@export=Binary

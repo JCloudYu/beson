@@ -2,8 +2,8 @@
  *	Author: JCloudYu
  *	Create: 2019/09/18
 **/
-import {DeserializeBuffer} from "./deserialize.esm.js";
-import {MergeArrayBuffers} from "./helper.esm.js";
+import {DeserializeBuffer} from "src/deserialize.esm.js";
+import {MergeArrayBuffers} from "src/helper.esm.js";
 
 
 

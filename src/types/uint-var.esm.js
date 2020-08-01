@@ -2,8 +2,8 @@
 * Author: JCloudYu
 * Create: 2018/09/24
 **/
-import {BinaryData, BinaryInt} from "./_core-types.esm.js";
-import {BufferFromBinStrLE, BufferFromHexStrLE, BufferFromIntStrLE, ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
+import {BinaryData, BinaryInt} from "src/types/_core-types.esm.js";
+import {BufferFromBinStrLE, BufferFromHexStrLE, BufferFromIntStrLE, ReadBuffer, ___SET_BINARY_BUFFER} from "src/helper.esm.js";
 
 
 //@export=BinaryVariableLengthInt

@@ -27,7 +27,7 @@ if ( (typeof module !== "undefined") && module.exports ) {
 }
 else
 if ( typeof window !== "undefined" ) {
-	exports = window.beson = window.beson||{};
+	exports = window.beson = window.Beson = window.Beson||{};
 }
 
 
@@ -40,7 +40,6 @@ Object.defineProperties(Misc, {
 	'UTF8Encode':{value:UTF8Encode, enumerable:true},
 	'UTF8Decode':{value:UTF8Decode, enumerable:true}
 });
-
 Object.defineProperties(exports, {
 	'Int8':{value:Int8, enumerable:true},
 	'Int16':{value:Int16, enumerable:true},

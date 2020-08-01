@@ -2,8 +2,8 @@
 *	Author: JCloudYu
 *	Create: 2018/12/04
 **/
-import {ReadBuffer, ___SET_BINARY_BUFFER} from "../helper.esm.js";
-import {BinaryData, BinaryInt} from "./_core-types.esm.js";
+import {ReadBuffer, ___SET_BINARY_BUFFER} from "src/helper.esm.js";
+import {BinaryData, BinaryInt} from "src/types/_core-types.esm.js";
 
 
 //@export=BinarySmallNumber

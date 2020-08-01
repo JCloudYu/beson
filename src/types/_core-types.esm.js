@@ -21,7 +21,7 @@ import {
 	DumpBinaryStringLE, DumpHexStringBE,
 	DumpHexStringLE,
 	DumpIntStringLE, ReadBuffer,
-} from "../helper.esm.js";
+} from "src/helper.esm.js";
 
 
 //@export=BinaryData

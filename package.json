@@ -1,11 +1,11 @@
 {
 	"name": "beson",
-	"version": "2.3.4",
+	"version": "3.0.1",
 	"description": "Yet an another binary representation of json format",
-	"main": "beson",
+	"main": "src/beson.js",
 	"scripts": {
-		"test": "node unit-test.js",
-		"pack-dist": "node ./dist/packer.js . ./dist/tmpl.js -o ./dist/beson.js"
+		"test": "node ./.test/unit-test.js",
+		"build": "node ./.build/packer.js -o ./beson.js ./.build/tmpl.js ./src"
 	},
 	"repository": {
 		"type": "git",

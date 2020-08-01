@@ -11,13 +11,13 @@ if ( !___IS_LITTLE_ENDIAN ) {
 
 export {___IS_LITTLE_ENDIAN};
 
-import {Serialize} from "./serialize.esm.js";
-import {Deserialize} from "./deserialize.esm.js";
+import {Serialize} from "src/serialize.esm.js";
+import {Deserialize} from "src/deserialize.esm.js";
 import {
 	Int8,  Int16,  Int32,  Int64,  Int128,  Int256,  Int512,  IntVar,
 	UInt8, UInt16, UInt32, UInt64, UInt128, UInt256, UInt512, UIntVar,
 	Float32
-} from "./beson-types.esm.js";
+} from "src/beson-types.esm.js";
 
 
 export const Beson = Object.freeze({
@@ -28,5 +28,5 @@ export const Beson = Object.freeze({
 	Int256, Int512, UInt256, UInt512,
 	IntVar, UIntVar
 });
-export {Serializer} from "./serializer.esm.js";
-export {Deserializer} from "./deserializer.esm.js";
+export {Serializer} from "src/serializer.esm.js";
+export {Deserializer} from "src/deserializer.esm.js";

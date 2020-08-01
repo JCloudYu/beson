@@ -1,9 +1,9 @@
-import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Decode, __COPY_BYTES} from "./helper.esm.js";
+import {HAS_NODE_BUFFER, DATA_TYPE, TYPE_HEADER, UTF8Decode, __COPY_BYTES} from "src/helper.esm.js";
 import {
 	Int8, Int16, Int32, Int64, Int128,
 	UInt8, UInt16, UInt32, UInt64, UInt128,
 	Int256, Int512, UInt256, UInt512, Float32
-} from "./beson-types.esm.js";
+} from "src/beson-types.esm.js";
 
 //@export=deserialize
 function Deserialize(buffer, throw_if_error=false) {

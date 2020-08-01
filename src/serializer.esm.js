@@ -2,8 +2,8 @@
  *	Author: JCloudYu
  *	Create: 2019/09/18
 **/
-import {SerializeData} from "./serialize.esm.js";
-import {MergeArrayBuffers} from "./helper.esm.js";
+import {SerializeData} from "src/serialize.esm.js";
+import {MergeArrayBuffers} from "src/helper.esm.js";
 
 
 //@export=Serializer
