@@ -1,8 +1,8 @@
 {
 	"name": "beson",
-	"version": "3.0.1",
+	"version": "3.0.2",
 	"description": "Yet an another binary representation of json format",
-	"main": "src/beson.js",
+	"main": "beson.js",
 	"scripts": {
 		"test": "node ./.test/unit-test.js",
 		"build": "node ./.build/packer.js -o ./beson.js ./.build/tmpl.js ./src"
