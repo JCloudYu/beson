@@ -41,6 +41,9 @@ Object.defineProperties(Misc, {
 	'UTF8Decode':{value:UTF8Decode, enumerable:true}
 });
 Object.defineProperties(exports, {
+	'BinaryData': {value:BinaryData, enumerable:true},
+	'BinaryInt': {value:BinaryInt, enumerable:true},
+
 	'Int8':{value:Int8, enumerable:true},
 	'Int16':{value:Int16, enumerable:true},
 	'Int32':{value:Int32, enumerable:true},

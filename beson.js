@@ -1094,7 +1094,6 @@ class BinaryData {
 		return check;
 	}
 }
-
 class BinaryInt extends BinaryData {
 	constructor() {
 		super();
@@ -2277,13 +2276,14 @@ function Serialize(data) {
 	return MergeArrayBuffers(chunks);
 }
 function SerializeData(data, data_cb) {
-	const type = __serializeType(data, data_cb);
-	__serializeTypeData(type, data, data_cb);
+	const type = __serializeType("$", data, data_cb);
+	__serializeTypeData("$", type, data, data_cb);
 }
 
 
 
-function __serializeType(data, data_cb) {
+function __serializeType(path, data, data_cb) {
+	if ( data === undefined ) return;
 	if ( data === null ) {
 		data_cb(Uint8Array.from([TYPE_HEADER.NULL]).buffer);
 		return DATA_TYPE.NULL;
@@ -2432,6 +2432,16 @@ function __serializeType(data, data_cb) {
 		return DATA_TYPE.FLOAT64_ARRAY;
 	}
 	
+	if (Object(data) === data) {
+		if ( typeof data.toBytes === "function" ) {
+			data_cb(Uint8Array.from([ TYPE_HEADER.UINT8_ARRAY ]).buffer);
+			return DATA_TYPE.BINARIZABLE;
+		}
+	
+		data_cb(Uint8Array.from([ TYPE_HEADER.OBJECT ]).buffer);
+		return DATA_TYPE.OBJECT;
+	}
+	
 	if (data_type === 'object') {
 		if ( typeof data.toBytes === "function" ) {
 			data_cb(Uint8Array.from([ TYPE_HEADER.UINT8_ARRAY ]).buffer);
@@ -2443,14 +2453,12 @@ function __serializeType(data, data_cb) {
 	}
 	
 	
-	
-	const error = new TypeError( "Given data cannot be serialized as beson!" );
-	error.detail = data;
-	
-	throw error;
+	console.error(`Given path ${path} cannot be serialized as beson! Skipping...`);
+	console.error(data);
+	return;
 }
-function __serializeTypeData(type, data, data_cb) {
-	if (type === DATA_TYPE.NULL || type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
+function __serializeTypeData(path, type, data, data_cb) {
+	if (type === undefined || type === DATA_TYPE.NULL || type === DATA_TYPE.FALSE || type === DATA_TYPE.TRUE) {
 		// null and boolean has no data payload
 		return;
 	}
@@ -2537,24 +2545,25 @@ function __serializeTypeData(type, data, data_cb) {
 		return;
 	}
 	
+	
+	
 	if (type === DATA_TYPE.ARRAY || type === DATA_TYPE.SET) {
-		return __serializeArrayAndSet(data, data_cb);
+		return __serializeArrayAndSet(path, data, data_cb);
 	}
 	
 	if (type === DATA_TYPE.OBJECT) {
-		return __serializeObject(data, data_cb);
+		return __serializeObject(path, data, data_cb);
 	}
 	
 	if (type === DATA_TYPE.MAP) {
-		return __serializeMap(data, data_cb);
+		return __serializeMap(path, data, data_cb);
 	}
 }
-
-function __serializeArrayAndSet(array, data_cb) {
+function __serializeArrayAndSet(path, array, data_cb) {
 	for ( let data of array ) {
 		if ( data === undefined ) { data = null; }
-		const type = __serializeType(data, data_cb);
-		__serializeTypeData(type, data, data_cb);
+		const type = __serializeType(path, data, data_cb);
+		__serializeTypeData(path, type, data, data_cb);
 	}
 	data_cb(SEQUENCE_END);
 }
@@ -2568,29 +2577,33 @@ function __serializeShortString(data, data_cb) {
 	data_cb(length_data);
 	data_cb(buffer);
 }
-function __serializeObject(object, data_cb) {
+function __serializeObject(path, object, data_cb) {
 	for ( let key in object ) {
 		const data = object[key];
 		if ( data === undefined ) continue;
 		
-		const type = __serializeType(data, data_cb);
+		path = `\`${path}\`.\`${key}\``;
+		const type = __serializeType(path, data, data_cb);
 		__serializeShortString(`${key}`, data_cb);
-		__serializeTypeData(type, data, data_cb);
+		__serializeTypeData(path, type, data, data_cb);
 	}
 	data_cb(SEQUENCE_END);
 }
-function __serializeMap(map, data_cb) {
+function __serializeMap(path, map, data_cb) {
+	
 	for ( let [key, data] of map ) {
 		if ( data === undefined ) continue;
 		
 		if ( Object(key) === key ) {
-			console.error( "You're serializing a Map that contains object key!" );
+			console.error( "You're serializing a Map that contains object key! Some object references will not be kept!" );
 		}
-		const key_type = __serializeType(key, data_cb);
-		__serializeTypeData(key_type, key, data_cb);
 		
-		const data_type = __serializeType(data, data_cb);
-		__serializeTypeData(data_type, data, data_cb);
+		path = `\`${path}\`.\`${key}\``;
+		const key_type = __serializeType(path, key, data_cb);
+		__serializeTypeData(path, key_type, key, data_cb);
+		
+		const data_type = __serializeType(path, data, data_cb);
+		__serializeTypeData(path, data_type, data, data_cb);
 	}
 	data_cb(SEQUENCE_END);
 }
@@ -3314,6 +3327,9 @@ Object.defineProperties(Misc, {
 	'UTF8Decode':{value:UTF8Decode, enumerable:true}
 });
 Object.defineProperties(exports, {
+	'BinaryData': {value:BinaryData, enumerable:true},
+	'BinaryInt': {value:BinaryInt, enumerable:true},
+
 	'Int8':{value:Int8, enumerable:true},
 	'Int16':{value:Int16, enumerable:true},
 	'Int32':{value:Int32, enumerable:true},

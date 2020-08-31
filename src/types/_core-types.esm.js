@@ -114,7 +114,6 @@ class BinaryData {
 		return check;
 	}
 }
-
 class BinaryInt extends BinaryData {
 	constructor() {
 		super();

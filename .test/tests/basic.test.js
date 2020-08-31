@@ -25,6 +25,16 @@ const MAX_UINT32 = 0xFFFFFFFF;
 init_context(()=>{
 	test_group('beson testing', ()=>{
 		test_group('beson Deserialize data is equal to original data', ()=>{
+			unit_test('Undefined', ()=>{
+				let original = undefined;
+				let test = Deserialize(Serialize(original));
+				assert(test === undefined);
+			});
+			unit_test('function', ()=>{
+				let original = ()=>{};
+				let test = Deserialize(Serialize(original));
+				assert(JSON.stringify(test) === '{}');
+			});
 			unit_test('Null', ()=>{
 				let original = null;
 				let test = Deserialize(Serialize(original));
