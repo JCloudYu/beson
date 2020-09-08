@@ -48,21 +48,10 @@ class BinaryData {
 	}
 	
 	toBytes(size=null) {
-		if (size === null) { return this._ba.slice(0); }
-		
+		size = (size===null) ? this._ba.length : size;
 		if ( typeof size !== "number" || size < 0 ) {
 			throw new Error( "Given size argument must be a number greater than zero!" );
 		}
-	
-		if ( this._ba.length === size ) {
-			return this._ba.slice(0);
-		}
-		
-		if ( this._ab.length > size ) {
-			return this._ba.slice(0, size);
-		}
-		
-		
 		const buffer = new Uint8Array(size);
 		buffer.set(this._ba);
 		return buffer;

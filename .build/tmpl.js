@@ -9,7 +9,6 @@ const writable=true, configurable=true, enumerable=false;
 ${'!beson'}
 ${'!helper'}
 ${'!BinaryData'}
-${'!Binary'}
 ${'!BinarySmallNumber'}
 ${'!BinaryVariableLengthInt'}
 ${'!UInt64'}
