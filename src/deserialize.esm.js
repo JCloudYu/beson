@@ -7,9 +7,21 @@ import {
 
 //@export=deserialize
 function Deserialize(buffer, throw_if_error=false) {
-	buffer = new Uint8Array(buffer);
+	let buff;
+	if ( buffer instanceof ArrayBuffer ) {
+		buff = new Uint8Array(buffer);
+	}
+	else 
+	if ( buffer instanceof Uint8Array ) {
+		buff = buffer;
+	}
+	else {
+		throw new TypeError("Given input must be an ArrayBuffer or an Uint8Array");
+	}
 
-	const result = DeserializeBuffer(buffer, 0);
+	
+
+	const result = DeserializeBuffer(buff, 0);
 	if ( result ) {
 		return result.value;
 	}

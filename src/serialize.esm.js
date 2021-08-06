@@ -14,7 +14,7 @@ function Serialize(data) {
 	SerializeData(data, (chunk)=>{
 		chunks.push(chunk);
 	});
-	return MergeArrayBuffers(chunks);
+	return new Uint8Array(MergeArrayBuffers(chunks));
 }
 function SerializeData(data, data_cb) {
 	const type = __serializeType("$", data, data_cb);
