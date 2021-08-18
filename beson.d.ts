@@ -1,8 +1,13 @@
+type TypedArray = Uint8Array|Uint8ClampedArray|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array|Float32Array|Float64Array;
 declare class BinaryInt {
+	_ab:ArrayBuffer;
+	_ba:Uint8Array;
+	_ta:TypedArray;
+	
 	isSignedInt:boolean;
 }
 
-export function Serialize(data:any):Uint8Array;
+export function Serialize(data:any):ArrayBuffer;
 export function Deserialize(data:ArrayBuffer|Uint8Array);
 export class Int8 extends BinaryInt {
 	static from(data:any):Int8;
