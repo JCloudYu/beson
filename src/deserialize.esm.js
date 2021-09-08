@@ -37,9 +37,9 @@ function Deserialize(buffer, throw_if_error=false) {
 function DeserializeBuffer(buffer, anchor=0) {
 	if ( HAS_NODE_BUFFER ) {
 		if ( buffer instanceof Buffer ) {
-			let buff = Buffer.alloc(buffer.length);
+			let buff = new Uint8Array(buffer.length);
 			buffer.copy(buff, 0);
-			buffer = buff.buffer;
+			buffer = buff;
 		}
 	}
 	
