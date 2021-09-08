@@ -32,7 +32,7 @@ declare class BinaryInt<T> extends BinaryIntBase {
 }
 
 export function Serialize(data:any):Uint8Array;
-export function Deserialize(data:ArrayBuffer|Uint8Array);
+export function Deserialize(data:ArrayBuffer|Uint8Array):any|undefined;
 export class Int8 extends BinaryInt<Int8>  {
 	static from(data:any):Int8;
 	static ZERO:Int8;
