@@ -28,7 +28,7 @@ declare class BinaryInt<T> extends BinaryIntBase {
 	compare(value:BinartIntLike<T>):boolean;
 	isZero():boolean;
 	toBytes():Uint8Array;
-	toString():string;
+	toString(radix?:2|10|16):string;
 }
 
 export function Serialize(data:any):Uint8Array;
